@@ -172,8 +172,8 @@ function initLeaderboardInteractivity() {
 // Prize Hub Initialization
 async function initPrizeHub() {
     try {
-        // Use deterministic cache busting from config
-        const response = await fetch('data/prizes.json?v=' + (new Date().toISOString().slice(0, 7).replace('-', '')));
+        // Fetch from database API
+        const response = await fetch('/api/prizes');
         const prizeData = await response.json();
         
         // Compute automatic states from dates

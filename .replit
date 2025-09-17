@@ -17,15 +17,15 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Static Server"
+args = "SpyFly Server"
 
 [[workflows.workflow]]
-name = "Static Server"
+name = "SpyFly Server"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python3 -m http.server 5000 --bind 0.0.0.0"
+args = "node server.js"
 waitForPort = 5000
 
 [workflows.workflow.metadata]
@@ -36,7 +36,7 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 41225
+localPort = 45455
 externalPort = 3000
 
 [deployment]
