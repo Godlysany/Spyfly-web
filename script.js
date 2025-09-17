@@ -45,6 +45,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Sound Controls
     initSoundControls();
     
+    // Initialize Prize System
+    initPrizeSystem();
+    
     // Smooth scrolling for navigation links
     initSmoothScrolling();
 });
@@ -580,4 +583,107 @@ function playSwoshSound() {
     const swoshSound = document.getElementById('swosh-sound');
     swoshSound.currentTime = 0; // Reset to beginning
     swoshSound.play().catch(e => console.log('Swosh sound play failed:', e));
+}
+
+// Prize System Functions
+async function initPrizeSystem() {
+    try {
+        const response = await fetch('data/prizes.json?v=' + Date.now());
+        const prizeData = await response.json();
+        
+        // Update hero banner
+        updateHeroPrizeBanner(prizeData);
+        
+        // Update leaderboard prize pill
+        updateLeaderboardPrizePill(prizeData);
+        
+        // Start countdown timers
+        startPrizeCountdowns(prizeData);
+        
+        // If on leaderboard page, initialize prize hub
+        if (window.location.pathname.includes('leaderboard.html')) {
+            initPrizeHub(prizeData);
+        }
+    } catch (error) {
+        console.log('Prize data loading failed:', error);
+    }
+}
+
+function updateHeroPrizeBanner(data) {
+    const banner = document.getElementById('prize-promotion-banner');
+    const headline = document.getElementById('prize-headline');
+    const countdown = document.getElementById('prize-countdown');
+    const ctaBtn = document.getElementById('prize-cta-btn');
+    
+    if (!banner || !data.current) return;
+    
+    const currentPrize = data.current;
+    const now = new Date();
+    const startDate = new Date(currentPrize.start_date);
+    const endDate = new Date(currentPrize.end_date);
+    
+    // Check if prize should be shown (active or within promo period)
+    const promoDays = data.config?.hero_promo_days_before_start || 7;
+    const promoStart = new Date(startDate.getTime() - (promoDays * 24 * 60 * 60 * 1000));
+    
+    if (now >= promoStart && now <= endDate) {
+        headline.textContent = currentPrize.highlight_copy;
+        ctaBtn.textContent = currentPrize.cta_text;
+        ctaBtn.href = currentPrize.cta_link;
+        
+        // Show banner
+        banner.style.display = 'block';
+        
+        // Update countdown
+        updateCountdown(countdown, endDate);
+    }
+}
+
+function updateLeaderboardPrizePill(data) {
+    const pill = document.getElementById('prize-pill');
+    if (!pill || !data.current) return;
+    
+    const currentPrize = data.current;
+    const amount = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(currentPrize.prize_pool_usd);
+    
+    pill.textContent = `💰 ${amount} Prize Pool`;
+    pill.style.display = 'inline-block';
+    pill.onclick = () => window.location.href = 'leaderboard.html#prize-hub';
+}
+
+function updateCountdown(element, endDate) {
+    function update() {
+        const now = new Date();
+        const diff = endDate - now;
+        
+        if (diff <= 0) {
+            element.textContent = 'Competition Ended';
+            return;
+        }
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        
+        element.textContent = `Ends in ${days}d ${hours}h ${minutes}m`;
+    }
+    
+    update();
+    setInterval(update, 60000); // Update every minute
+}
+
+function startPrizeCountdowns(data) {
+    // Start countdowns for any elements that need them
+    if (data.current) {
+        const endDate = new Date(data.current.end_date);
+        const countdownElements = document.querySelectorAll('.countdown-timer');
+        countdownElements.forEach(element => {
+            updateCountdown(element, endDate);
+        });
+    }
 }

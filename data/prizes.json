@@ -1,0 +1,78 @@
+{
+  "current": {
+    "id": "oct2025",
+    "title": "October Trading Championship",
+    "period": "October 2025",
+    "status": "active",
+    "start_date": "2025-10-01T00:00:00Z",
+    "end_date": "2025-10-31T23:59:59Z",
+    "prize_pool_usd": 15000,
+    "breakdown": [
+      {"place": 1, "amount_usd": 7500, "percent": 50},
+      {"place": 2, "amount_usd": 3750, "percent": 25},
+      {"place": 3, "amount_usd": 2250, "percent": 15},
+      {"place": "4-10", "amount_usd": 1500, "percent": 10, "split": true}
+    ],
+    "eligibility": {
+      "min_trades": 50,
+      "min_volume_usd": 10000,
+      "rules_url": "#prize-rules"
+    },
+    "highlight_copy": "🔥 $15K Prize Pool - Ends This Month!",
+    "cta_text": "JOIN COMPETITION",
+    "cta_link": "leaderboard.html#prize-hub"
+  },
+  "upcoming": {
+    "id": "nov2025", 
+    "title": "November Trading Championship",
+    "period": "November 2025",
+    "status": "upcoming",
+    "start_date": "2025-11-01T00:00:00Z",
+    "end_date": "2025-11-30T23:59:59Z",
+    "prize_pool_usd": 20000,
+    "highlight_copy": "🚀 $20K November Championship - Get Ready!",
+    "cta_text": "GET NOTIFIED",
+    "cta_link": "https://t.me/spyflybot"
+  },
+  "history": [
+    {
+      "id": "sep2025",
+      "title": "September Trading Championship", 
+      "period": "September 2025",
+      "status": "ended",
+      "start_date": "2025-09-01T00:00:00Z",
+      "end_date": "2025-09-30T23:59:59Z",
+      "prize_pool_usd": 12000,
+      "winners": [
+        {"place": 1, "username": "@crypto_king", "amount_usd": 6000, "tx_url": "https://solscan.io/tx/example1"},
+        {"place": 2, "username": "@whale_hunter", "amount_usd": 3000, "tx_url": "https://solscan.io/tx/example2"},
+        {"place": 3, "username": "@degen_lord", "amount_usd": 1800, "tx_url": "https://solscan.io/tx/example3"}
+      ],
+      "total_distributed": 12000
+    },
+    {
+      "id": "aug2025",
+      "title": "August Trading Championship",
+      "period": "August 2025", 
+      "status": "ended",
+      "start_date": "2025-08-01T00:00:00Z",
+      "end_date": "2025-08-31T23:59:59Z",
+      "prize_pool_usd": 10000,
+      "winners": [
+        {"place": 1, "username": "@alpha_master", "amount_usd": 5000, "tx_url": "https://solscan.io/tx/example4"},
+        {"place": 2, "username": "@profit_wizard", "amount_usd": 2500, "tx_url": "https://solscan.io/tx/example5"},
+        {"place": 3, "username": "@moon_rider", "amount_usd": 1500, "tx_url": "https://solscan.io/tx/example6"}
+      ],
+      "total_distributed": 10000
+    }
+  ],
+  "stats": {
+    "total_distributed_usd": 22000,
+    "total_winners": 6,
+    "months_active": 2
+  },
+  "config": {
+    "hero_promo_days_before_start": 7,
+    "cache_version": "2025.10"
+  }
+}

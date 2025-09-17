@@ -60,6 +60,20 @@
     <!-- Hero Section -->
     <section id="hero" class="section">
         <div class="container">
+            <!-- Prize Promotion Banner (Dynamic) -->
+            <div id="prize-promotion-banner" class="prize-banner" style="display: none;">
+                <div class="prize-content">
+                    <div class="prize-icon">🏆</div>
+                    <div class="prize-text">
+                        <div class="prize-headline" id="prize-headline">Loading...</div>
+                        <div class="prize-countdown" id="prize-countdown">Loading...</div>
+                    </div>
+                    <div class="prize-cta">
+                        <a href="#leaderboard-preview" id="prize-cta-btn" class="btn btn-prize">JOIN NOW</a>
+                    </div>
+                </div>
+            </div>
+            
             <h1 class="headline">Let SpyFly Sit in the Alpha Groups <span class="highlight-24-7">24/7</span> So You Don't Have To!</h1>
             <h2 class="subheadline">SpyFly silently scrapes Solana meme caller groups to find contract addresses before they send.</h2>
             
@@ -257,7 +271,10 @@
             <div class="leaderboard-mini-fullwidth">
                 <div class="leaderboard-header">
                     <h3>Weekly Leaders</h3>
-                    <span class="live-indicator">🔴 LIVE</span>
+                    <div class="header-pills">
+                        <span class="live-indicator">🔴 LIVE</span>
+                        <span id="prize-pill" class="prize-pill" style="display: none;">💰 Loading...</span>
+                    </div>
                 </div>
                 <div class="leaderboard-list">
                     <div class="leader-row rank-1">

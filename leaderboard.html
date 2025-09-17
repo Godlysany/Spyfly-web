@@ -30,6 +30,76 @@
         </nav>
     </header>
 
+    <!-- Prize Hub Section -->
+    <section id="prize-hub" class="section">
+        <div class="container">
+            <h1 class="section-title">🏆 Prize Championships</h1>
+            
+            <!-- Current Prize Competition -->
+            <div id="current-prize-section" class="prize-section" style="display: none;">
+                <div class="current-prize-card">
+                    <div class="prize-header">
+                        <h2 id="current-prize-title">Loading...</h2>
+                        <div class="prize-badges">
+                            <span class="prize-badge live">🔴 LIVE</span>
+                            <span class="prize-badge monthly">MONTHLY</span>
+                        </div>
+                    </div>
+                    <div class="prize-pool">
+                        <div class="pool-amount" id="current-prize-pool">$0</div>
+                        <div class="pool-label">Total Prize Pool</div>
+                    </div>
+                    <div class="prize-countdown-container">
+                        <div class="countdown-label">Competition Ends In:</div>
+                        <div class="countdown-timer" id="current-prize-countdown">00d 00h 00m</div>
+                    </div>
+                    <div class="prize-breakdown" id="current-prize-breakdown">
+                        <!-- Dynamic content -->
+                    </div>
+                    <div class="prize-actions">
+                        <a href="https://t.me/spyflybot" class="btn btn-primary btn-large">JOIN COMPETITION</a>
+                        <div class="eligibility-note">Min 50 trades • $10K volume</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Future Prizes -->
+            <div id="future-prizes-section" class="prize-section" style="display: none;">
+                <h3 class="subsection-title">Upcoming Championships</h3>
+                <div id="future-prizes-container">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+
+            <!-- Historical Impact -->
+            <div id="historic-impact-section" class="prize-section">
+                <h3 class="subsection-title">Historical Impact</h3>
+                <div class="impact-stats">
+                    <div class="impact-stat">
+                        <div class="impact-number" id="total-distributed">$0</div>
+                        <div class="impact-label">Total Distributed</div>
+                    </div>
+                    <div class="impact-stat">
+                        <div class="impact-number" id="total-winners">0</div>
+                        <div class="impact-label">Winners Paid</div>
+                    </div>
+                    <div class="impact-stat">
+                        <div class="impact-number" id="months-active">0</div>
+                        <div class="impact-label">Months Active</div>
+                    </div>
+                </div>
+                
+                <!-- Past Winners Carousel -->
+                <div class="past-winners">
+                    <h4>Recent Champions</h4>
+                    <div id="winners-carousel" class="winners-carousel">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Leaderboard Hero Section -->
     <section id="leaderboard-hero" class="section">
         <div class="container">
