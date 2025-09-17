@@ -172,8 +172,13 @@ function initLeaderboardInteractivity() {
 // Prize Hub Initialization
 async function initPrizeHub() {
     try {
-        const response = await fetch('data/prizes.json?v=' + Date.now());
+        // Use deterministic cache busting from config
+        const response = await fetch('data/prizes.json?v=' + (new Date().toISOString().slice(0, 7).replace('-', '')));
         const prizeData = await response.json();
+        
+        // Compute automatic states from dates
+        prizeData.current = computePrizeState(prizeData.current);
+        prizeData.upcoming = computePrizeState(prizeData.upcoming);
         
         updateCurrentPrizeSection(prizeData);
         updateFuturePrizesSection(prizeData);
@@ -311,4 +316,24 @@ function getPlaceEmoji(place) {
     if (place === 2) return '🥈';
     if (place === 3) return '🥉';
     return `#${place}`;
+}
+
+// Compute prize state automatically from dates (duplicate for leaderboard page)
+function computePrizeState(prize) {
+    if (!prize) return prize;
+    
+    const now = new Date();
+    const startDate = new Date(prize.start_date);
+    const endDate = new Date(prize.end_date);
+    
+    // Auto-compute status from dates (ignore manual status)
+    if (now >= startDate && now <= endDate) {
+        prize.computed_status = 'active';
+    } else if (now < startDate) {
+        prize.computed_status = 'upcoming';
+    } else {
+        prize.computed_status = 'ended';
+    }
+    
+    return prize;
 }

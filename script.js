@@ -588,8 +588,13 @@ function playSwoshSound() {
 // Prize System Functions
 async function initPrizeSystem() {
     try {
-        const response = await fetch('data/prizes.json?v=' + Date.now());
+        // Use deterministic cache busting from config
+        const response = await fetch('data/prizes.json?v=' + (new Date().toISOString().slice(0, 7).replace('-', '')));
         const prizeData = await response.json();
+        
+        // Compute automatic states from dates
+        prizeData.current = computePrizeState(prizeData.current);
+        prizeData.upcoming = computePrizeState(prizeData.upcoming);
         
         // Update hero banner
         updateHeroPrizeBanner(prizeData);
@@ -622,14 +627,18 @@ function updateHeroPrizeBanner(data) {
     const startDate = new Date(currentPrize.start_date);
     const endDate = new Date(currentPrize.end_date);
     
-    // Check if prize should be shown (active or within promo period)
+    // Check if prize should be shown (active or within promo period) - use computed status
     const promoDays = data.config?.hero_promo_days_before_start || 7;
     const promoStart = new Date(startDate.getTime() - (promoDays * 24 * 60 * 60 * 1000));
     
-    if (now >= promoStart && now <= endDate) {
+    // Show if currently active OR within promo period before start
+    const showPromo = (currentPrize.computed_status === 'active') || 
+                      (currentPrize.computed_status === 'upcoming' && now >= promoStart);
+    
+    if (showPromo && now <= endDate) {
         headline.textContent = currentPrize.highlight_copy;
         ctaBtn.textContent = currentPrize.cta_text;
-        ctaBtn.href = currentPrize.cta_link;
+        ctaBtn.href = currentPrize.cta_link || 'leaderboard.html#prize-hub'; // Fallback to safe target
         
         // Show banner
         banner.style.display = 'block';
@@ -686,4 +695,24 @@ function startPrizeCountdowns(data) {
             updateCountdown(element, endDate);
         });
     }
+}
+
+// Compute prize state automatically from dates
+function computePrizeState(prize) {
+    if (!prize) return prize;
+    
+    const now = new Date();
+    const startDate = new Date(prize.start_date);
+    const endDate = new Date(prize.end_date);
+    
+    // Auto-compute status from dates (ignore manual status)
+    if (now >= startDate && now <= endDate) {
+        prize.computed_status = 'active';
+    } else if (now < startDate) {
+        prize.computed_status = 'upcoming';
+    } else {
+        prize.computed_status = 'ended';
+    }
+    
+    return prize;
 }
