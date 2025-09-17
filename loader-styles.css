@@ -1,17 +1,22 @@
 /* Stunning Loader Animation Styles */
 .loader-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    inset: 0;
     background: linear-gradient(135deg, #001213, #000);
-    z-index: 10000;
+    z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+body.loading .loader-overlay {
     opacity: 1;
-    transition: opacity 0.8s ease-out;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 .loader-overlay.fade-out {
