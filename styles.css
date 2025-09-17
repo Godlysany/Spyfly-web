@@ -1677,6 +1677,24 @@ body.loading .loader-overlay {
    LEADERBOARD PAGE STYLES - SPYFLY 2025  
    =================================================================== */
 
+/* Hide fly game elements on leaderboard page - they were covering content */
+.leaderboard-page #flying-fly,
+.leaderboard-page #fly-swatter,
+.leaderboard-page #sound-control {
+    display: none !important;
+}
+
+/* Ensure leaderboard sections are visible above any overlays */
+.leaderboard-page #leaderboard-hero,
+.leaderboard-page #leaderboard-controls,
+.leaderboard-page #main-leaderboard,
+.leaderboard-page #footer {
+    position: relative;
+    z-index: 10;
+    opacity: 1;
+    visibility: visible;
+}
+
 .leaderboard-page {
     background: var(--dark-bg);
     min-height: 100vh;
