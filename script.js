@@ -391,6 +391,9 @@ function initFlySwatter() {
         // Check if we hit the fly
         if (checkFlyHit(e.clientX, e.clientY)) {
             smackFlySuccess();
+        } else {
+            // Miss - swatter should NOT return to corner on miss
+            console.log('Miss! Try again!');
         }
         
         e.stopPropagation();
@@ -429,16 +432,16 @@ function initFlySwatter() {
     }
     
     function doSmackAnimation() {
-        // Add smack animation
-        swatter.classList.add('smack-animation');
+        // Add smack animation (CSS class is 'smack' not 'smack-animation')
+        swatter.classList.add('smack');
         
         // Play swosh sound
         playSwoshSound();
         
         // Remove animation class after it completes
         setTimeout(() => {
-            swatter.classList.remove('smack-animation');
-        }, 400);
+            swatter.classList.remove('smack');
+        }, 300);
     }
     
     function checkFlyHit(clickX, clickY) {
