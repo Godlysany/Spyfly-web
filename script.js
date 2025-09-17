@@ -545,3 +545,41 @@ function playSwoshSound() {
     swoshSound.currentTime = 0; // Reset to beginning
     swoshSound.play().catch(e => console.log('Swosh sound play failed:', e));
 } 
+// Stunning Loader Animation Controller
+function initLoaderAnimation() {
+    const overlay = document.getElementById("loader");
+    if (!overlay) return;
+    
+    // Add loading class to body
+    document.body.classList.add("loading");
+    
+    // Sequence timing:
+    // 0-2s: Icon spinning and growing
+    // 2-2.6s: Impact rings explosion 
+    // 2.6s: Boom effect and screen flash
+    // 2.6-3.4s: Crack effect and shards
+    // 3.4s: Fade out and reveal content
+    
+    // Add boom effect for screen flash
+    setTimeout(() => {
+        overlay.classList.add("boom");
+    }, 2600);
+    
+    // Start fade out and reveal content
+    setTimeout(() => {
+        overlay.classList.add("fade-out");
+        document.body.classList.remove("loading");
+    }, 3400);
+    
+    // Remove loader from DOM after fade completes
+    overlay.addEventListener("transitionend", (e) => {
+        if (e.propertyName === "opacity" && overlay.classList.contains("fade-out")) {
+            overlay.remove();
+        }
+    });
+}
+
+// Initialize loader on page load
+document.addEventListener("DOMContentLoaded", function() {
+    initLoaderAnimation();
+});

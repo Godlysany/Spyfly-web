@@ -97,7 +97,8 @@ nav ul li a {
     background: linear-gradient(135deg, var(--purple-color), var(--primary-color)) !important;
     background-color: transparent !important;
     color: #ffffff !important;
-    transform: translateY(-5px) scale(1.05) !important;
+    border: 2px solid transparent !important;
+    transform: translateY(-3px) scale(1.02) !important;
 }
 
 .genesis-cta .btn-genesis:hover,
@@ -124,6 +125,15 @@ nav ul li a {
     font-weight: 400;
 }
 
+/* Button Text Alignment Fix */
+.btn, .btn-primary, .btn-secondary {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+}
+
 /* Logo Preparation for Image */
 .logo {
     display: flex;
@@ -135,6 +145,11 @@ nav ul li a {
     height: 40px;
     width: auto;
     object-fit: contain;
+}
+
+/* Hide h1 text to show only logo - LOGO REPLACEMENT FIX */
+.logo h1 {
+    display: none !important;
 }
 
 /* Enhanced Shadows with New Colors */
@@ -168,6 +183,33 @@ nav ul li a:hover::after {
     font-weight: 900 !important;
 }
 
+/* Navbar CTA Button - Right Side */
+.nav-cta-btn {
+    background: linear-gradient(135deg, var(--purple-color), var(--primary-color)) !important;
+    color: #ffffff !important;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+    margin-left: 20px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: "Inter", sans-serif;
+}
+
+.nav-cta-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(153, 69, 255, 0.4);
+    color: #ffffff !important;
+    text-decoration: none !important;
+}
+
+.nav-cta-btn::after {
+    display: none !important;
+}
+
 /* Header CTA Button */
 .header-cta-btn {
     background: linear-gradient(135deg, var(--purple-color), var(--primary-color)) !important;
@@ -199,7 +241,7 @@ nav ul li a:hover::after {
 
 .leaderboard-preview-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1.2fr;
     gap: 40px;
     margin-bottom: 40px;
     align-items: start;
@@ -357,4 +399,52 @@ nav ul li a:hover::after {
     .stat-number {
         font-size: 2rem;
     }
+}
+
+/* FAQ Section Styles */
+#faq {
+    background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+}
+
+.faq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+/* FAQ Mobile Fix - Single column on very small screens */
+@media (max-width: 480px) {
+    .faq-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.faq-item {
+    background: rgba(45, 212, 127, 0.05);
+    border: 1px solid rgba(45, 212, 127, 0.2);
+    border-radius: 16px;
+    padding: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.faq-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(45, 212, 127, 0.2);
+}
+
+.faq-question {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.faq-answer {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-color);
+    opacity: 0.9;
 }

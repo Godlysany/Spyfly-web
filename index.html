@@ -8,11 +8,38 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="corporate-identity.css?v=20250917">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="loader-styles.css">
 </head>
 <body>
+    <!-- Loader Overlay START -->
+    <div id="loader" class="loader-overlay">
+        <div class="loader-container">
+            <div class="loader-glow"></div>
+            <div class="loader-icon">
+                <img src="icon.png" alt="Loading" class="loader-image" onerror="this.src='favicon.png'" />
+            </div>
+            <div class="impact-rings">
+                <span class="ring ring-1"></span>
+                <span class="ring ring-2"></span>
+                <span class="ring ring-3"></span>
+            </div>
+            <div class="crack-effect"></div>
+            <div class="screen-shatter">
+                <div class="shard shard-1"></div>
+                <div class="shard shard-2"></div>
+                <div class="shard shard-3"></div>
+                <div class="shard shard-4"></div>
+                <div class="shard shard-5"></div>
+                <div class="shard shard-6"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Loader Overlay END -->
+    <div class="main-content">
     <!-- Header with Navigation -->
     <header id="header">
         <div class="logo">
+            <img src="logo.png" alt="SpyFly Logo">
             <h1>SpyFly</h1>
         </div>
         <nav>
@@ -21,8 +48,9 @@
                 <li><a href="#how-it-works">How It Works</a></li>
                 <li><a href="#highlights">Highlights</a></li>
                 <li><a href="#about">About</a></li>
-                <li><a href="leaderboard.html" class="header-cta-btn">🏆 Leaderboard</a></li>
+                <li><a href="#faq">FAQ</a></li>
                 <li><a href="https://spyfly.gitbook.io/never-miss-an-alpha" target="_blank" rel="noopener noreferrer">Docs</a></li>
+                <li><a href="leaderboard.html" class="header-cta-btn nav-cta-btn">🏆 Leaderboard</a></li>
             </ul>
         </nav>
     </header>
@@ -293,6 +321,39 @@
         </div>
     </section>
 
+    <!-- FAQ Section -->
+    <section id="faq" class="section">
+        <div class="container">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3 class="faq-question">What is SpyFly?</h3>
+                    <p class="faq-answer">SpyFly is a sophisticated, Telegram-based Solana trading bot designed to help crypto traders effortlessly identify and capitalize on profitable meme-token opportunities. By silently tracking your top alpha caller groups, SpyFly captures valuable trading signals and executes trades automatically based on your predefined settings — without ever needing to be installed or added to those groups.</p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">How does SpyFly ensure security?</h3>
+                    <p class="faq-answer">SpyFly operates with advanced encryption and never stores your private keys. All trading operations use secure wallet connections, and you maintain full control over your funds. The bot only executes trades based on your predefined settings and trusted caller filters.</p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">Who is Jeffrey?</h3>
+                    <p class="faq-answer">Jeffrey wasn't always a SpyFly. Once a humble meme trader, he spent countless hours glued to Telegram channels, chasing alpha and dodging rug pulls. Exhausted and frustrated by front-running jeeters, Jeffrey transformed into SpyFly - a stealthy and vigilant spy with high-tech goggles, rapid-fire typing skills, and a Solana-powered backpack.</p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">What are the key features?</h3>
+                    <p class="faq-answer">SpyFly offers instant signal detection, automatic token buying, customizable filters for trusted callers and market cap thresholds, detailed risk management with stop-loss and take-profit levels, and 24/7 operation without needing admin access to groups.</p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">How do I get started?</h3>
+                    <p class="faq-answer">Simply deploy SpyFly by clicking the "Deploy SpyFly" button, connect your Telegram, configure your trading preferences including trusted callers and filters, and let SpyFly monitor your alpha groups 24/7 to execute profitable trades automatically.</p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">Is SpyFly trustworthy?</h3>
+                    <p class="faq-answer">SpyFly operates transparently with a public leaderboard showing real trader results. The bot never has access to your private keys, uses secure wallet connections, and you maintain full control over your funds and trading settings at all times.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer Section -->
     <footer id="footer">
         <div class="container">
@@ -336,5 +397,6 @@
     </audio>
 
     <script src="script.js"></script>
+    </div><!-- /.main-content -->
 </body>
 </html> 
