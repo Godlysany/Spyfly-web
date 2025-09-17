@@ -129,6 +129,20 @@ h1, h2, h3, .section-title, .headline, .genesis-title {
     gap: 10px;
 }
 
+.logo-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+.logo-link:hover {
+    transform: scale(1.05);
+    color: var(--primary-color);
+}
+
 #header .logo img {
     height: 56px !important;
     width: auto !important;
@@ -141,18 +155,6 @@ h1, h2, h3, .section-title, .headline, .genesis-title {
     display: none;
 }
 
-#header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 18px 28px;
-    background-color: var(--darker-bg);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 20px rgba(153, 69, 255, 0.2);
-    transition: all 0.3s ease;
-}
 
 #header nav {
     flex: 1;
