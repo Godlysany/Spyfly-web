@@ -167,3 +167,194 @@ nav ul li a:hover::after {
     font-family: 'Orbitron', monospace !important;
     font-weight: 900 !important;
 }
+
+/* Header CTA Button */
+.header-cta-btn {
+    background: linear-gradient(135deg, var(--purple-color), var(--primary-color)) !important;
+    color: #ffffff !important;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-right: 20px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: "Inter", sans-serif;
+}
+
+.header-cta-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(153, 69, 255, 0.4);
+    color: #ffffff !important;
+}
+
+/* Leaderboard Preview Section */
+#leaderboard-preview {
+    background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+    position: relative;
+    overflow: hidden;
+}
+
+.leaderboard-preview-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+    align-items: start;
+}
+
+.leaderboard-stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.stat-card {
+    background: rgba(45, 212, 127, 0.1);
+    border: 1px solid rgba(45, 212, 127, 0.3);
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(45, 212, 127, 0.2);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.stat-number {
+    font-family: "Orbitron", monospace !important;
+    font-size: 2.5rem;
+    font-weight: 700 !important;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: var(--text-color);
+    opacity: 0.9;
+    font-family: "Inter", sans-serif;
+}
+
+.leaderboard-mini {
+    background: rgba(153, 69, 255, 0.05);
+    border: 1px solid rgba(153, 69, 255, 0.2);
+    border-radius: 16px;
+    padding: 25px;
+}
+
+.leaderboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(45, 212, 127, 0.2);
+}
+
+.leaderboard-header h3 {
+    font-family: "Orbitron", monospace !important;
+    font-weight: 700 !important;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.live-indicator {
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-family: "Inter", sans-serif;
+}
+
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.leader-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 80px 50px;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(45, 212, 127, 0.1);
+}
+
+.leader-row:last-child {
+    border-bottom: none;
+}
+
+.rank {
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.username {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-family: "Inter", sans-serif;
+}
+
+.pnl.positive {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-family: "Orbitron", monospace;
+    font-size: 0.9rem;
+}
+
+.winrate {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-family: "Orbitron", monospace;
+    font-size: 0.9rem;
+}
+
+.leaderboard-cta {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, rgba(153, 69, 255, 0.1), rgba(45, 212, 127, 0.1));
+    border-radius: 16px;
+    border: 1px solid rgba(45, 212, 127, 0.3);
+}
+
+.leaderboard-cta h3 {
+    font-family: "Orbitron", monospace !important;
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.leaderboard-cta p {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    opacity: 0.9;
+    margin-bottom: 25px;
+    font-family: "Inter", sans-serif;
+}
+
+/* Mobile Responsiveness for Leaderboard */
+@media (max-width: 768px) {
+    .leaderboard-preview-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .leader-row {
+        grid-template-columns: 30px 1fr 70px 40px;
+        gap: 10px;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+}

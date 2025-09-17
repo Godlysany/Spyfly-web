@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpyFly Leaderboard - Top Performers</title>
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="corporate-identity.css?v=20250917">
+    <link rel="stylesheet" href="leaderboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="leaderboard-page">
+    <!-- Header with Navigation -->
+    <header id="header">
+        <div class="logo">
+            <h1><a href="index.html">SpyFly</a></h1>
+        </div>
+        <nav>
+            <a href="index.html" class="back-btn">← Back to Home</a>
+            <ul>
+                <li><a href="index.html#hero">Home</a></li>
+                <li><a href="index.html#how-it-works">How It Works</a></li>
+                <li><a href="#leaderboard" class="active">🏆 Leaderboard</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Leaderboard Hero Section -->
+    <section id="leaderboard-hero" class="section">
+        <div class="container">
+            <h1 class="headline">🏆 SpyFly Elite Leaderboard</h1>
+            <h2 class="subheadline">Real traders, real results. See who's dominating the alpha game.</h2>
+            
+            <!-- Live Stats Banner -->
+            <div class="stats-banner">
+                <div class="stat-item">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value">1,247</div>
+                    <div class="stat-label">Active Traders</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value">$18.3M</div>
+                    <div class="stat-label">Total Volume</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-value">89.2%</div>
+                    <div class="stat-label">Avg Win Rate</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🚀</div>
+                    <div class="stat-value">2,847</div>
+                    <div class="stat-label">Trades Today</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leaderboard Controls -->
+    <section id="leaderboard-controls" class="section">
+        <div class="container">
+            <div class="controls-header">
+                <div class="period-selector">
+                    <button class="period-btn active" data-period="weekly">Weekly</button>
+                    <button class="period-btn" data-period="monthly">Monthly</button>
+                    <button class="period-btn" data-period="alltime">All Time</button>
+                </div>
+                <div class="metric-selector">
+                    <select id="metric-select">
+                        <option value="pnl">Best PnL</option>
+                        <option value="volume">Most Volume</option>
+                        <option value="winrate">Best Win Rate</option>
+                    </select>
+                </div>
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    <span>Live Data</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Leaderboard Table -->
+    <section id="main-leaderboard" class="section">
+        <div class="container">
+            <div class="leaderboard-table-container">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Trader</th>
+                            <th>PnL</th>
+                            <th>Volume</th>
+                            <th>Win Rate</th>
+                            <th>Trades</th>
+                            <th>Best Trade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-data">
+                        <tr class="rank-1">
+                            <td><span class="rank-medal">🥇</span> 1</td>
+                            <td class="trader-cell">
+                                <div class="trader-info">
+                                    <span class="username">@crypto_wizard</span>
+                                    <span class="badge premium">GENESIS</span>
+                                </div>
+                            </td>
+                            <td class="pnl positive">+$47,234</td>
+                            <td class="volume">$892K</td>
+                            <td class="winrate excellent">94.2%</td>
+                            <td>127</td>
+                            <td class="best-trade">+$12.4K</td>
+                        </tr>
+                        <tr class="rank-2">
+                            <td><span class="rank-medal">🥈</span> 2</td>
+                            <td class="trader-cell">
+                                <div class="trader-info">
+                                    <span class="username">@alpha_hunter</span>
+                                    <span class="badge vip">VIP</span>
+                                </div>
+                            </td>
+                            <td class="pnl positive">+$38,967</td>
+                            <td class="volume">$743K</td>
+                            <td class="winrate excellent">89.7%</td>
+                            <td>94</td>
+                            <td class="best-trade">+$18.2K</td>
+                        </tr>
+                        <tr class="rank-3">
+                            <td><span class="rank-medal">🥉</span> 3</td>
+                            <td class="trader-cell">
+                                <div class="trader-info">
+                                    <span class="username">@moon_sniper</span>
+                                    <span class="badge premium">GENESIS</span>
+                                </div>
+                            </td>
+                            <td class="pnl positive">+$31,785</td>
+                            <td class="volume">$654K</td>
+                            <td class="winrate good">85.3%</td>
+                            <td>108</td>
+                            <td class="best-trade">+$9.8K</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td class="trader-cell">
+                                <div class="trader-info">
+                                    <span class="username">@degen_king</span>
+                                </div>
+                            </td>
+                            <td class="pnl positive">+$28,432</td>
+                            <td class="volume">$567K</td>
+                            <td class="winrate good">82.1%</td>
+                            <td>85</td>
+                            <td class="best-trade">+$15.6K</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td class="trader-cell">
+                                <div class="trader-info">
+                                    <span class="username">@fly_whisperer</span>
+                                    <span class="badge vip">VIP</span>
+                                </div>
+                            </td>
+                            <td class="pnl positive">+$24,891</td>
+                            <td class="volume">$498K</td>
+                            <td class="winrate good">78.9%</td>
+                            <td>76</td>
+                            <td class="best-trade">+$11.2K</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Join Competition CTA -->
+            <div class="join-competition">
+                <h3>Ready to Compete?</h3>
+                <p>Start your SpyFly journey and see your name climb the leaderboard</p>
+                <a href="https://t.me/spyfly_bot" class="btn btn-primary">JOIN THE COMPETITION</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="copyright">
+                    <p>&copy; 2025 SpyFly. All rights reserved.</p>
+                </div>
+                <div class="social-links">
+                    <a href="https://x.com/spyfly_app" class="social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-x-twitter"></i></a>
+                    <a href="https://t.me/spyflymainchat" class="social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="leaderboard.js"></script>
+</body>
+</html>
