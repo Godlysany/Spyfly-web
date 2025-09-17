@@ -426,10 +426,12 @@ function initFlySwatter() {
         const centerX = clientX - (swatter.offsetWidth / 2);
         const centerY = clientY - (swatter.offsetHeight / 2);
         
-        // Use transform instead of left/top for better performance
+        // Clear any previous positioning and use transform for smooth following
+        swatter.style.left = '';
+        swatter.style.top = '';
+        swatter.style.right = '';
+        swatter.style.bottom = '';
         swatter.style.transform = `translate(${centerX}px, ${centerY}px)`;
-        swatter.style.left = '0';
-        swatter.style.top = '0';
         
         if (e.type === 'touchmove') {
             e.preventDefault();
@@ -530,10 +532,11 @@ function initFlySwatter() {
         swatter.classList.remove('picked-up');
         swatter.classList.add('returning');
         
-        // Reset to original position
+        // Reset to original position - CRITICAL: Clear transform too!
         swatter.style.position = 'fixed';
         swatter.style.left = '';
         swatter.style.top = '';
+        swatter.style.transform = ''; // Clear any transform that was applied during mouse follow
         swatter.style.right = '20px';
         swatter.style.bottom = '20px';
         
