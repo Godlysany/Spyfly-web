@@ -419,12 +419,14 @@ function initFlySwatter() {
         const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
         const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
         
-        // Center the spatula on cursor
+        // Use transform for better performance and smoother movement
         const centerX = clientX - (swatter.offsetWidth / 2);
         const centerY = clientY - (swatter.offsetHeight / 2);
         
-        swatter.style.left = centerX + 'px';
-        swatter.style.top = centerY + 'px';
+        // Use transform instead of left/top for better performance
+        swatter.style.transform = `translate(${centerX}px, ${centerY}px)`;
+        swatter.style.left = '0';
+        swatter.style.top = '0';
         
         if (e.type === 'touchmove') {
             e.preventDefault();
