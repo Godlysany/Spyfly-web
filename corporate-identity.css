@@ -448,3 +448,48 @@ nav ul li a:hover::after {
     color: var(--text-color);
     opacity: 0.9;
 }
+
+/* CRITICAL FIXES - Final overrides */
+
+/* 1. Hide header text completely - logo should replace text */
+#header .logo h1 { 
+    display: none !important; 
+}
+
+/* 2. Move leaderboard button to far right */
+#header nav { 
+    flex: 1; 
+}
+
+#header nav ul { 
+    width: 100%; 
+    display: flex; 
+    align-items: center; 
+    gap: 30px; 
+}
+
+#header nav ul li:last-child { 
+    margin-left: auto; 
+}
+
+/* Keep underline off for the CTA button */
+.nav-cta-btn::after { 
+    display: none !important; 
+}
+
+/* 3. Fix deploy button text centering */
+.btn, .btn-primary, .btn-secondary { 
+    display: inline-flex !important; 
+    align-items: center !important; 
+    justify-content: center !important; 
+    line-height: 1 !important; 
+    padding: 12px 22px !important; 
+    min-height: 44px;
+}
+
+/* 4. Remove green border on Follow button hover */
+.btn-secondary:hover { 
+    border-color: transparent !important; 
+    outline: none !important; 
+    box-shadow: 0 12px 35px rgba(153,69,255,0.5) !important; 
+}
