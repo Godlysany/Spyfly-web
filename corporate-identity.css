@@ -17,6 +17,31 @@ h1, h2, h3 {
     font-weight: 700 !important;
 }
 
+/* Stronger specificity for specific elements */
+#hero .headline {
+    font-family: 'Orbitron', monospace !important;
+    font-weight: 700 !important;
+}
+
+#genesis-pass .genesis-title {
+    font-family: 'Orbitron', monospace !important;
+    font-weight: 900 !important;
+}
+
+#header .logo h1 {
+    font-family: 'Orbitron', monospace !important;
+    font-weight: 700 !important;
+}
+
+/* Override all section titles specifically */
+#how-it-works .section-title,
+#highlights .section-title,
+#meet-jeffrey .section-title,
+#about .section-title {
+    font-family: 'Orbitron', monospace !important;
+    font-weight: 700 !important;
+}
+
 /* Body text - Inter Regular */
 body, p, span, div, a {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -27,9 +52,11 @@ nav ul li a {
     font-weight: 500;
 }
 
-/* Gradient Buttons - Purple to Green */
+/* Gradient Buttons - Purple to Green - Stronger Specificity */
+.cta-buttons .btn-primary,
 .btn-primary {
     background: linear-gradient(135deg, var(--purple-color), var(--primary-color)) !important;
+    background-color: transparent !important;
     color: #ffffff !important;
     border: none !important;
     font-family: 'Inter', sans-serif !important;
@@ -37,8 +64,10 @@ nav ul li a {
     box-shadow: 0 8px 25px rgba(153, 69, 255, 0.3) !important;
 }
 
+.cta-buttons .btn-secondary,
 .btn-secondary {
     background: linear-gradient(135deg, rgba(153, 69, 255, 0.15), rgba(45, 212, 127, 0.15)) !important;
+    background-color: transparent !important;
     color: var(--primary-color) !important;
     border: 2px solid var(--primary-color) !important;
     font-family: 'Inter', sans-serif !important;
@@ -46,25 +75,32 @@ nav ul li a {
     backdrop-filter: blur(10px);
 }
 
+.genesis-cta .btn-genesis,
 .btn-genesis {
     background: linear-gradient(135deg, var(--purple-color), var(--primary-color)) !important;
     font-family: 'Inter', sans-serif !important;
     box-shadow: 0 12px 35px rgba(153, 69, 255, 0.4) !important;
 }
 
-/* Button Hover Effects */
+/* Button Hover Effects - Stronger Specificity */
+.cta-buttons .btn-primary:hover,
 .btn-primary:hover {
     background: linear-gradient(135deg, #7c3aed, #22c55e) !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
     transform: translateY(-5px) scale(1.05) !important;
     box-shadow: 0 12px 35px rgba(153, 69, 255, 0.5) !important;
 }
 
+.cta-buttons .btn-secondary:hover,
 .btn-secondary:hover {
     background: linear-gradient(135deg, var(--purple-color), var(--primary-color)) !important;
+    background-color: transparent !important;
     color: #ffffff !important;
     transform: translateY(-5px) scale(1.05) !important;
 }
 
+.genesis-cta .btn-genesis:hover,
 .btn-genesis:hover {
     background: linear-gradient(135deg, #7c3aed, #22c55e) !important;
     transform: translateY(-5px) scale(1.05) !important;
@@ -128,4 +164,6 @@ nav ul li a:hover::after {
 .genesis-title {
     color: var(--primary-color) !important;
     text-shadow: 0 0 30px rgba(45, 212, 127, 0.5) !important;
+    font-family: 'Orbitron', monospace !important;
+    font-weight: 900 !important;
 }
