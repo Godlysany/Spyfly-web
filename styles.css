@@ -2402,6 +2402,61 @@ nav ul li a.active {
     box-shadow: 0 5px 20px rgba(153, 69, 255, 0.4);
 }
 
+/* Additional Prize System Styles */
+.future-prize-card {
+    background: var(--darker-bg);
+    border: 1px solid rgba(153, 69, 255, 0.3);
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+}
+
+.future-prize-card h4 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.future-pool {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 10px 0;
+}
+
+.future-start {
+    color: #ffffff;
+    opacity: 0.8;
+    margin-bottom: 20px;
+}
+
+.winner-period {
+    color: #ffffff;
+    opacity: 0.7;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+.eligibility-note {
+    color: #ffffff;
+    opacity: 0.7;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+.winners-carousel::-webkit-scrollbar {
+    height: 6px;
+}
+
+.winners-carousel::-webkit-scrollbar-track {
+    background: var(--darker-bg);
+    border-radius: 3px;
+}
+
+.winners-carousel::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+}
+
 /* Mobile Responsiveness for Leaderboard */
 @media (max-width: 768px) {
     .stats-banner {

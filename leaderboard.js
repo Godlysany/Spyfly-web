@@ -164,4 +164,151 @@ function initLeaderboardInteractivity() {
 
     // Initialize with default view
     updateLeaderboard();
+    
+    // Initialize Prize Hub
+    initPrizeHub();
+}
+
+// Prize Hub Initialization
+async function initPrizeHub() {
+    try {
+        const response = await fetch('data/prizes.json?v=' + Date.now());
+        const prizeData = await response.json();
+        
+        updateCurrentPrizeSection(prizeData);
+        updateFuturePrizesSection(prizeData);
+        updateHistoricImpactSection(prizeData);
+        
+    } catch (error) {
+        console.log('Prize Hub initialization failed:', error);
+    }
+}
+
+function updateCurrentPrizeSection(data) {
+    const section = document.getElementById('current-prize-section');
+    const title = document.getElementById('current-prize-title');
+    const pool = document.getElementById('current-prize-pool');
+    const countdown = document.getElementById('current-prize-countdown');
+    const breakdown = document.getElementById('current-prize-breakdown');
+    
+    if (!section || !data.current) return;
+    
+    const current = data.current;
+    
+    title.textContent = current.title;
+    pool.textContent = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(current.prize_pool_usd);
+    
+    // Generate breakdown
+    if (current.breakdown) {
+        breakdown.innerHTML = current.breakdown.map(item => `
+            <div class="breakdown-item">
+                <div class="breakdown-place">${item.place}${getPlaceSuffix(item.place)}</div>
+                <div class="breakdown-amount">$${item.amount_usd.toLocaleString()}</div>
+            </div>
+        `).join('');
+    }
+    
+    // Start countdown
+    const endDate = new Date(current.end_date);
+    updatePrizeCountdown(countdown, endDate);
+    
+    section.style.display = 'block';
+}
+
+function updateFuturePrizesSection(data) {
+    const section = document.getElementById('future-prizes-section');
+    const container = document.getElementById('future-prizes-container');
+    
+    if (!section || !data.upcoming) return;
+    
+    const upcoming = data.upcoming;
+    container.innerHTML = `
+        <div class="future-prize-card">
+            <h4>${upcoming.title}</h4>
+            <div class="future-pool">$${upcoming.prize_pool_usd.toLocaleString()} Prize Pool</div>
+            <div class="future-start">Starts ${new Date(upcoming.start_date).toLocaleDateString()}</div>
+            <a href="${upcoming.cta_link}" class="btn btn-secondary">${upcoming.cta_text}</a>
+        </div>
+    `;
+    
+    section.style.display = 'block';
+}
+
+function updateHistoricImpactSection(data) {
+    const totalDistributed = document.getElementById('total-distributed');
+    const totalWinners = document.getElementById('total-winners');
+    const monthsActive = document.getElementById('months-active');
+    const carousel = document.getElementById('winners-carousel');
+    
+    if (!data.stats) return;
+    
+    totalDistributed.textContent = `$${data.stats.total_distributed_usd.toLocaleString()}`;
+    totalWinners.textContent = data.stats.total_winners;
+    monthsActive.textContent = data.stats.months_active;
+    
+    // Generate winners carousel
+    if (data.history && carousel) {
+        const allWinners = data.history.flatMap(competition => 
+            competition.winners ? competition.winners.map(winner => ({
+                ...winner,
+                period: competition.period,
+                competition_title: competition.title
+            })) : []
+        );
+        
+        carousel.innerHTML = allWinners.map(winner => `
+            <div class="winner-card">
+                <div class="winner-rank">${getPlaceEmoji(winner.place)}</div>
+                <div class="winner-username">${winner.username}</div>
+                <div class="winner-amount">$${winner.amount_usd.toLocaleString()}</div>
+                <div class="winner-period">${winner.period}</div>
+                ${winner.tx_url ? `<div class="winner-proof"><a href="${winner.tx_url}" target="_blank">View Transaction</a></div>` : ''}
+            </div>
+        `).join('');
+    }
+}
+
+function updatePrizeCountdown(element, endDate) {
+    function update() {
+        const now = new Date();
+        const diff = endDate - now;
+        
+        if (diff <= 0) {
+            element.textContent = 'Competition Ended';
+            return;
+        }
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        
+        element.textContent = `${days}d ${hours}h ${minutes}m`;
+    }
+    
+    update();
+    setInterval(update, 60000); // Update every minute
+}
+
+function getPlaceSuffix(place) {
+    if (typeof place === 'string') return '';
+    const lastDigit = place % 10;
+    const lastTwoDigits = place % 100;
+    
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 13) return 'th';
+    if (lastDigit === 1) return 'st';
+    if (lastDigit === 2) return 'nd';
+    if (lastDigit === 3) return 'rd';
+    return 'th';
+}
+
+function getPlaceEmoji(place) {
+    if (place === 1) return '🥇';
+    if (place === 2) return '🥈';
+    if (place === 3) return '🥉';
+    return `#${place}`;
 }
