@@ -56,8 +56,19 @@ a {
     transition: color 0.3s ease;
 }
 
-a:hover {
-    color: var(--primary-color);
+/* Consistent link hover styles following corporate identity */
+#header nav ul li a:hover:not(.header-cta-btn):not(.nav-cta-btn) {
+    color: var(--purple-color) !important;
+    text-decoration: none;
+}
+
+/* Content links hover (not buttons) */
+.section p a:hover:not(.btn):not(.cta-btn),
+.footer-content a:hover:not(.btn):not(.cta-btn),
+.content a:hover:not(.btn):not(.cta-btn) {
+    color: var(--purple-color);
+    text-decoration: underline;
+    transition: all 0.3s ease;
 }
 
 section.section {
@@ -1806,7 +1817,8 @@ body.loading .loader-overlay {
 }
 
 .period-btn:hover:not(.active) {
-    background: rgba(45, 212, 127, 0.2);
+    background: rgba(153, 69, 255, 0.2);
+    color: var(--purple-color);
 }
 
 .metric-selector select {
