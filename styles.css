@@ -1282,12 +1282,13 @@ body.loading .loader-overlay {
     width: 120px;
     height: 120px;
     z-index: 5200;
-    pointer-events: none;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: none;
+    pointer-events: auto;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
     align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
     justify-content: center;
     transition: all 0.2s ease;
 }
@@ -1297,6 +1298,21 @@ body.loading .loader-overlay {
     height: 100%;
     object-fit: contain;
     transition: transform 0.2s ease;
+    filter: drop-shadow(2px 2px 8px rgba(0, 0, 0, 0.4));
+}
+
+#fly-swatter:hover .swatter-image {
+    transform: scale(1.1);
+    filter: drop-shadow(3px 3px 12px rgba(45, 212, 127, 0.6));
+}
+
+#fly-swatter.picked-up {
+    pointer-events: none;
+    z-index: 5201;
+}
+
+#fly-swatter.returning {
+    transition: all 1s ease-in-out;
 }
 
 #fly-swatter.smack {
