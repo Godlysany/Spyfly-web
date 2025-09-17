@@ -1307,11 +1307,12 @@ body.loading .loader-overlay {
 }
 
 #fly-swatter.picked-up {
-    pointer-events: none;
+    pointer-events: none !important;
     z-index: 5201;
 }
 
 #fly-swatter.returning {
+    pointer-events: none !important;
     transition: all 1s ease-in-out;
 }
 
