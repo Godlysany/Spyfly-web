@@ -1,14 +1,16 @@
 /* Import Orbitron Font */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 /* Base Styles */
 :root {
-    --primary-color: #32CD32;
-    --secondary-color: #40b68b;
-    --dark-bg: #121214;
-    --darker-bg: #0a0a0c;
-    --text-color: #e0e0e0;
-    --accent-color: #5eead4;
+    --primary-color: #2DD47F;
+    --secondary-color: #2DD47F;
+    --dark-bg: #001213;
+    --darker-bg: #000810;
+    --text-color: #eeeeee;
+    --accent-color: #2DD47F;
+    --purple-color: #9945ff;
     --section-padding: 40px 0;
 }
 
@@ -19,7 +21,7 @@
 }
 
 body {
-    font-family: 'Orbitron', monospace;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--dark-bg);
     color: var(--text-color);
     line-height: 1.6;
