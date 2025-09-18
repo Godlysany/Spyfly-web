@@ -2590,6 +2590,235 @@ nav ul li a.active {
     font-style: italic;
 }
 
+/* Sophisticated Historical Section */
+.sophisticated-historical-section {
+    margin: 80px 0;
+    padding: 40px 0;
+    border-top: 1px solid rgba(45, 212, 127, 0.2);
+}
+
+.sophisticated-historical-section .subsection-title {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+/* Historical KPIs */
+.historical-kpis {
+    margin-bottom: 60px;
+}
+
+.historical-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+}
+
+/* Hall of Fame Section */
+.hall-of-fame-section {
+    margin-bottom: 60px;
+}
+
+.hall-navigation {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.competition-indicator {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    min-width: 200px;
+    text-align: center;
+}
+
+.hall-of-fame-display {
+    margin-top: 30px;
+}
+
+.hall-winners-display {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.hall-winner-card {
+    background: rgba(45, 212, 127, 0.05);
+    border: 1px solid rgba(45, 212, 127, 0.2);
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hall-winner-card.champion {
+    border-color: rgba(255, 215, 0, 0.4);
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.hall-winner-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(45, 212, 127, 0.2);
+}
+
+.winner-position {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.winner-username {
+    color: white;
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.winner-prize {
+    color: var(--primary-color);
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.winner-performance {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.no-hall-data, .no-winners-competition {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 40px;
+    font-style: italic;
+}
+
+/* Championship History Table */
+.championship-history-section h4 {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.championship-history-table {
+    background: rgba(45, 212, 127, 0.03);
+    border: 1px solid rgba(45, 212, 127, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.history-table-header {
+    background: rgba(45, 212, 127, 0.1);
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 0.8fr 1fr 1fr;
+    gap: 20px;
+    padding: 20px 25px;
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.history-table-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.history-table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 0.8fr 1fr 1fr;
+    gap: 20px;
+    padding: 20px 25px;
+    border-bottom: 1px solid rgba(45, 212, 127, 0.05);
+    transition: background-color 0.3s ease;
+    align-items: center;
+}
+
+.history-table-row:hover {
+    background: rgba(45, 212, 127, 0.05);
+}
+
+.history-table-row:last-child {
+    border-bottom: none;
+}
+
+.history-table-row.no-data {
+    grid-template-columns: 1fr;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 40px 25px;
+    font-style: italic;
+}
+
+.table-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.table-col-full {
+    grid-column: 1 / -1;
+    text-align: center;
+}
+
+.competition-name {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.competition-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+}
+
+.comp-type-badge {
+    background: rgba(45, 212, 127, 0.2);
+    color: var(--primary-color);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.comp-type-badge.pnl {
+    background: rgba(255, 215, 0, 0.2);
+    color: #ffd700;
+}
+
+.comp-type-badge.volume {
+    background: rgba(138, 43, 226, 0.2);
+    color: #ba68c8;
+}
+
+.comp-type-badge.winrate {
+    background: rgba(0, 191, 255, 0.2);
+    color: #00bfff;
+}
+
+.prize-amount {
+    color: var(--primary-color);
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.winners-count {
+    color: white;
+    font-weight: 600;
+}
+
+.comp-date {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
 /* Status Messages for Testing */
 .status-message {
     background: rgba(45, 212, 127, 0.1);
@@ -2637,6 +2866,198 @@ nav ul li a.active {
     font-size: 0.85rem;
 }
 
+/* Test Controls */
+.test-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(45, 212, 127, 0.3);
+}
+
+.test-controls button {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    white-space: nowrap;
+}
+
+/* Fix Prize Distribution Section Names */
+.prize-distribution-section,
+.prize-structure-section {
+    margin: 60px 0;
+}
+
+.prize-distribution-section .subsection-title {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+.prize-distribution-grid,
+.prize-breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.prize-position,
+.prize-tier-card {
+    background: rgba(45, 212, 127, 0.05);
+    border: 1px solid rgba(45, 212, 127, 0.2);
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.prize-position.champion,
+.prize-tier-card.champion {
+    border-color: rgba(255, 215, 0, 0.4);
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.prize-position.runner-up,
+.prize-tier-card.runner-up {
+    border-color: rgba(192, 192, 192, 0.4);
+    background: rgba(192, 192, 192, 0.05);
+}
+
+.prize-position.third,
+.prize-tier-card.third-place {
+    border-color: rgba(205, 127, 50, 0.4);
+    background: rgba(205, 127, 50, 0.05);
+}
+
+.prize-position:hover,
+.prize-tier-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(45, 212, 127, 0.15);
+}
+
+.position-icon,
+.tier-rank {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.position-details h4,
+.tier-details .tier-title {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.prize-amount,
+.tier-amount {
+    color: var(--primary-color);
+    font-family: 'Orbitron', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.percentage,
+.tier-percentage {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+/* Next Championships Section */
+.next-championships-section,
+.next-competitions-section {
+    margin: 60px 0;
+}
+
+.next-championships-section .subsection-title,
+.next-competitions-section .subsection-title {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+.next-championships-grid,
+.next-competitions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.next-championship-card,
+.next-comp-card {
+    background: rgba(45, 212, 127, 0.05);
+    border: 1px solid rgba(45, 212, 127, 0.2);
+    border-radius: 12px;
+    padding: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.next-championship-card:hover,
+.next-comp-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(45, 212, 127, 0.15);
+}
+
+.next-championship-header,
+.next-comp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.next-championship-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.championship-type,
+.next-comp-type {
+    background: rgba(45, 212, 127, 0.2);
+    color: var(--primary-color);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.championship-status {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+}
+
+.championship-prize,
+.next-comp-prize {
+    color: var(--primary-color);
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.championship-title,
+.next-comp-title {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.next-comp-date {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
 /* Responsive Design Updates */
 @media (max-width: 768px) {
     .jackpot-amount {
@@ -2681,6 +3102,53 @@ nav ul li a.active {
     .hall-header {
         flex-direction: column;
         gap: 15px;
+    }
+    
+    .test-controls {
+        top: 10px;
+        right: 10px;
+        padding: 10px;
+    }
+    
+    .test-controls button {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+    }
+    
+    .historical-kpi-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    
+    .hall-winners-display {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
+    .history-table-header,
+    .history-table-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        text-align: left;
+    }
+    
+    .history-table-header {
+        display: none; /* Hide header on mobile for cleaner look */
+    }
+    
+    .history-table-row {
+        padding: 15px 20px;
+        border: 1px solid rgba(45, 212, 127, 0.1);
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .table-col::before {
+        content: attr(data-label) ': ';
+        font-weight: 600;
+        color: var(--primary-color);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 }
 

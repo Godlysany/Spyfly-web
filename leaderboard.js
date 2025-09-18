@@ -775,48 +775,22 @@ function renderSophisticatedStatus1(data, prizeHub) {
     
     prizeHub.innerHTML = `
         <div class="container">
-            <!-- Total Ecosystem Jackpot Banner -->
-            <div class="total-jackpot-banner ecosystem">
+            <!-- Total Jackpot Highlight Banner (EXACT from Transition) -->
+            <div class="total-jackpot-banner">
                 <div class="jackpot-content">
-                    <div class="jackpot-label">🎯 TOTAL ECOSYSTEM VALUE</div>
+                    <div class="jackpot-label">🎯 TOTAL CHAMPIONSHIP JACKPOT</div>
                     <div class="jackpot-amount">$${(totalJackpot/1000).toFixed(0)}K</div>
-                    <div class="jackpot-description">Distributed + active + upcoming competitions</div>
+                    <div class="jackpot-description">Available across all current & upcoming competitions</div>
                 </div>
             </div>
             
             <h1 class="section-title">🏆 Prize Championships</h1>
             
-            <!-- High Level KPIs -->
-            <div class="sophisticated-kpis">
-                <div class="kpi-row">
-                    <div class="kpi-card highlight">
-                        <div class="kpi-icon">💰</div>
-                        <div class="kpi-value">$${(stats.total_distributed_usd || 0).toLocaleString()}</div>
-                        <div class="kpi-label">Total Distributed</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-icon">🏆</div>
-                        <div class="kpi-value">${stats.total_competitions || historyData.length}</div>
-                        <div class="kpi-label">Competitions Finished</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-icon">👥</div>
-                        <div class="kpi-value">${stats.total_participants || '1,247'}</div>
-                        <div class="kpi-label">Total Participants</div>
-                    </div>
-                    <div class="kpi-card highlight">
-                        <div class="kpi-icon">📊</div>
-                        <div class="kpi-value">$${stats.total_volume ? (stats.total_volume/1000000).toFixed(1) + 'M' : '18.3M'}</div>
-                        <div class="kpi-label">Total Volume</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Active Competition Hero (Reuse from Transition) -->
+            <!-- Live Competition Hero Card (EXACT from Transition) -->
             <div class="transition-hero-card">
                 <div class="transition-hero-content">
                     <div class="live-badge">🔴 LIVE NOW</div>
-                    <h2 class="transition-title">${currentComp.title}</h2>
+                    <h2 class="transition-title">${currentComp ? currentComp.title : 'September Trading Championship'}</h2>
                     <p class="transition-subtitle">Elite traders are competing live. Join the championship and prove your alpha.</p>
                     
                     <div class="transition-stats">
@@ -824,21 +798,21 @@ function renderSophisticatedStatus1(data, prizeHub) {
                             <i class="fas fa-trophy"></i>
                             <div>
                                 <strong>Prize Pool</strong>
-                                <span>$${(currentComp.prize_pool_usd/1000).toFixed(0)}K ready to win</span>
+                                <span>$${currentComp ? (currentComp.prize_pool_usd/1000).toFixed(0) : '15'}K ready to win</span>
                             </div>
                         </div>
                         <div class="transition-stat">
                             <i class="fas fa-chart-line"></i>
                             <div>
                                 <strong>Competition Type</strong>
-                                <span>${getCompetitionTypeDisplay(currentComp.competition_type)}</span>
+                                <span>${currentComp ? getCompetitionTypeDisplay(currentComp.competition_type) : '💰 P&L'}</span>
                             </div>
                         </div>
                         <div class="transition-stat">
                             <i class="fas fa-calendar-alt"></i>
                             <div>
                                 <strong>Competition Period</strong>
-                                <span>${formatDate(currentComp.start_date)} - ${formatDate(currentComp.end_date)}</span>
+                                <span>${currentComp ? formatDate(currentComp.start_date) + ' - ' + formatDate(currentComp.end_date) : 'Sept 15 - Sept 30, 2025'}</span>
                             </div>
                         </div>
                         <div class="transition-stat countdown-stat">
@@ -870,7 +844,7 @@ function renderSophisticatedStatus1(data, prizeHub) {
                     <div class="big-prize-display">
                         <div class="prize-spotlight">
                             <div class="prize-icon">💰</div>
-                            <div class="prize-value">$${(currentComp.prize_pool_usd/1000).toFixed(0)}K</div>
+                            <div class="prize-value">$${currentComp ? (currentComp.prize_pool_usd/1000).toFixed(0) : '15'}K</div>
                             <div class="prize-label">LIVE PRIZE POOL</div>
                         </div>
                     </div>
@@ -900,58 +874,132 @@ function renderSophisticatedStatus1(data, prizeHub) {
                 </div>
             </div>
             
-            <!-- History Section -->
-            <div class="history-section">
-                <h3 class="subsection-title">🏅 Hall of Fame & Tournament History</h3>
-                
-                <!-- Hall of Fame Carousel -->
-                <div class="hall-of-fame">
-                    <div class="hall-header">
-                        <h4>🌟 Recent Champions</h4>
-                        <div class="carousel-controls">
-                            <button class="carousel-btn prev" onclick="previousWinners()">&lt;</button>
-                            <button class="carousel-btn next" onclick="nextWinners()">&gt;</button>
+            <!-- Prize Distribution (EXACT from Transition) -->
+            <div class="prize-distribution-section">
+                <h3 class="subsection-title">💰 Prize Distribution</h3>
+                <div class="prize-distribution-grid">
+                    <div class="prize-position champion">
+                        <div class="position-icon">🏆</div>
+                        <div class="position-details">
+                            <h4>Champion</h4>
+                            <div class="prize-amount">$${Math.floor((currentComp ? currentComp.prize_pool_usd : 15000) * 0.5).toLocaleString()}</div>
+                            <div class="percentage">50% of total pool</div>
                         </div>
                     </div>
-                    
-                    <div class="winners-carousel-container">
-                        <div class="winners-carousel" id="winners-carousel">
-                            ${generateWinnersCarousel(historyData)}
+                    <div class="prize-position runner-up">
+                        <div class="position-icon">🥈</div>
+                        <div class="position-details">
+                            <h4>Runner-up</h4>
+                            <div class="prize-amount">$${Math.floor((currentComp ? currentComp.prize_pool_usd : 15000) * 0.3).toLocaleString()}</div>
+                            <div class="percentage">30% of total pool</div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Past Tournaments List -->
-                <div class="past-tournaments">
-                    <h4>📊 Tournament History</h4>
-                    <div class="tournaments-list">
-                        ${generateTournamentsList(historyData)}
+                    <div class="prize-position third">
+                        <div class="position-icon">🥉</div>
+                        <div class="position-details">
+                            <h4>Third Place</h4>
+                            <div class="prize-amount">$${Math.floor((currentComp ? currentComp.prize_pool_usd : 15000) * 0.2).toLocaleString()}</div>
+                            <div class="percentage">20% of total pool</div>
+                        </div>
                     </div>
                 </div>
             </div>
             
+            <!-- Next Championships (EXACT from Transition) -->
             ${upcomingComps.length > 0 ? `
-            <!-- Next Competitions Preview -->
-            <div class="next-competitions-section">
+            <div class="next-championships-section">
                 <h3 class="subsection-title">🔥 Next Championships</h3>
-                <div class="next-competitions-grid">
-                    ${upcomingComps.slice(0, 3).map(comp => `
-                        <div class="next-comp-card ${comp.competition_type}">
-                            <div class="next-comp-header">
-                                <span class="next-comp-type">${getCompetitionTypeDisplay(comp.competition_type)}</span>
-                                <span class="next-comp-prize">$${(comp.prize_pool_usd/1000).toFixed(0)}K</span>
+                <div class="next-championships-grid">
+                    ${upcomingComps.slice(0, 2).map(comp => `
+                        <div class="next-championship-card ${comp.competition_type}">
+                            <div class="next-championship-header">
+                                <div class="next-championship-info">
+                                    <span class="championship-type">${getCompetitionTypeDisplay(comp.competition_type)}</span>
+                                    <span class="championship-status">📅 ${new Date(comp.start_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+                                </div>
+                                <div class="championship-prize">$${(comp.prize_pool_usd/1000).toFixed(0)}K</div>
                             </div>
-                            <h4 class="next-comp-title">${comp.title}</h4>
-                            <div class="next-comp-date">
-                                ${new Date(comp.start_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                            </div>
+                            <h4 class="championship-title">${comp.title}</h4>
                         </div>
                     `).join('')}
                 </div>
             </div>
             ` : ''}
+            
+            <!-- ==== ADDITIONAL SOPHISTICATED SECTIONS BELOW ==== -->
+            
+            <!-- Historical KPIs Section -->
+            <div class="sophisticated-historical-section">
+                <h3 class="subsection-title">📊 Platform Analytics & History</h3>
+                
+                <!-- Core Historical KPIs -->
+                <div class="historical-kpis">
+                    <div class="historical-kpi-grid">
+                        <div class="kpi-card highlight">
+                            <div class="kpi-icon">💰</div>
+                            <div class="kpi-value">$${(stats.total_distributed_usd || 45000).toLocaleString()}</div>
+                            <div class="kpi-label">Total Distributed</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">🏆</div>
+                            <div class="kpi-value">${stats.total_competitions || historyData.length || 3}</div>
+                            <div class="kpi-label">Championships Finished</div>
+                        </div>
+                        <div class="kpi-card highlight">
+                            <div class="kpi-icon">📊</div>
+                            <div class="kpi-value">$${stats.total_volume ? (stats.total_volume/1000000).toFixed(1) + 'M' : '18.3M'}</div>
+                            <div class="kpi-label">Total Volume</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">📈</div>
+                            <div class="kpi-value">${stats.total_trades ? (stats.total_trades/1000).toFixed(1) + 'K' : '45.2K'}</div>
+                            <div class="kpi-label">Total Trades</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hall of Fame Section -->
+                <div class="hall-of-fame-section">
+                    <div class="hall-header">
+                        <h4>🏅 Hall of Fame</h4>
+                        <div class="hall-navigation">
+                            <button class="carousel-btn" onclick="previousCompetition()">&lt;</button>
+                            <span class="competition-indicator" id="competition-indicator">
+                                ${historyData.length > 0 ? historyData[0].title : 'August P&L Championship'}
+                            </span>
+                            <button class="carousel-btn" onclick="nextCompetition()">&gt;</button>
+                        </div>
+                    </div>
+                    
+                    <div class="hall-of-fame-display" id="hall-of-fame-display">
+                        ${generateHallOfFameDisplay(historyData)}
+                    </div>
+                </div>
+                
+                <!-- Championship History Table -->
+                <div class="championship-history-section">
+                    <h4>📋 Championship History</h4>
+                    <div class="championship-history-table">
+                        <div class="history-table-header">
+                            <div class="table-col">Competition</div>
+                            <div class="table-col">Type</div>
+                            <div class="table-col">Prize Pool</div>
+                            <div class="table-col">Winners</div>
+                            <div class="table-col">Date</div>
+                            <div class="table-col">Action</div>
+                        </div>
+                        <div class="history-table-body">
+                            ${generateChampionshipHistoryTable(historyData)}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     `;
+    
+    // Store history data globally for navigation
+    currentHistoryData = historyData;
+    currentCompetitionIndex = 0;
     
     // Start countdown timer if we have an end date
     if (currentComp && currentComp.end_date) {
@@ -1014,6 +1062,72 @@ function generateWinnersCarousel(historyData) {
                 <div class="winner-prize">$${winner.amount_usd.toLocaleString()}</div>
                 <div class="winner-competition">${winner.competition_title}</div>
                 <div class="winner-type">${getCompetitionTypeDisplay(winner.competition_type)}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Hall of Fame display for specific competitions
+function generateHallOfFameDisplay(historyData) {
+    if (!historyData || historyData.length === 0) {
+        return '<div class="no-hall-data">🏅 Hall of Fame will showcase past champions here</div>';
+    }
+    
+    const competition = historyData[0]; // Currently showing first competition
+    if (!competition.winners || competition.winners.length === 0) {
+        return '<div class="no-winners-competition">🏆 No winners data for this competition</div>';
+    }
+    
+    return `
+        <div class="hall-winners-display">
+            ${competition.winners.map(winner => `
+                <div class="hall-winner-card ${winner.place === 1 ? 'champion' : ''}">
+                    <div class="winner-position">${['🥇', '🥈', '🥉'][winner.place - 1] || '🏆'}</div>
+                    <div class="winner-details">
+                        <div class="winner-username">@${winner.username}</div>
+                        <div class="winner-prize">$${winner.amount_usd.toLocaleString()}</div>
+                        <div class="winner-performance">${winner.performance_metric || 'Winner'}</div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+// Championship history table
+function generateChampionshipHistoryTable(historyData) {
+    if (!historyData || historyData.length === 0) {
+        return `
+            <div class="history-table-row no-data">
+                <div class="table-col-full">📊 Championship history will be displayed here after competitions conclude</div>
+            </div>
+        `;
+    }
+    
+    return historyData.map((competition, index) => `
+        <div class="history-table-row">
+            <div class="table-col">
+                <div class="competition-name">${competition.title}</div>
+                <div class="competition-subtitle">${new Date(competition.end_date).toLocaleDateString()}</div>
+            </div>
+            <div class="table-col">
+                <span class="comp-type-badge ${competition.competition_type}">
+                    ${getCompetitionTypeDisplay(competition.competition_type)}
+                </span>
+            </div>
+            <div class="table-col">
+                <div class="prize-amount">$${(competition.prize_pool_usd/1000).toFixed(0)}K</div>
+            </div>
+            <div class="table-col">
+                <div class="winners-count">${competition.winners ? competition.winners.length : 0}</div>
+            </div>
+            <div class="table-col">
+                <div class="comp-date">${new Date(competition.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+            </div>
+            <div class="table-col">
+                <button class="btn btn-ghost btn-sm" onclick="openChampionshipModal(${index})">
+                    📊 View Details
+                </button>
             </div>
         </div>
     `).join('');
@@ -1104,6 +1218,43 @@ window.openTournamentModal = function(tournamentIndex) {
     // TODO: Implement tournament modal with detailed leaderboard
     console.log('Opening tournament modal for index:', tournamentIndex);
     alert('Tournament details modal coming soon! This will show the complete leaderboard and statistics for this competition.');
+}
+
+// Championship navigation and modal handlers
+let currentCompetitionIndex = 0;
+let currentHistoryData = [];
+
+window.previousCompetition = function() {
+    if (currentHistoryData.length === 0) return;
+    
+    currentCompetitionIndex = Math.max(0, currentCompetitionIndex - 1);
+    updateHallOfFameDisplay();
+}
+
+window.nextCompetition = function() {
+    if (currentHistoryData.length === 0) return;
+    
+    currentCompetitionIndex = Math.min(currentHistoryData.length - 1, currentCompetitionIndex + 1);
+    updateHallOfFameDisplay();
+}
+
+function updateHallOfFameDisplay() {
+    const indicatorEl = document.getElementById('competition-indicator');
+    const displayEl = document.getElementById('hall-of-fame-display');
+    
+    if (indicatorEl && currentHistoryData[currentCompetitionIndex]) {
+        indicatorEl.textContent = currentHistoryData[currentCompetitionIndex].title;
+    }
+    
+    if (displayEl) {
+        displayEl.innerHTML = generateHallOfFameDisplay([currentHistoryData[currentCompetitionIndex]]);
+    }
+}
+
+window.openChampionshipModal = function(championshipIndex) {
+    // TODO: Implement championship details modal with full leaderboard
+    console.log('Opening championship modal for index:', championshipIndex);
+    alert('Championship details modal coming soon! This will show the complete ranked leaderboard and detailed statistics for this specific championship.');
 }
 
 // Backup: Original sophisticated view implementation
