@@ -2180,6 +2180,309 @@ nav ul li a.active {
     opacity: 1 !important; /* Force visibility - override any hiding rules */
 }
 
+/* Transition View Styles - Consistent with Launch View */
+.transition-hero-card {
+    background: linear-gradient(135deg, rgba(45, 212, 127, 0.1), rgba(153, 69, 255, 0.05));
+    border: 1px solid rgba(45, 212, 127, 0.3);
+    border-radius: 16px;
+    padding: 40px;
+    margin-bottom: 50px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.transition-hero-content {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.live-badge {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+    width: fit-content;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    animation: livePulse 2s infinite;
+}
+
+@keyframes livePulse {
+    0% { box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+    50% { box-shadow: 0 4px 25px rgba(239, 68, 68, 0.5); }
+    100% { box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+}
+
+.transition-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1.2;
+    margin: 0;
+}
+
+.transition-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.transition-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.transition-stat {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(45, 212, 127, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(45, 212, 127, 0.2);
+}
+
+.transition-stat i {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    width: 20px;
+    text-align: center;
+}
+
+.transition-stat strong {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.transition-stat span {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+}
+
+.transition-cta {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.transition-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.current-standings-preview {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(45, 212, 127, 0.3);
+    border-radius: 12px;
+    padding: 25px;
+    width: 100%;
+    max-width: 350px;
+}
+
+.standings-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.standings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.standing-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background: rgba(45, 212, 127, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(45, 212, 127, 0.1);
+}
+
+.standing-row.leader {
+    background: rgba(45, 212, 127, 0.1);
+    border-color: rgba(45, 212, 127, 0.3);
+}
+
+.standing-row .position {
+    font-size: 1.1rem;
+    width: 30px;
+}
+
+.standing-row .trader {
+    color: white;
+    font-weight: 500;
+    flex: 1;
+    margin-left: 10px;
+}
+
+.standing-row .performance {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-family: 'Orbitron', monospace;
+}
+
+.standings-footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 15px;
+}
+
+/* Prize Structure Section */
+.prize-structure-section {
+    margin-bottom: 50px;
+}
+
+.prize-breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.prize-tier-card {
+    background: rgba(45, 212, 127, 0.05);
+    border: 1px solid rgba(45, 212, 127, 0.2);
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.prize-tier-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(45, 212, 127, 0.2);
+}
+
+.prize-tier-card.champion {
+    border-color: rgba(255, 215, 0, 0.4);
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.tier-rank {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.tier-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.tier-amount {
+    color: white;
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.tier-percentage {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+/* Next Competitions Section */
+.next-competitions-section {
+    margin-bottom: 50px;
+}
+
+.next-competitions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.next-comp-card {
+    background: rgba(45, 212, 127, 0.05);
+    border: 1px solid rgba(45, 212, 127, 0.2);
+    border-radius: 12px;
+    padding: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.next-comp-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(45, 212, 127, 0.15);
+}
+
+.next-comp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.next-comp-type {
+    background: rgba(45, 212, 127, 0.2);
+    color: var(--primary-color);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.next-comp-prize {
+    color: var(--primary-color);
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.next-comp-title {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    line-height: 1.3;
+}
+
+.next-comp-date {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+/* Responsive Design for Transition View */
+@media (max-width: 768px) {
+    .transition-hero-card {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 30px 20px;
+    }
+    
+    .transition-title {
+        font-size: 2rem;
+    }
+    
+    .transition-cta {
+        flex-direction: column;
+    }
+    
+    .prize-breakdown-grid,
+    .next-competitions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Launch View Countdown Timer */
 .launch-countdown {
     margin: 30px 0;

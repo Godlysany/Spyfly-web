@@ -365,143 +365,125 @@ function renderTransitionView(data) {
         <div class="container">
             <h1 class="section-title">🏆 Prize Championships</h1>
             
-            <!-- Live Competition Ticker Bar -->
-            <div class="live-ticker-section">
-                <div class="ticker-container">
-                    <div class="live-competition-card">
-                        <div class="live-competition-header">
-                            <div class="live-indicator">
-                                <span class="live-dot"></span>
-                                <span class="live-text">LIVE COMPETITION</span>
-                            </div>
-                            <div class="competition-badges">
-                                <span class="badge-live">🔴 LIVE</span>
-                                <span class="badge-type">${getCompetitionTypeDisplay(currentComp ? currentComp.competition_type : 'pnl')}</span>
+            <!-- Live Competition Hero Card (Similar to Launch View) -->
+            <div class="transition-hero-card">
+                <div class="transition-hero-content">
+                    <div class="live-badge">🔴 LIVE NOW</div>
+                    <h2 class="transition-title">${currentComp ? currentComp.title : 'September Trading Championship'}</h2>
+                    <p class="transition-subtitle">Elite traders are competing live. Join the championship and prove your alpha.</p>
+                    
+                    <div class="transition-stats">
+                        <div class="transition-stat">
+                            <i class="fas fa-trophy"></i>
+                            <div>
+                                <strong>Prize Pool</strong>
+                                <span>$${currentComp ? (currentComp.prize_pool_usd/1000).toFixed(0) : '15'}K ready to win</span>
                             </div>
                         </div>
-                        
-                        <div class="competition-main">
-                            <div class="competition-info">
-                                <h3 class="competition-title">${currentComp ? currentComp.title : 'September Championship'}</h3>
-                                <div class="prize-display">
-                                    <div class="prize-amount">$${currentComp ? (currentComp.prize_pool_usd/1000).toFixed(0) : '15'}K</div>
-                                    <div class="prize-label">Total Prize Pool</div>
-                                </div>
+                        <div class="transition-stat">
+                            <i class="fas fa-chart-line"></i>
+                            <div>
+                                <strong>Competition Type</strong>
+                                <span>${getCompetitionTypeDisplay(currentComp ? currentComp.competition_type : 'pnl')}</span>
                             </div>
-                            
-                            <div class="competition-actions">
-                                <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-join">
-                                    🚀 JOIN NOW
-                                </a>
-                                <a href="#main-leaderboard" class="btn btn-secondary btn-view-leaderboard">
-                                    📊 VIEW LEADERBOARD
-                                </a>
+                        </div>
+                        <div class="transition-stat">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <strong>Competition Status</strong>
+                                <span>Active & accepting participants</span>
                             </div>
                         </div>
                     </div>
                     
-                    ${upcomingComps.length > 0 ? `
-                    <div class="upcoming-ticker">
-                        <div class="ticker-header">
-                            <span class="upcoming-label">🔥 COMING UP</span>
-                        </div>
-                        <div class="ticker-scroll">
-                            ${upcomingComps.map(comp => `
-                                <div class="upcoming-comp-item ${comp.competition_type}">
-                                    <span class="comp-type-badge">${getCompetitionTypeDisplay(comp.competition_type)}</span>
-                                    <span class="comp-name">${comp.title}</span>
-                                    <span class="comp-prize">$${(comp.prize_pool_usd/1000).toFixed(0)}K</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    ` : ''}
-                </div>
-            </div>
-            
-            <!-- Prize Breakdown & Incentives -->
-            <div class="prize-breakdown-section">
-                <h3 class="subsection-title">💰 What's At Stake</h3>
-                <div class="prize-incentive-grid">
-                    <div class="prize-breakdown-card main-prize">
-                        <div class="prize-rank">🥇</div>
-                        <div class="prize-details">
-                            <div class="prize-amount">$${currentComp ? Math.floor(currentComp.prize_pool_usd * 0.5) : '7,500'}</div>
-                            <div class="prize-desc">Winner Takes All</div>
-                            <div class="prize-percentage">50% of Total Pool</div>
-                        </div>
-                    </div>
-                    
-                    <div class="prize-breakdown-card">
-                        <div class="prize-rank">🥈</div>
-                        <div class="prize-details">
-                            <div class="prize-amount">$${currentComp ? Math.floor(currentComp.prize_pool_usd * 0.3) : '4,500'}</div>
-                            <div class="prize-desc">Runner-up Reward</div>
-                            <div class="prize-percentage">30% of Pool</div>
-                        </div>
-                    </div>
-                    
-                    <div class="prize-breakdown-card">
-                        <div class="prize-rank">🥉</div>
-                        <div class="prize-details">
-                            <div class="prize-amount">$${currentComp ? Math.floor(currentComp.prize_pool_usd * 0.2) : '3,000'}</div>
-                            <div class="prize-desc">Third Place</div>
-                            <div class="prize-percentage">20% of Pool</div>
-                        </div>
+                    <div class="transition-cta">
+                        <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-large">
+                            🚀 Join Competition
+                        </a>
+                        <a href="#main-leaderboard" class="btn btn-secondary">
+                            📊 View Live Rankings
+                        </a>
                     </div>
                 </div>
                 
-                <!-- Live Battle Status -->
-                <div class="live-battle-status">
-                    <div class="battle-header">
-                        <div class="battle-title">
-                            <span class="fire-icon">🔥</span>
-                            <h4>BATTLE ROYALE IN PROGRESS</h4>
-                            <div class="battle-pulse"></div>
+                <div class="transition-visual">
+                    <div class="current-standings-preview">
+                        <div class="standings-title">Live Leaderboard Preview</div>
+                        <div class="standings-list">
+                            <div class="standing-row leader">
+                                <span class="position">🥇</span>
+                                <span class="trader">@current_leader</span>
+                                <span class="performance">+$47.2K</span>
+                            </div>
+                            <div class="standing-row">
+                                <span class="position">🥈</span>
+                                <span class="trader">@runner_up</span>
+                                <span class="performance">+$38.9K</span>
+                            </div>
+                            <div class="standing-row">
+                                <span class="position">🥉</span>
+                                <span class="trader">@third_place</span>
+                                <span class="performance">+$31.5K</span>
+                            </div>
                         </div>
-                        <p class="battle-subtitle">Top traders are fighting for supremacy. Join the war!</p>
+                        <div class="standings-footer">Rankings update every 15 minutes</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Prize Structure Section -->
+            <div class="prize-structure-section">
+                <h3 class="subsection-title">💰 Prize Distribution</h3>
+                <div class="prize-breakdown-grid">
+                    <div class="prize-tier-card champion">
+                        <div class="tier-rank">🏆</div>
+                        <div class="tier-details">
+                            <div class="tier-title">Champion</div>
+                            <div class="tier-amount">$${currentComp ? Math.floor(currentComp.prize_pool_usd * 0.5).toLocaleString() : '7,500'}</div>
+                            <div class="tier-percentage">50% of total pool</div>
+                        </div>
                     </div>
                     
-                    <div class="current-leaders">
-                        <div class="leader-spotlight leader-gold">
-                            <div class="leader-crown">👑</div>
-                            <div class="leader-info">
-                                <div class="leader-name">@current_leader</div>
-                                <div class="leader-performance">+$47.2K</div>
-                                <div class="leader-status">DOMINATING</div>
-                            </div>
-                            <div class="leader-glow"></div>
-                        </div>
-                        
-                        <div class="challengers-row">
-                            <div class="leader-challenger">
-                                <span class="rank-badge silver">🥈</span>
-                                <div class="challenger-info">
-                                    <span class="name">@runner_up</span>
-                                    <span class="performance">+$38.9K</span>
-                                </div>
-                            </div>
-                            <div class="leader-challenger">
-                                <span class="rank-badge bronze">🥉</span>
-                                <div class="challenger-info">
-                                    <span class="name">@third_place</span>
-                                    <span class="performance">+$31.5K</span>
-                                </div>
-                            </div>
+                    <div class="prize-tier-card runner-up">
+                        <div class="tier-rank">🥈</div>
+                        <div class="tier-details">
+                            <div class="tier-title">Runner-up</div>
+                            <div class="tier-amount">$${currentComp ? Math.floor(currentComp.prize_pool_usd * 0.3).toLocaleString() : '4,500'}</div>
+                            <div class="tier-percentage">30% of total pool</div>
                         </div>
                     </div>
                     
-                    <div class="battle-cta">
-                        <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-battle">
-                            ⚔️ ENTER THE ARENA
-                        </a>
-                        <div class="battle-urgency">
-                            <span class="urgency-pulse"></span>
-                            <span class="urgency-text">Limited spots available!</span>
+                    <div class="prize-tier-card third-place">
+                        <div class="tier-rank">🥉</div>
+                        <div class="tier-details">
+                            <div class="tier-title">Third Place</div>
+                            <div class="tier-amount">$${currentComp ? Math.floor(currentComp.prize_pool_usd * 0.2).toLocaleString() : '3,000'}</div>
+                            <div class="tier-percentage">20% of total pool</div>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            ${upcomingComps.length > 0 ? `
+            <!-- Next Competitions Preview -->
+            <div class="next-competitions-section">
+                <h3 class="subsection-title">🔥 Next Championships</h3>
+                <div class="next-competitions-grid">
+                    ${upcomingComps.slice(0, 3).map(comp => `
+                        <div class="next-comp-card ${comp.competition_type}">
+                            <div class="next-comp-header">
+                                <span class="next-comp-type">${getCompetitionTypeDisplay(comp.competition_type)}</span>
+                                <span class="next-comp-prize">$${(comp.prize_pool_usd/1000).toFixed(0)}K</span>
+                            </div>
+                            <h4 class="next-comp-title">${comp.title}</h4>
+                            <div class="next-comp-date">
+                                ${new Date(comp.start_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
         </div>
     `;
 }
