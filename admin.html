@@ -90,12 +90,39 @@
         .override-log { max-height: 300px; overflow-y: auto; }
         .override-entry { background: rgba(255, 68, 68, 0.1); border: 1px solid rgba(255, 68, 68, 0.3); border-radius: 8px; padding: 15px; margin-bottom: 10px; }
         
+        /* Modal Styles */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: var(--darker-bg); border: 1px solid rgba(45, 212, 127, 0.3); border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid rgba(45, 212, 127, 0.2); }
+        .modal-header h3 { margin: 0; color: var(--primary-color); }
+        .modal-close { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 5px; }
+        .modal-close:hover { color: var(--primary-color); }
+        .modal-body { padding: 20px; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+        
+        /* Competition List Styles */
+        .competition-item { background: rgba(45, 212, 127, 0.1); border: 1px solid rgba(45, 212, 127, 0.3); border-radius: 8px; padding: 15px; margin-bottom: 10px; }
+        .competition-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .competition-title { color: var(--primary-color); font-weight: 600; margin: 0; }
+        .competition-actions { display: flex; gap: 5px; }
+        .btn-small { padding: 5px 10px; font-size: 0.8rem; }
+        .competition-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; font-size: 0.9rem; }
+        .detail-item { color: rgba(255, 255, 255, 0.8); }
+        .detail-label { font-weight: 600; color: var(--primary-color); }
+        .status-badge { padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+        .status-active { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .status-upcoming { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .status-ended { background: rgba(156, 163, 175, 0.2); color: #9ca3af; }
+        
         @media (max-width: 768px) { 
             .admin-grid { grid-template-columns: 1fr; }
             .admin-container { padding: 15px; }
             .control-tabs { flex-wrap: wrap; }
             .mapping-controls { grid-template-columns: 1fr; }
             .monitor-cards { grid-template-columns: repeat(2, 1fr); }
+            .modal-content { width: 95%; }
+            .competition-header { flex-direction: column; gap: 10px; }
+            .competition-details { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -224,6 +251,96 @@
                     <div class="loading">Loading competitions...</div>
                 </div>
                 <button class="btn-admin" onclick="loadCompetitions()">Refresh List</button>
+            </div>
+
+            <!-- Competition Detail Modal -->
+            <div id="competition-detail-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="detail-modal-title">Competition Details</h3>
+                        <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="competition-detail-content">
+                            <!-- Content will be populated by JavaScript -->
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn-admin" onclick="editCompetition()">✏️ Edit</button>
+                            <button class="btn-danger" onclick="confirmDeleteCompetition()">🗑️ Delete</button>
+                            <button class="btn btn-secondary" onclick="closeDetailModal()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Competition Edit Modal -->
+            <div id="competition-edit-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Edit Competition</h3>
+                        <button class="modal-close" onclick="closeEditModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-competition-form">
+                            <div class="form-group">
+                                <label>Competition Name (ID)</label>
+                                <input type="text" id="edit-comp-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Title</label>
+                                <input type="text" id="edit-comp-title" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Period</label>
+                                <input type="text" id="edit-comp-period" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Competition Type</label>
+                                <select id="edit-comp-type" required>
+                                    <option value="pnl">P&L Performance</option>
+                                    <option value="volume">Trading Volume</option>
+                                    <option value="winrate">Win Rate</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <input type="datetime-local" id="edit-comp-start" required>
+                            </div>
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <input type="datetime-local" id="edit-comp-end" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Prize Pool (USD)</label>
+                                <input type="number" id="edit-comp-prize" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Highlight Copy</label>
+                                <textarea id="edit-comp-highlight" rows="2" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>CTA Button Text</label>
+                                <input type="text" id="edit-comp-cta-text">
+                            </div>
+                            <div class="form-group">
+                                <label>CTA Link</label>
+                                <input type="url" id="edit-comp-cta-link">
+                            </div>
+                            <div class="form-group">
+                                <label>Min Trades Required</label>
+                                <input type="number" id="edit-comp-min-trades">
+                            </div>
+                            <div class="form-group">
+                                <label>Min Volume (USD)</label>
+                                <input type="number" id="edit-comp-min-volume">
+                            </div>
+                            <div class="modal-actions">
+                                <button type="submit" class="btn-admin">💾 Save Changes</button>
+                                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
 
             <!-- Add Winners -->
@@ -1121,6 +1238,305 @@
             setTimeout(() => {
                 historyContainer.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">No overrides recorded yet</div>';
             }, 1000);
+        }
+
+        // Enhanced Competition Management Functions
+        let currentEditingCompetition = null;
+        
+        async function loadCompetitions() {
+            const container = document.getElementById('competitions-list');
+            container.innerHTML = '<div class="loading">Loading competitions...</div>';
+            
+            try {
+                const response = await fetch('/api/competitions');
+                const competitions = await response.json();
+                
+                if (competitions.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.6); padding: 20px;">No competitions found</div>';
+                    return;
+                }
+                
+                container.innerHTML = competitions.map(comp => {
+                    const status = getCompetitionStatus(comp);
+                    const statusClass = status === 'ACTIVE' ? 'status-active' : 
+                                       status === 'UPCOMING' ? 'status-upcoming' : 'status-ended';
+                    
+                    return `
+                        <div class="competition-item">
+                            <div class="competition-header">
+                                <div>
+                                    <h4 class="competition-title">${comp.title}</h4>
+                                    <span class="status-badge ${statusClass}">${status}</span>
+                                </div>
+                                <div class="competition-actions">
+                                    <button class="btn-admin btn-small" onclick="viewCompetitionDetails('${comp.id}')">👁️ View</button>
+                                    <button class="btn-admin btn-small" onclick="openEditModal('${comp.id}')">✏️ Edit</button>
+                                    <button class="btn-danger btn-small" onclick="deleteCompetition('${comp.id}')">🗑️ Delete</button>
+                                </div>
+                            </div>
+                            <div class="competition-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Type:</span> ${getCompetitionTypeDisplay(comp.competition_type)}
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Prize Pool:</span> $${comp.prize_pool_usd.toLocaleString()}
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Period:</span> ${comp.period}
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Start:</span> ${new Date(comp.start_date).toLocaleDateString()}
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">End:</span> ${new Date(comp.end_date).toLocaleDateString()}
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Min Trades:</span> ${comp.min_trades || 'N/A'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Store competitions globally for other functions
+                window.loadedCompetitions = competitions;
+                
+            } catch (error) {
+                console.error('Error loading competitions:', error);
+                container.innerHTML = '<div class="error">Failed to load competitions</div>';
+            }
+        }
+        
+        function getCompetitionStatus(comp) {
+            const now = new Date();
+            const start = new Date(comp.start_date);
+            const end = new Date(comp.end_date);
+            
+            if (now >= start && now <= end) return 'ACTIVE';
+            if (now < start) return 'UPCOMING';
+            return 'ENDED';
+        }
+        
+        function getCompetitionTypeDisplay(type) {
+            const types = {
+                'pnl': 'P&L Performance',
+                'volume': 'Trading Volume', 
+                'winrate': 'Win Rate'
+            };
+            return types[type] || type;
+        }
+        
+        // Competition Detail View
+        function viewCompetitionDetails(competitionId) {
+            const competition = window.loadedCompetitions?.find(c => c.id === competitionId);
+            if (!competition) {
+                showMessage('Competition not found', 'error');
+                return;
+            }
+            
+            const modal = document.getElementById('competition-detail-modal');
+            const content = document.getElementById('competition-detail-content');
+            const title = document.getElementById('detail-modal-title');
+            
+            title.textContent = competition.title;
+            content.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div class="detail-section">
+                        <h4 style="color: var(--primary-color); margin-bottom: 15px;">📋 Basic Information</h4>
+                        <div class="detail-item"><strong>ID:</strong> ${competition.name}</div>
+                        <div class="detail-item"><strong>Title:</strong> ${competition.title}</div>
+                        <div class="detail-item"><strong>Period:</strong> ${competition.period}</div>
+                        <div class="detail-item"><strong>Type:</strong> ${getCompetitionTypeDisplay(competition.competition_type)}</div>
+                        <div class="detail-item"><strong>Status:</strong> <span class="status-badge ${getCompetitionStatus(competition) === 'ACTIVE' ? 'status-active' : getCompetitionStatus(competition) === 'UPCOMING' ? 'status-upcoming' : 'status-ended'}">${getCompetitionStatus(competition)}</span></div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h4 style="color: var(--primary-color); margin-bottom: 15px;">💰 Prize Information</h4>
+                        <div class="detail-item"><strong>Prize Pool:</strong> $${competition.prize_pool_usd.toLocaleString()}</div>
+                        <div class="detail-item"><strong>Breakdown Count:</strong> ${competition.prize_breakdown?.length || 0} places</div>
+                        <div class="detail-item"><strong>Highlight Copy:</strong> ${competition.highlight_copy}</div>
+                        <div class="detail-item"><strong>CTA Text:</strong> ${competition.cta_text || 'N/A'}</div>
+                        <div class="detail-item"><strong>CTA Link:</strong> ${competition.cta_link || 'N/A'}</div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h4 style="color: var(--primary-color); margin-bottom: 15px;">📅 Schedule & Requirements</h4>
+                        <div class="detail-item"><strong>Start Date:</strong> ${new Date(competition.start_date).toLocaleString()}</div>
+                        <div class="detail-item"><strong>End Date:</strong> ${new Date(competition.end_date).toLocaleString()}</div>
+                        <div class="detail-item"><strong>Duration:</strong> ${Math.ceil((new Date(competition.end_date) - new Date(competition.start_date)) / (1000 * 60 * 60 * 24))} days</div>
+                        <div class="detail-item"><strong>Min Trades:</strong> ${competition.min_trades || 'Not set'}</div>
+                        <div class="detail-item"><strong>Min Volume:</strong> $${(competition.min_volume_usd || 0).toLocaleString()}</div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h4 style="color: var(--primary-color); margin-bottom: 15px;">🏆 Prize Breakdown</h4>
+                        ${competition.prize_breakdown && competition.prize_breakdown.length > 0 ? 
+                            competition.prize_breakdown.map(prize => `
+                                <div class="detail-item">
+                                    <strong>${prize.place}:</strong> $${prize.amount_usd.toLocaleString()} (${prize.percentage}%)
+                                </div>
+                            `).join('') : 
+                            '<div class="detail-item" style="color: rgba(255,255,255,0.6);">No prize breakdown configured</div>'
+                        }
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(45, 212, 127, 0.2);">
+                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">🔧 System Information</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 0.9rem;">
+                        <div class="detail-item"><strong>Created:</strong> ${new Date(competition.created_at).toLocaleString()}</div>
+                        <div class="detail-item"><strong>Updated:</strong> ${new Date(competition.updated_at).toLocaleString()}</div>
+                        <div class="detail-item"><strong>Competition ID:</strong> ${competition.id}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Store current competition for edit/delete actions
+            currentEditingCompetition = competition;
+            modal.style.display = 'flex';
+        }
+        
+        function closeDetailModal() {
+            document.getElementById('competition-detail-modal').style.display = 'none';
+            currentEditingCompetition = null;
+        }
+        
+        // Competition Edit Functions
+        function editCompetition() {
+            if (!currentEditingCompetition) {
+                showMessage('No competition selected', 'error');
+                return;
+            }
+            closeDetailModal();
+            openEditModal(currentEditingCompetition.id);
+        }
+        
+        function openEditModal(competitionId) {
+            const competition = window.loadedCompetitions?.find(c => c.id === competitionId);
+            if (!competition) {
+                showMessage('Competition not found', 'error');
+                return;
+            }
+            
+            // Pre-populate form fields
+            document.getElementById('edit-comp-name').value = competition.name;
+            document.getElementById('edit-comp-title').value = competition.title;
+            document.getElementById('edit-comp-period').value = competition.period;
+            document.getElementById('edit-comp-type').value = competition.competition_type;
+            document.getElementById('edit-comp-start').value = competition.start_date.slice(0, 16); // Format for datetime-local
+            document.getElementById('edit-comp-end').value = competition.end_date.slice(0, 16);
+            document.getElementById('edit-comp-prize').value = competition.prize_pool_usd;
+            document.getElementById('edit-comp-highlight').value = competition.highlight_copy;
+            document.getElementById('edit-comp-cta-text').value = competition.cta_text || '';
+            document.getElementById('edit-comp-cta-link').value = competition.cta_link || '';
+            document.getElementById('edit-comp-min-trades').value = competition.min_trades || '';
+            document.getElementById('edit-comp-min-volume').value = competition.min_volume_usd || '';
+            
+            currentEditingCompetition = competition;
+            document.getElementById('competition-edit-modal').style.display = 'flex';
+        }
+        
+        function closeEditModal() {
+            document.getElementById('competition-edit-modal').style.display = 'none';
+            currentEditingCompetition = null;
+        }
+        
+        // Handle edit form submission
+        document.getElementById('edit-competition-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!currentEditingCompetition) {
+                showMessage('No competition selected for editing', 'error');
+                return;
+            }
+            
+            const formData = {
+                name: document.getElementById('edit-comp-name').value,
+                title: document.getElementById('edit-comp-title').value,
+                period: document.getElementById('edit-comp-period').value,
+                competition_type: document.getElementById('edit-comp-type').value,
+                start_date: new Date(document.getElementById('edit-comp-start').value).toISOString(),
+                end_date: new Date(document.getElementById('edit-comp-end').value).toISOString(),
+                prize_pool_usd: parseInt(document.getElementById('edit-comp-prize').value),
+                highlight_copy: document.getElementById('edit-comp-highlight').value,
+                cta_text: document.getElementById('edit-comp-cta-text').value,
+                cta_link: document.getElementById('edit-comp-cta-link').value,
+                min_trades: parseInt(document.getElementById('edit-comp-min-trades').value) || null,
+                min_volume_usd: parseInt(document.getElementById('edit-comp-min-volume').value) || null
+            };
+            
+            try {
+                showMessage('Updating competition...', 'info');
+                
+                const response = await fetch(`/api/competitions/${currentEditingCompetition.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    showMessage('Competition updated successfully!', 'success');
+                    closeEditModal();
+                    loadCompetitions(); // Refresh the list
+                } else {
+                    const error = await response.json();
+                    showMessage('Failed to update competition: ' + error.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error updating competition:', error);
+                showMessage('Error updating competition', 'error');
+            }
+        });
+        
+        // Competition Delete Function
+        async function deleteCompetition(competitionId) {
+            const competition = window.loadedCompetitions?.find(c => c.id === competitionId);
+            if (!competition) {
+                showMessage('Competition not found', 'error');
+                return;
+            }
+            
+            const confirmMessage = `Are you sure you want to delete "${competition.title}"?\n\nThis will also delete:\n- All associated prize breakdowns\n- All winners for this competition\n- This action CANNOT be undone!\n\nType "DELETE" to confirm:`;
+            
+            const confirmation = prompt(confirmMessage);
+            if (confirmation !== 'DELETE') {
+                showMessage('Deletion cancelled', 'info');
+                return;
+            }
+            
+            try {
+                showMessage('Deleting competition...', 'info');
+                
+                const response = await fetch(`/api/competitions/${competitionId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    showMessage('Competition deleted successfully!', 'success');
+                    loadCompetitions(); // Refresh the list
+                    // Close any open modals
+                    closeDetailModal();
+                    closeEditModal();
+                } else {
+                    const error = await response.json();
+                    showMessage('Failed to delete competition: ' + error.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting competition:', error);
+                showMessage('Error deleting competition', 'error');
+            }
+        }
+        
+        function confirmDeleteCompetition() {
+            if (currentEditingCompetition) {
+                deleteCompetition(currentEditingCompetition.id);
+            }
         }
 
         async function loadSystemStats() {
