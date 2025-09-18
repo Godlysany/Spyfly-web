@@ -26,10 +26,48 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci --only=production
 
-      - name: ℹ️ Database Notice
+      - name: 🗄 Database Migration Check
         run: |
-          echo "ℹ️ Database changes must be applied manually via Supabase SQL Editor"
-          echo "ℹ️ Check README for required database schema"
+          echo "🔍 Checking for database changes..."
+          if [ -f "migrations.sql" ]; then
+            echo "✅ Migration file found - will sync database"
+            echo "DB_CHANGES=true" >> $GITHUB_ENV
+          else
+            echo "ℹ️ No migration file - skipping database sync"
+            echo "DB_CHANGES=false" >> $GITHUB_ENV
+          fi
+
+      - name: 🗄 Sync Database Schema (if needed)
+        if: env.DB_CHANGES == 'true'
+        run: |
+          echo "🚀 Syncing database schema to production..."
+          # Install PostgreSQL client
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          
+          # Extract database connection details from DATABASE_URL
+          DB_URL="${{ secrets.DATABASE_URL }}"
+          
+          # Apply migrations using the full DATABASE_URL
+          if [ -f "migrations.sql" ]; then
+            echo "Applying database migrations..."
+            psql "$DB_URL" -f migrations.sql
+            
+            # Archive the migration file
+            mkdir -p applied-migrations
+            mv migrations.sql "applied-migrations/migration-$(date +%Y%m%d_%H%M%S).sql"
+            
+            # Commit the archived migration (if we have changes)
+            if [ -n "$(git status --porcelain)" ]; then
+              git config --global user.name 'SpyFly Deploy Bot'
+              git config --global user.email 'deploy@spyfly.com'
+              git add applied-migrations/
+              git commit -m "📦 Archive applied migration $(date +%Y-%m-%d)"
+              git push origin ${{ github.ref_name }}
+            fi
+            
+            echo "✅ Database migration completed successfully"
+          fi
 
       - name: 🚀 Deploy to Railway
         uses: bltavares/actions-railway@v1
@@ -38,10 +76,10 @@ jobs:
           service: ${{ secrets.RAILWAY_SERVICE_NAME }}
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'spyfly-production-jwt-key-2025' }}
 
       - name: 🔄 Health Check
         run: |
