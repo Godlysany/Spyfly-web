@@ -134,24 +134,73 @@ function initImageComparisonSlider() {
         if (animationInterval) return;
         autoAnimation = true;
         
+        let animationState = 'showing_before'; // 'showing_before', 'transitioning_to_after', 'showing_after', 'transitioning_to_before'
+        let stateTimer = 0;
+        const SHOW_DURATION = 60; // 3 seconds at 50ms intervals
+        const TRANSITION_DURATION = 30; // 1.5 seconds at 50ms intervals
+        
         animationInterval = setInterval(() => {
             if (isDragging) return;
             
-            // Smooth cycling between 15% and 85%
-            if (direction === 1 && currentPosition >= 85) {
-                direction = -1;
-            } else if (direction === -1 && currentPosition <= 15) {
-                direction = 1;
+            stateTimer++;
+            
+            switch(animationState) {
+                case 'showing_before':
+                    // Hold at 10% to fully show "before" image
+                    currentPosition = 10;
+                    updateSliderPosition(currentPosition);
+                    
+                    if (stateTimer >= SHOW_DURATION) {
+                        animationState = 'transitioning_to_after';
+                        stateTimer = 0;
+                    }
+                    break;
+                    
+                case 'transitioning_to_after':
+                    // Smooth transition from 10% to 90%
+                    const progressToAfter = stateTimer / TRANSITION_DURATION;
+                    const easedProgress = easeInOutCubic(progressToAfter);
+                    currentPosition = 10 + (easedProgress * 80); // 10% to 90%
+                    updateSliderPosition(currentPosition);
+                    
+                    if (stateTimer >= TRANSITION_DURATION) {
+                        animationState = 'showing_after';
+                        stateTimer = 0;
+                        currentPosition = 90;
+                    }
+                    break;
+                    
+                case 'showing_after':
+                    // Hold at 90% to fully show "after" image
+                    currentPosition = 90;
+                    updateSliderPosition(currentPosition);
+                    
+                    if (stateTimer >= SHOW_DURATION) {
+                        animationState = 'transitioning_to_before';
+                        stateTimer = 0;
+                    }
+                    break;
+                    
+                case 'transitioning_to_before':
+                    // Smooth transition from 90% back to 10%
+                    const progressToBefore = stateTimer / TRANSITION_DURATION;
+                    const easedProgressBack = easeInOutCubic(progressToBefore);
+                    currentPosition = 90 - (easedProgressBack * 80); // 90% to 10%
+                    updateSliderPosition(currentPosition);
+                    
+                    if (stateTimer >= TRANSITION_DURATION) {
+                        animationState = 'showing_before';
+                        stateTimer = 0;
+                        currentPosition = 10;
+                    }
+                    break;
             }
-            
-            // Move in smooth increments
-            currentPosition += direction * 2;
-            
-            // Clamp position
-            currentPosition = Math.min(85, Math.max(15, currentPosition));
-            
-            updateSliderPosition(currentPosition);
         }, 50); // 50ms intervals for smooth animation
+        
+        // Easing function for smooth transitions
+        function easeInOutCubic(t) {
+            return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+        }
     }
     
     function pauseAutoAnimation() {
