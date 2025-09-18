@@ -1787,21 +1787,29 @@ body.loading .loader-overlay {
 .leaderboard-page #leaderboard-hero,
 .leaderboard-page #leaderboard-controls,
 .leaderboard-page #main-leaderboard,
-.leaderboard-page #footer {
+.leaderboard-page #footer,
+.leaderboard-page #prize-hub {
     position: relative;
     z-index: 10;
-    opacity: 1;
-    visibility: visible;
+    opacity: 1 !important;
+    visibility: visible !important;
+    background: var(--dark-bg) !important; /* Force consistent background */
 }
 
 .leaderboard-page {
-    background: var(--dark-bg);
+    background: var(--dark-bg) !important;
     min-height: 100vh;
+}
+
+/* Force consistent background for all sections on leaderboard page */
+.leaderboard-page .section {
+    background: var(--dark-bg) !important;
+    opacity: 1 !important;
 }
 
 /* Leaderboard Hero Section */
 #leaderboard-hero {
-    background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+    background: var(--dark-bg); /* Consistent background */
     padding: 60px 0 40px;
     text-align: center;
 }
@@ -2166,7 +2174,7 @@ nav ul li a.active {
 
 /* Prize Hub Styles */
 #prize-hub {
-    background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+    background: var(--dark-bg); /* Consistent with page background */
     padding: 60px 0;
     opacity: 1 !important; /* Force visibility - override any hiding rules */
 }

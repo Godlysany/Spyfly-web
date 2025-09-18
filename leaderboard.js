@@ -165,6 +165,8 @@ async function initSmartPrizeHub() {
 function renderZeroDataView() {
     const prizeHub = document.getElementById('prize-hub');
     prizeHub.style.display = 'none'; // Hide the entire section
+    prizeHub.style.padding = '0'; // Remove any padding that could create gaps
+    prizeHub.style.margin = '0'; // Remove any margin that could create gaps
     console.log('Zero data state: Prize section hidden, showing leaderboard only');
 }
 
