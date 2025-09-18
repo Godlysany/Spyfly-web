@@ -1463,30 +1463,54 @@ function generateWinnersCarousel(historyData) {
 }
 
 // Hall of Fame display for specific competitions
-function generateHallOfFameDisplay(historyData) {
+function generateHallOfFameDisplay(historyData, specificIndex = null) {
     if (!historyData || historyData.length === 0) {
         return '<div class="no-hall-data">🏅 Hall of Fame will showcase past champions here</div>';
     }
     
-    const competition = historyData[0]; // Currently showing first competition
-    if (!competition.winners || competition.winners.length === 0) {
-        return '<div class="no-winners-competition">🏆 No winners data for this competition</div>';
+    // Use specific index if provided, otherwise use currentCompetitionIndex or 0
+    const competitionIndex = specificIndex !== null ? specificIndex : (typeof currentCompetitionIndex !== 'undefined' ? currentCompetitionIndex : 0);
+    const competition = historyData[competitionIndex];
+    
+    if (!competition || !competition.winners || competition.winners.length === 0) {
+        return '<div class="no-winners-competition">🏆 No winners data available for this competition</div>';
     }
+    
+    // Ensure we show all winners (top 3) with proper layout
+    const winners = competition.winners.slice(0, 3); // Show maximum 3 winners
     
     return `
         <div class="hall-winners-display">
-            ${competition.winners.map(winner => `
+            ${winners.map(winner => `
                 <div class="hall-winner-card ${winner.place === 1 ? 'champion' : ''}">
                     <div class="winner-position">${['🥇', '🥈', '🥉'][winner.place - 1] || '🏆'}</div>
                     <div class="winner-details">
                         <div class="winner-username">@${winner.username}</div>
                         <div class="winner-prize">$${winner.amount_usd.toLocaleString()}</div>
-                        <div class="winner-performance">${winner.performance_metric || 'Winner'}</div>
+                        <div class="winner-performance">${getWinnerPerformanceLabel(winner, competition)}</div>
                     </div>
                 </div>
             `).join('')}
         </div>
     `;
+}
+
+// Helper function to get proper performance label based on competition type
+function getWinnerPerformanceLabel(winner, competition) {
+    if (!winner.performance_metric && !winner.pnl_usd && !winner.total_volume_usd && !winner.win_rate) {
+        return 'Winner';
+    }
+    
+    switch(competition.competition_type) {
+        case 'pnl':
+            return winner.pnl_usd ? `+$${winner.pnl_usd.toLocaleString()} P&L` : 'P&L Winner';
+        case 'volume':
+            return winner.total_volume_usd ? `$${(winner.total_volume_usd/1000).toFixed(0)}K Volume` : 'Volume Winner';
+        case 'win_rate':
+            return winner.win_rate ? `${winner.win_rate}% Win Rate` : 'Win Rate Champion';
+        default:
+            return winner.performance_metric || 'Champion';
+    }
 }
 
 // Championship history table
@@ -1658,8 +1682,9 @@ function updateHallOfFameDisplay() {
         indicatorEl.textContent = currentHistoryData[currentCompetitionIndex].title;
     }
     
-    if (displayEl) {
-        displayEl.innerHTML = generateHallOfFameDisplay([currentHistoryData[currentCompetitionIndex]]);
+    if (displayEl && currentHistoryData && currentHistoryData.length > 0) {
+        // Pass the full history data and the specific index to show
+        displayEl.innerHTML = generateHallOfFameDisplay(currentHistoryData, currentCompetitionIndex);
     }
 }
 
