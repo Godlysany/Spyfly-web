@@ -309,6 +309,33 @@ async function handleApiRequest(req, res, pathname, method) {
             return;
         }
 
+        // Get all winners (PROTECTED)  
+        if (pathname === '/api/winners' && method === 'GET') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const { data: winners, error } = await supabase
+                .from('winners')
+                .select(`*, competitions(title)`)
+                .order('created_at', { ascending: false });
+            
+            if (error) throw error;
+            
+            // Flatten competition title
+            const winnersWithTitle = winners.map(winner => ({
+                ...winner,
+                competition_title: winner.competitions?.title
+            }));
+            
+            res.writeHead(200);
+            res.end(JSON.stringify(winnersWithTitle));
+            return;
+        }
+
         // Add winner (PROTECTED)
         if (pathname === '/api/winners' && method === 'POST') {
             const admin = await verifyAdminToken(req);
@@ -327,6 +354,52 @@ async function handleApiRequest(req, res, pathname, method) {
             
             if (error) throw error;
             res.writeHead(201);
+            res.end(JSON.stringify({ success: true }));
+            return;
+        }
+
+        // Update winner (PROTECTED)
+        if (pathname.startsWith('/api/winners/') && method === 'PUT') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const winnerId = pathname.split('/api/winners/')[1];
+            const body = await getRequestBody(req);
+            const updates = JSON.parse(body);
+            
+            const { error } = await supabase
+                .from('winners')
+                .update(updates)
+                .eq('id', winnerId);
+            
+            if (error) throw error;
+            res.writeHead(200);
+            res.end(JSON.stringify({ success: true }));
+            return;
+        }
+
+        // Delete winner (PROTECTED)
+        if (pathname.startsWith('/api/winners/') && method === 'DELETE') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const winnerId = pathname.split('/api/winners/')[1];
+            
+            const { error } = await supabase
+                .from('winners')
+                .delete()
+                .eq('id', winnerId);
+            
+            if (error) throw error;
+            res.writeHead(200);
             res.end(JSON.stringify({ success: true }));
             return;
         }

@@ -205,6 +205,15 @@
                 </form>
             </div>
 
+            <!-- Winners Management -->
+            <div class="admin-card">
+                <h3>🏆 Manage Winners</h3>
+                <div id="winners-list" style="max-height: 400px; overflow-y: auto;">
+                    <div class="loading">Loading winners...</div>
+                </div>
+                <button class="btn-admin" onclick="loadWinners()" style="margin-top: 15px;">Refresh Winners</button>
+            </div>
+
             <!-- System Stats -->
             <div class="admin-card">
                 <h3>📊 System Statistics</h3>
@@ -315,6 +324,7 @@
                 testConnection();
                 loadCompetitions();
                 loadSystemStats();
+                loadWinners();
                 
                 // Setup form handlers
                 document.getElementById('competition-form').addEventListener('submit', createCompetition);
