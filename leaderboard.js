@@ -118,8 +118,9 @@ window.testSimple = function() {
     const prizeHub = document.getElementById('prize-hub');
     if (prizeHub) {
         console.log('Element found, setting simple test content...');
-        prizeHub.innerHTML = '<div style="background: red; color: white; padding: 20px; text-align: center;"><h1>🔧 SIMPLE TEST WORKS!</h1><p>This proves DOM manipulation is working</p></div>';
-        console.log('Simple test content set!');
+        prizeHub.innerHTML = '<div style="background: red !important; color: white !important; padding: 20px !important; text-align: center !important; display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 999999 !important; position: relative !important; height: auto !important; width: 100% !important;"><h1 style="font-size: 2em !important; margin: 10px !important;">🔧 SIMPLE TEST WORKS!</h1><p style="font-size: 1.2em !important; margin: 10px !important;">This proves DOM manipulation is working</p></div>';
+        console.log('Simple test content set with !important overrides!');
+        console.log('Element computed styles:', window.getComputedStyle(prizeHub).display, window.getComputedStyle(prizeHub).visibility, window.getComputedStyle(prizeHub).opacity);
     } else {
         console.log('ERROR: Could not find prize-hub element!');
     }
