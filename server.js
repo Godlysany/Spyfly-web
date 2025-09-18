@@ -3,21 +3,20 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
-const { Pool } = require('pg');
+const { createClient } = require('@supabase/supabase-js');
 
-const DATABASE_URL = process.env.DATABASE_URL;
+// Environment variables
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const PORT = 5000;
 
-if (!DATABASE_URL) {
-    console.error('❌ DATABASE_URL environment variable is not set');
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+    console.error('❌ Missing Supabase environment variables');
     process.exit(1);
 }
 
-// Database connection
-const pool = new Pool({
-    connectionString: DATABASE_URL,
-    ssl: DATABASE_URL.includes('supabase') ? { rejectUnauthorized: false } : false
-});
+// Supabase client for server-side operations
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 // MIME types for static file serving
 const mimeTypes = {
@@ -77,28 +76,23 @@ async function handleApiRequest(req, res, pathname, method) {
     try {
         // Test endpoint
         if (pathname === '/api/test' && method === 'GET') {
-            const result = await pool.query('SELECT NOW()');
+            const { data, error } = await supabase.from('competitions').select('count').limit(1);
+            if (error) throw error;
             res.writeHead(200);
-            res.end(JSON.stringify({ status: 'connected', time: result.rows[0].now }));
+            res.end(JSON.stringify({ status: 'connected', supabase: true, time: new Date() }));
             return;
         }
 
         // Get all competitions
         if (pathname === '/api/competitions' && method === 'GET') {
-            const result = await pool.query(`
-                SELECT c.*, 
-                       COALESCE(json_agg(
-                           CASE WHEN pb.place IS NOT NULL THEN
-                               json_build_object('place', pb.place, 'amount_usd', pb.amount_usd, 'percent', pb.percent, 'is_split', pb.is_split)
-                           END
-                       ) FILTER (WHERE pb.place IS NOT NULL), '[]'::json) as breakdown
-                FROM competitions c
-                LEFT JOIN prize_breakdown pb ON c.id = pb.competition_id
-                GROUP BY c.id
-                ORDER BY c.start_date DESC
-            `);
+            const { data: competitions, error } = await supabase
+                .from('competitions')
+                .select(`*, prize_breakdown(*)`)
+                .order('start_date', { ascending: false });
+            
+            if (error) throw error;
             res.writeHead(200);
-            res.end(JSON.stringify(result.rows));
+            res.end(JSON.stringify(competitions));
             return;
         }
 
@@ -107,14 +101,14 @@ async function handleApiRequest(req, res, pathname, method) {
             const body = await getRequestBody(req);
             const comp = JSON.parse(body);
             
-            const result = await pool.query(`
-                INSERT INTO competitions (name, title, period, start_date, end_date, prize_pool_usd, highlight_copy, cta_text, cta_link)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-                RETURNING id
-            `, [comp.name, comp.title, comp.period, comp.start_date, comp.end_date, comp.prize_pool_usd, comp.highlight_copy, comp.cta_text, comp.cta_link]);
+            const { data, error } = await supabase
+                .from('competitions')
+                .insert([comp])
+                .select();
             
+            if (error) throw error;
             res.writeHead(201);
-            res.end(JSON.stringify({ success: true, id: result.rows[0].id }));
+            res.end(JSON.stringify({ success: true, id: data[0].id }));
             return;
         }
 
@@ -123,11 +117,11 @@ async function handleApiRequest(req, res, pathname, method) {
             const body = await getRequestBody(req);
             const winner = JSON.parse(body);
             
-            await pool.query(`
-                INSERT INTO winners (competition_id, place, username, amount_usd, tx_url, paid_at)
-                VALUES ($1, $2, $3, $4, $5, NOW())
-            `, [winner.competition_id, winner.place, winner.username, winner.amount_usd, winner.tx_url || null]);
+            const { error } = await supabase
+                .from('winners')
+                .insert([{ ...winner, paid_at: new Date().toISOString() }]);
             
+            if (error) throw error;
             res.writeHead(201);
             res.end(JSON.stringify({ success: true }));
             return;
@@ -135,17 +129,27 @@ async function handleApiRequest(req, res, pathname, method) {
 
         // Get system stats
         if (pathname === '/api/stats' && method === 'GET') {
-            const distributedResult = await pool.query('SELECT COALESCE(SUM(amount_usd), 0) as total FROM winners');
-            const winnersResult = await pool.query('SELECT COUNT(*) as count FROM winners');
-            const monthsResult = await pool.query('SELECT COUNT(DISTINCT CONCAT(EXTRACT(YEAR FROM created_at), EXTRACT(MONTH FROM created_at))) as count FROM competitions');
-            const cacheResult = await pool.query("SELECT value FROM app_settings WHERE key = 'cache_version'");
+            const [
+                { data: winners },
+                { data: competitions },
+                { data: settings }
+            ] = await Promise.all([
+                supabase.from('winners').select('amount_usd'),
+                supabase.from('competitions').select('id, created_at'),
+                supabase.from('app_settings').select('*').eq('key', 'cache_version')
+            ]);
+            
+            const totalDistributed = winners?.reduce((sum, w) => sum + w.amount_usd, 0) || 0;
+            const totalWinners = winners?.length || 0;
+            const monthsActive = competitions?.length || 0;
+            const cacheVersion = settings?.[0]?.value || '202509';
             
             res.writeHead(200);
             res.end(JSON.stringify({
-                total_distributed: parseInt(distributedResult.rows[0].total),
-                total_winners: parseInt(winnersResult.rows[0].count),
-                months_active: parseInt(monthsResult.rows[0].count),
-                cache_version: cacheResult.rows[0]?.value || '202509'
+                total_distributed: totalDistributed,
+                total_winners: totalWinners,
+                months_active: monthsActive,
+                cache_version: cacheVersion
             }));
             return;
         }
@@ -155,11 +159,11 @@ async function handleApiRequest(req, res, pathname, method) {
             const body = await getRequestBody(req);
             const { key, value } = JSON.parse(body);
             
-            await pool.query(`
-                INSERT INTO app_settings (key, value) VALUES ($1, $2)
-                ON CONFLICT (key) DO UPDATE SET value = $2, updated_at = NOW()
-            `, [key, value]);
+            const { error } = await supabase
+                .from('app_settings')
+                .upsert([{ key, value, updated_at: new Date().toISOString() }]);
             
+            if (error) throw error;
             res.writeHead(200);
             res.end(JSON.stringify({ success: true }));
             return;
@@ -170,70 +174,58 @@ async function handleApiRequest(req, res, pathname, method) {
             const now = new Date().toISOString();
             
             // Get current active competition
-            const currentResult = await pool.query(`
-                SELECT c.*, 
-                       COALESCE(json_agg(
-                           CASE WHEN pb.place IS NOT NULL THEN
-                               json_build_object('place', pb.place, 'amount_usd', pb.amount_usd, 'percent', pb.percent, 'is_split', pb.is_split)
-                           END
-                       ) FILTER (WHERE pb.place IS NOT NULL), '[]'::json) as breakdown
-                FROM competitions c
-                LEFT JOIN prize_breakdown pb ON c.id = pb.competition_id
-                WHERE c.start_date <= $1 AND c.end_date >= $1
-                GROUP BY c.id
-                LIMIT 1
-            `, [now]);
+            const { data: currentComp } = await supabase
+                .from('competitions')
+                .select(`*, prize_breakdown(*)`)
+                .lte('start_date', now)
+                .gte('end_date', now)
+                .limit(1)
+                .single();
 
             // Get upcoming competition
-            const upcomingResult = await pool.query(`
-                SELECT * FROM competitions 
-                WHERE start_date > $1 
-                ORDER BY start_date ASC 
-                LIMIT 1
-            `, [now]);
+            const { data: upcomingComp } = await supabase
+                .from('competitions')
+                .select('*')
+                .gt('start_date', now)
+                .order('start_date', { ascending: true })
+                .limit(1)
+                .single();
 
             // Get historical competitions with winners
-            const historyResult = await pool.query(`
-                SELECT c.name, c.title, c.period, c.start_date, c.end_date, c.prize_pool_usd,
-                       COALESCE(json_agg(
-                           CASE WHEN w.place IS NOT NULL THEN
-                               json_build_object('place', w.place, 'username', w.username, 'amount_usd', w.amount_usd, 'tx_url', w.tx_url)
-                           END
-                       ) FILTER (WHERE w.place IS NOT NULL), '[]'::json) as winners
-                FROM competitions c
-                LEFT JOIN winners w ON c.id = w.competition_id
-                WHERE c.end_date < $1
-                GROUP BY c.id, c.name, c.title, c.period, c.start_date, c.end_date, c.prize_pool_usd
-                ORDER BY c.end_date DESC
-                LIMIT 5
-            `, [now]);
+            const { data: historyComps } = await supabase
+                .from('competitions')
+                .select(`*, winners(*)`)
+                .lt('end_date', now)
+                .order('end_date', { ascending: false })
+                .limit(5);
 
-            // Get app settings
-            const settingsResult = await pool.query('SELECT key, value FROM app_settings');
-            const settings = {};
-            settingsResult.rows.forEach(row => {
-                settings[row.key] = row.value;
-            });
+            // Get settings
+            const { data: settings } = await supabase
+                .from('app_settings')
+                .select('*');
 
-            // Calculate stats
-            const totalDistributed = historyResult.rows.reduce((sum, comp) => {
-                return sum + comp.winners.reduce((compSum, winner) => compSum + winner.amount_usd, 0);
-            }, 0);
+            const settingsMap = {};
+            settings?.forEach(s => settingsMap[s.key] = s.value);
 
-            const totalWinners = historyResult.rows.reduce((sum, comp) => sum + comp.winners.length, 0);
+            // Calculate stats from history
+            const totalDistributed = historyComps?.reduce((sum, comp) => {
+                return sum + (comp.winners?.reduce((compSum, winner) => compSum + winner.amount_usd, 0) || 0);
+            }, 0) || 0;
+
+            const totalWinners = historyComps?.reduce((sum, comp) => sum + (comp.winners?.length || 0), 0) || 0;
 
             const response = {
-                current: currentResult.rows[0] || null,
-                upcoming: upcomingResult.rows[0] || null,
-                history: historyResult.rows,
+                current: currentComp || null,
+                upcoming: upcomingComp || null,  
+                history: historyComps || [],
                 stats: {
                     total_distributed_usd: totalDistributed,
                     total_winners: totalWinners,
-                    months_active: historyResult.rows.length
+                    months_active: historyComps?.length || 0
                 },
                 config: {
-                    hero_promo_days_before_start: parseInt(settings.hero_promo_days_before_start) || 7,
-                    cache_version: settings.cache_version || '202509'
+                    hero_promo_days_before_start: parseInt(settingsMap.hero_promo_days_before_start) || 7,
+                    cache_version: settingsMap.cache_version || '202509'
                 }
             };
 
@@ -292,12 +284,15 @@ function getRequestBody(req) {
 server.listen(PORT, '0.0.0.0', async () => {
     console.log(`🚀 SpyFly Server running on port ${PORT}`);
     
-    // Test database connection
+    // Test Supabase connection
     try {
-        const result = await pool.query('SELECT NOW()');
-        console.log(`✅ Database connected at ${result.rows[0].now}`);
+        const { data, error } = await supabase.from('competitions').select('count').limit(1);
+        if (error && !error.message.includes('does not exist')) {
+            throw error;
+        }
+        console.log(`✅ Supabase connected to ${SUPABASE_URL}`);
     } catch (error) {
-        console.error('❌ Database connection failed:', error.message);
+        console.error('❌ Supabase connection failed:', error.message);
     }
 });
 
