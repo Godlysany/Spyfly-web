@@ -1,10 +1,199 @@
 // ===================================================================
 // LEADERBOARD INTERACTIVE FUNCTIONALITY - SPYFLY 2025
+// SMART VIEW SYSTEM: Launch View → Sophisticated View
 // ===================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
     initLeaderboardInteractivity();
+    initSmartPrizeHub();
 });
+
+// ===================================================================
+// SMART PRIZE HUB - LAUNCH VS SOPHISTICATED VIEW
+// ===================================================================
+async function initSmartPrizeHub() {
+    try {
+        const response = await fetch('/api/prizes');
+        const data = await response.json();
+        
+        // Detect data richness to choose view
+        const hasCompetitions = data.current || data.upcoming;
+        const hasHistory = data.history && data.history.length > 0;
+        const hasStats = data.stats && data.stats.total_winners > 0;
+        
+        if (!hasCompetitions && !hasHistory && !hasStats) {
+            renderLaunchView();
+        } else if (hasCompetitions && hasHistory && hasStats) {
+            renderSophisticatedView(data);
+        } else {
+            renderTransitionView(data);
+        }
+    } catch (error) {
+        console.log('API not available, using launch view');
+        renderLaunchView();
+    }
+}
+
+function renderLaunchView() {
+    const prizeHub = document.getElementById('prize-hub');
+    prizeHub.innerHTML = `
+        <div class="container">
+            <h1 class="section-title">🏆 Prize Championships</h1>
+            
+            <!-- Launch Hero -->
+            <div class="launch-hero-card">
+                <div class="launch-hero-content">
+                    <div class="launch-badge">🚀 LAUNCHING SOON</div>
+                    <h2 class="launch-title">The Ultimate Trading Championship</h2>
+                    <p class="launch-subtitle">Compete with elite traders. Win life-changing prizes. Prove your alpha.</p>
+                    
+                    <div class="launch-features">
+                        <div class="launch-feature">
+                            <i class="fas fa-trophy"></i>
+                            <div>
+                                <strong>Massive Prize Pools</strong>
+                                <span>$15K+ monthly competitions</span>
+                            </div>
+                        </div>
+                        <div class="launch-feature">
+                            <i class="fas fa-chart-line"></i>
+                            <div>
+                                <strong>Real Performance</strong>
+                                <span>Track actual P&L and win rates</span>
+                            </div>
+                        </div>
+                        <div class="launch-feature">
+                            <i class="fas fa-users"></i>
+                            <div>
+                                <strong>Elite Community</strong>
+                                <span>Compete with top Solana traders</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="launch-cta">
+                        <a href="https://t.me/spyflybot" class="btn btn-primary btn-large">
+                            🎯 GET EARLY ACCESS
+                        </a>
+                        <p class="launch-note">Be among the first competitors when we launch</p>
+                    </div>
+                </div>
+                
+                <div class="launch-visual">
+                    <div class="launch-stats-preview">
+                        <div class="stat-item">
+                            <div class="stat-number">$50K+</div>
+                            <div class="stat-label">Prize Pool Ready</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">24/7</div>
+                            <div class="stat-label">Real-time Tracking</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">1st</div>
+                            <div class="stat-label">On Solana</div>
+                        </div>
+                    </div>
+                    
+                    <div class="launch-preview-leaderboard">
+                        <div class="preview-title">Live Leaderboard Preview</div>
+                        <div class="preview-row preview-winner">
+                            <span>🥇 @your_username</span>
+                            <span class="preview-pnl">+$47.2K</span>
+                        </div>
+                        <div class="preview-row">
+                            <span>🥈 @trader_legend</span>
+                            <span class="preview-pnl">+$38.9K</span>
+                        </div>
+                        <div class="preview-row">
+                            <span>🥉 @alpha_hunter</span>
+                            <span class="preview-pnl">+$31.5K</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Coming Soon Features -->
+            <div class="coming-soon-section">
+                <h3 class="subsection-title">What's Coming</h3>
+                <div class="coming-soon-grid">
+                    <div class="coming-soon-card">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h4>Monthly Championships</h4>
+                        <p>Regular competitions with increasing prize pools</p>
+                    </div>
+                    <div class="coming-soon-card">
+                        <i class="fas fa-medal"></i>
+                        <h4>Instant Payouts</h4>
+                        <p>Winners receive prizes directly to their wallets</p>
+                    </div>
+                    <div class="coming-soon-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Verified Trades</h4>
+                        <p>100% transparent, on-chain verification system</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderTransitionView(data) {
+    // Mixed view - some data exists but not full sophisticated view yet
+    const prizeHub = document.getElementById('prize-hub');
+    const hasCompetitions = data.current || data.upcoming;
+    const hasHistory = data.history && data.history.length > 0;
+    
+    let content = '<div class="container"><h1 class="section-title">🏆 Prize Championships</h1>';
+    
+    if (hasCompetitions) {
+        content += renderCompetitionSection(data);
+    } else {
+        content += renderUpcomingPromise();
+    }
+    
+    if (hasHistory) {
+        content += renderHistorySection(data);
+    } else {
+        content += renderHistoryPreview();
+    }
+    
+    content += '</div>';
+    prizeHub.innerHTML = content;
+}
+
+function renderUpcomingPromise() {
+    return `
+        <div class="transition-promise">
+            <div class="promise-card">
+                <i class="fas fa-rocket"></i>
+                <h3>First Championship Loading...</h3>
+                <p>We're preparing an epic competition with massive prizes. Early access members will be notified first!</p>
+                <a href="https://t.me/spyflybot" class="btn btn-primary">🔔 Get Notified</a>
+            </div>
+        </div>
+    `;
+}
+
+function renderHistoryPreview() {
+    return `
+        <div class="history-preview-section">
+            <h3 class="subsection-title">Hall of Champions</h3>
+            <div class="history-preview">
+                <div class="preview-card">
+                    <i class="fas fa-crown"></i>
+                    <h4>Make History</h4>
+                    <p>Be the first name in our Hall of Champions. Your trading skills could earn you legendary status.</p>
+                </div>
+                <div class="preview-benefits">
+                    <div class="benefit-item">✅ Permanent leaderboard recognition</div>
+                    <div class="benefit-item">✅ Winner spotlight & interview</div>
+                    <div class="benefit-item">✅ Exclusive champion badge</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
 
 function initLeaderboardInteractivity() {
     const periodButtons = document.querySelectorAll('.period-btn');
@@ -106,6 +295,34 @@ function initLeaderboardInteractivity() {
             currentMetric = this.value;
             updateLeaderboard();
         });
+    }
+
+    // Sophisticated view renderer for rich data
+    function renderSophisticatedView(data) {
+        // Use the original prize hub logic with full data
+        renderCurrentPrizeSection(data.current);
+        renderFuturePrizesSection(data.upcoming);
+        renderHistoricImpactSection(data.history, data.stats);
+    }
+
+    function renderCompetitionSection(data) {
+        // Render current/upcoming competitions
+        return `
+            <div class="competition-active">
+                <h3>${data.current ? 'Live Competition' : 'Next Competition'}</h3>
+                <!-- Competition details -->
+            </div>
+        `;
+    }
+
+    function renderHistorySection(data) {
+        // Render actual historical data
+        return `
+            <div class="history-rich">
+                <h3>Past Champions</h3>
+                <!-- Real historical data -->
+            </div>
+        `;
     }
 
     // Function to update leaderboard table
