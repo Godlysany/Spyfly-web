@@ -1,122 +1,82 @@
-name: SpyFly Auto Deploy & DB Sync
+name: SpyFly Database Sync
 
 on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
 
-env:
-  NODE_VERSION: '18'
-
 jobs:
-  deploy:
-    name: Deploy to Production
+  database-sync:
+    name: Sync Supabase Database
     runs-on: ubuntu-latest
     
     steps:
       - name: 🏗 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🏗 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📦 Install dependencies
-        run: npm ci --only=production
-
-      - name: 🗄 Database Migration Check
+      - name: 🗄 Check for Database Changes
+        id: check-migration
         run: |
-          echo "🔍 Checking for database changes..."
           if [ -f "migrations.sql" ]; then
             echo "✅ Migration file found - will sync database"
-            echo "DB_CHANGES=true" >> $GITHUB_ENV
+            echo "has_migration=true" >> $GITHUB_OUTPUT
           else
-            echo "ℹ️ No migration file - skipping database sync"
-            echo "DB_CHANGES=false" >> $GITHUB_ENV
+            echo "ℹ️ No migration file found - skipping database sync"
+            echo "has_migration=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: 🗄 Sync Database Schema (if needed)
-        if: env.DB_CHANGES == 'true'
+      - name: 🚀 Apply Database Migration
+        if: steps.check-migration.outputs.has_migration == 'true'
         run: |
-          echo "🚀 Syncing database schema to production..."
+          echo "🗄 Connecting to Supabase database..."
           # Install PostgreSQL client
-          sudo apt-get update
+          sudo apt-get update -q
           sudo apt-get install -y postgresql-client
           
-          # Extract database connection details from DATABASE_URL
-          DB_URL="${{ secrets.DATABASE_URL }}"
+          # Apply migration using DATABASE_URL
+          echo "📝 Applying migration to database..."
+          psql "${{ secrets.DATABASE_URL }}" -f migrations.sql -v ON_ERROR_STOP=1
           
-          # Apply migrations using the full DATABASE_URL
-          if [ -f "migrations.sql" ]; then
-            echo "Applying database migrations..."
-            psql "$DB_URL" -f migrations.sql
-            
-            # Archive the migration file
-            mkdir -p applied-migrations
-            mv migrations.sql "applied-migrations/migration-$(date +%Y%m%d_%H%M%S).sql"
-            
-            # Commit the archived migration (if we have changes)
-            if [ -n "$(git status --porcelain)" ]; then
-              git config --global user.name 'SpyFly Deploy Bot'
-              git config --global user.email 'deploy@spyfly.com'
-              git add applied-migrations/
-              git commit -m "📦 Archive applied migration $(date +%Y-%m-%d)"
-              git push origin ${{ github.ref_name }}
-            fi
-            
-            echo "✅ Database migration completed successfully"
-          fi
+          echo "✅ Database migration completed successfully!"
 
-      - name: 🚀 Deploy to Railway
-        uses: bltavares/actions-railway@v1
-        with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: ${{ secrets.RAILWAY_SERVICE_NAME }}
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET || 'spyfly-production-jwt-key-2025' }}
-
-      - name: 🔄 Health Check
+      - name: 📦 Archive Migration File
+        if: steps.check-migration.outputs.has_migration == 'true'
         run: |
-          echo "⏳ Waiting for deployment to be ready..."
-          sleep 30
+          # Create archive directory
+          mkdir -p applied-migrations
           
-          echo "🩺 Performing health check..."
-          response=$(curl -s -o /dev/null -w "%{http_code}" https://spyfly.railway.app/api/test)
+          # Move migration file with timestamp
+          timestamp=$(date +%Y%m%d_%H%M%S)
+          mv migrations.sql "applied-migrations/migration-${timestamp}.sql"
           
-          if [ $response -eq 200 ]; then
-            echo "✅ Deployment successful! SpyFly is live at https://spyfly.railway.app"
+          # Configure git and commit the archived migration
+          git config --global user.name 'SpyFly Database Sync'
+          git config --global user.email 'dbsync@spyfly.com'
+          git add applied-migrations/
+          
+          if ! git diff --staged --quiet; then
+            git commit -m "📦 Archive database migration ${timestamp}"
+            git push origin ${{ github.ref_name }}
+            echo "🗃️ Migration archived successfully"
           else
-            echo "❌ Health check failed with status: $response"
-            exit 1
+            echo "ℹ️ No changes to archive"
           fi
 
-      - name: 📊 Deployment Summary
+      - name: 📊 Migration Summary
+        if: steps.check-migration.outputs.has_migration == 'true'
         run: |
-          echo "## 🎉 SpyFly Deployment Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "## 🗄️ SpyFly Database Migration Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY  
+          echo "**✅ Status:** Migration Applied Successfully" >> $GITHUB_STEP_SUMMARY
+          echo "**🕒 Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "**🗃️ Archive:** Migration moved to applied-migrations/" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**🌐 Live URL:** https://spyfly.railway.app" >> $GITHUB_STEP_SUMMARY
-          echo "**🏆 Admin Panel:** https://spyfly.railway.app/admin.html" >> $GITHUB_STEP_SUMMARY
-          echo "**🔐 Login:** https://spyfly.railway.app/login.html" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Database Changes:** ${{ env.DB_CHANGES }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Deployment Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "ℹ️ Railway will auto-deploy your application changes." >> $GITHUB_STEP_SUMMARY
 
-  notify:
-    name: Notify Success
-    needs: deploy
-    runs-on: ubuntu-latest
-    if: success()
-    
-    steps:
-      - name: ✅ Success Notification
+      - name: ℹ️ No Changes
+        if: steps.check-migration.outputs.has_migration == 'false'
         run: |
-          echo "🚀 SpyFly successfully deployed!"
-          echo "   🌐 Frontend: https://spyfly.railway.app"
-          echo "   🏆 Admin: https://spyfly.railway.app/admin.html"
-          echo "   📊 Database: Synced and operational"
+          echo "## ℹ️ No Database Changes" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "No migrations.sql file found - database sync skipped." >> $GITHUB_STEP_SUMMARY
+          echo "Railway will still auto-deploy any application changes." >> $GITHUB_STEP_SUMMARY
