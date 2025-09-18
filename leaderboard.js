@@ -1295,61 +1295,32 @@ function renderSophisticatedStatus3(data, prizeHub) {
                     <h2 class="stay-tuned-title">Next Championships Coming Soon</h2>
                     <p class="stay-tuned-subtitle">We're preparing exciting new trading competitions with bigger prizes and better rewards. Don't miss out when they launch!</p>
                     
-                    <div class="stay-tuned-features">
-                        <div class="feature-item">
-                            <div class="feature-icon">💎</div>
-                            <div class="feature-text">
-                                <strong>Bigger Prize Pools</strong>
-                                <span>Enhanced rewards for top performers</span>
-                            </div>
+                    <!-- Reuse existing launch mode tiles -->
+                    <div class="coming-soon-grid">
+                        <div class="coming-soon-card">
+                            <i class="fas fa-calendar-alt"></i>
+                            <h4>Monthly Championships</h4>
+                            <p>Regular competitions with increasing prize pools</p>
                         </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">⚡</div>
-                            <div class="feature-text">
-                                <strong>New Competition Types</strong>
-                                <span>More ways to showcase your trading skills</span>
-                            </div>
+                        <div class="coming-soon-card">
+                            <i class="fas fa-medal"></i>
+                            <h4>Instant Payouts</h4>
+                            <p>Winners receive prizes directly to their wallets</p>
                         </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">🎯</div>
-                            <div class="feature-text">
-                                <strong>Advanced Analytics</strong>
-                                <span>Better tracking and performance insights</span>
-                            </div>
-                        </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">🏅</div>
-                            <div class="feature-text">
-                                <strong>Elite Recognition</strong>
-                                <span>Special badges and leaderboard status</span>
-                            </div>
+                        <div class="coming-soon-card">
+                            <i class="fas fa-shield-alt"></i>
+                            <h4>Verified Trades</h4>
+                            <p>100% transparent, on-chain verification system</p>
                         </div>
                     </div>
                     
                     <div class="stay-tuned-actions">
                         <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-large">
-                            🔔 Get Notified First
+                            🚀 Start Trading
                         </a>
-                        <a href="https://x.com/spyfly_app" target="_blank" class="btn btn-secondary btn-large">
-                            📱 Follow Updates
+                        <a href="#leaderboard-container" class="btn btn-secondary btn-large">
+                            📊 View Leaderboard
                         </a>
-                    </div>
-                    
-                    <div class="stay-tuned-stats">
-                        <div class="stat-item">
-                            <span class="stat-value">${stats.total_winners || 0}</span>
-                            <span class="stat-label">Past Champions</span>
-                        </div>
-                        <div class="stat-separator">•</div>
-                        <div class="stat-item">
-                            <span class="stat-value">${historyData.length || 0}</span>
-                            <span class="stat-label">Completed Tournaments</span>
-                        </div>
-                        <div class="stat-separator">•</div>
-                        <div class="stat-item">
-                            <span class="stat-value">$${(historicalPrizes/1000).toFixed(0)}K</span>
-                            <span class="stat-label">Total Distributed</span>
-                        </div>
                     </div>
                 </div>
             </div>
