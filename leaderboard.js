@@ -381,7 +381,7 @@ function renderTransitionView(data) {
                                     <span class="stat-label">Prize Pool</span>
                                 </div>
                                 <div class="stat-pill">
-                                    <span class="stat-value">${currentComp ? currentComp.competition_type || 'P&L' : 'P&L'}</span>
+                                    <span class="stat-value">${getCompetitionTypeDisplay(currentComp ? currentComp.competition_type : 'pnl')}</span>
                                     <span class="stat-label">Category</span>
                                 </div>
                             </div>
@@ -398,7 +398,8 @@ function renderTransitionView(data) {
                         </div>
                         <div class="ticker-scroll">
                             ${upcomingComps.map(comp => `
-                                <div class="upcoming-comp-item">
+                                <div class="upcoming-comp-item ${comp.competition_type}">
+                                    <span class="comp-type-badge">${getCompetitionTypeDisplay(comp.competition_type)}</span>
                                     <span class="comp-name">${comp.title}</span>
                                     <span class="comp-prize">$${(comp.prize_pool_usd/1000).toFixed(0)}K</span>
                                 </div>
@@ -474,6 +475,16 @@ function renderTransitionView(data) {
             </div>
         </div>
     `;
+}
+
+// Helper function to display competition types with proper formatting
+function getCompetitionTypeDisplay(type) {
+    switch(type) {
+        case 'pnl': return '💰 P&L';
+        case 'volume': return '📈 Volume';
+        case 'winrate': return '🎯 Win Rate';
+        default: return '💰 P&L';
+    }
 }
 
 // Sophisticated view renderer for rich data

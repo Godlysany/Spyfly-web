@@ -466,14 +466,13 @@ async function handleApiRequest(req, res, pathname, method) {
                 .limit(1)
                 .single();
 
-            // Get upcoming competition
-            const { data: upcomingComp } = await supabase
+            // Get upcoming competitions (multiple to show variety)
+            const { data: upcomingComps } = await supabase
                 .from('competitions')
                 .select('*')
                 .gt('start_date', now)
                 .order('start_date', { ascending: true })
-                .limit(1)
-                .single();
+                .limit(3);
 
             // Get historical competitions with winners
             const { data: historyComps } = await supabase
@@ -499,8 +498,8 @@ async function handleApiRequest(req, res, pathname, method) {
             const totalWinners = historyComps?.reduce((sum, comp) => sum + (comp.winners?.length || 0), 0) || 0;
 
             const response = {
-                current: currentComp || null,
-                upcoming: upcomingComp || null,  
+                current: currentComp ? [currentComp] : [],
+                upcoming: upcomingComps || [],  
                 history: historyComps || [],
                 stats: {
                     total_distributed_usd: totalDistributed,
