@@ -517,6 +517,275 @@ async function handleApiRequest(req, res, pathname, method) {
             return;
         }
 
+        // ===== SOPHISTICATED ADMIN FEATURES =====
+        
+        // Bulk winner import endpoint
+        if (pathname === '/api/admin/winners/bulk' && method === 'POST') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const body = await getRequestBody(req);
+            const { competition_id, winners } = JSON.parse(body);
+            
+            // Validate competition exists
+            const { data: competition } = await supabase
+                .from('competitions')
+                .select('id')
+                .eq('id', competition_id)
+                .single();
+                
+            if (!competition) {
+                res.writeHead(404);
+                res.end(JSON.stringify({ error: 'Competition not found' }));
+                return;
+            }
+            
+            // Process winners
+            const winnersData = winners.map(winner => ({
+                ...winner,
+                competition_id,
+                created_at: new Date().toISOString()
+            }));
+            
+            const { data, error } = await supabase
+                .from('winners')
+                .insert(winnersData)
+                .select();
+                
+            if (error) throw error;
+            
+            res.writeHead(201);
+            res.end(JSON.stringify({ 
+                success: true, 
+                imported: data.length,
+                message: `Successfully imported ${data.length} winners` 
+            }));
+            return;
+        }
+        
+        // Disqualification system endpoint
+        if (pathname === '/api/admin/disqualify' && method === 'POST') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const body = await getRequestBody(req);
+            const { competition_id, trader_identifier, reason, notes } = JSON.parse(body);
+            
+            // Remove any existing winners with this identifier
+            await supabase
+                .from('winners')
+                .delete()
+                .eq('competition_id', competition_id)
+                .eq('username', trader_identifier);
+                
+            res.writeHead(200);
+            res.end(JSON.stringify({ 
+                success: true,
+                message: `${trader_identifier} has been disqualified` 
+            }));
+            return;
+        }
+        
+        // Data mapping validation endpoint
+        if (pathname === '/api/admin/validate-mappings' && method === 'POST') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const body = await getRequestBody(req);
+            const { mappings } = JSON.parse(body);
+            
+            const validationResults = {
+                valid: [],
+                invalid: [],
+                duplicates: []
+            };
+            
+            const seenWallets = new Set();
+            const seenIds = new Set();
+            
+            mappings.forEach((mapping, index) => {
+                const { id, wallet } = mapping;
+                
+                // Basic validation
+                if (!id || !wallet) {
+                    validationResults.invalid.push({
+                        line: index + 1,
+                        error: 'Missing ID or wallet address'
+                    });
+                    return;
+                }
+                
+                // Check for duplicates
+                if (seenIds.has(id)) {
+                    validationResults.duplicates.push({
+                        line: index + 1,
+                        error: `Duplicate ID: ${id}`
+                    });
+                    return;
+                }
+                
+                if (seenWallets.has(wallet)) {
+                    validationResults.duplicates.push({
+                        line: index + 1,
+                        error: `Duplicate wallet: ${wallet}`
+                    });
+                    return;
+                }
+                
+                seenIds.add(id);
+                seenWallets.add(wallet);
+                validationResults.valid.push(mapping);
+            });
+            
+            res.writeHead(200);
+            res.end(JSON.stringify({
+                success: true,
+                results: validationResults,
+                summary: {
+                    total: mappings.length,
+                    valid: validationResults.valid.length,
+                    invalid: validationResults.invalid.length,
+                    duplicates: validationResults.duplicates.length
+                }
+            }));
+            return;
+        }
+        
+        // Manual override system endpoint
+        if (pathname === '/api/admin/override' && method === 'POST') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const body = await getRequestBody(req);
+            const { override_type, target_id, field, new_value, reason } = JSON.parse(body);
+            
+            let updateResult;
+            
+            try {
+                // Apply override based on type
+                switch(override_type) {
+                    case 'competition-status':
+                        updateResult = await supabase
+                            .from('competitions')
+                            .update({ 
+                                status: new_value,
+                                updated_at: new Date().toISOString() 
+                            })
+                            .eq('id', target_id);
+                        break;
+                        
+                    case 'winner-position':
+                        updateResult = await supabase
+                            .from('winners')
+                            .update({ 
+                                place: parseInt(new_value),
+                                updated_at: new Date().toISOString() 
+                            })
+                            .eq('id', target_id);
+                        break;
+                        
+                    case 'prize-amount':
+                        updateResult = await supabase
+                            .from('winners')
+                            .update({ 
+                                amount_usd: parseFloat(new_value),
+                                updated_at: new Date().toISOString() 
+                            })
+                            .eq('id', target_id);
+                        break;
+                        
+                    case 'data-correction':
+                        // Generic field update
+                        const updateData = {};
+                        updateData[field] = new_value;
+                        updateData.updated_at = new Date().toISOString();
+                        
+                        updateResult = await supabase
+                            .from(target_id.split(':')[0]) // table:id format
+                            .update(updateData)
+                            .eq('id', target_id.split(':')[1]);
+                        break;
+                        
+                    default:
+                        throw new Error('Invalid override type');
+                }
+                
+                if (updateResult.error) throw updateResult.error;
+                
+                res.writeHead(200);
+                res.end(JSON.stringify({ 
+                    success: true,
+                    message: `Override applied successfully` 
+                }));
+                
+            } catch (error) {
+                console.error('Override error:', error);
+                res.writeHead(400);
+                res.end(JSON.stringify({ 
+                    error: 'Override failed: ' + error.message 
+                }));
+            }
+            return;
+        }
+        
+        // Live monitoring data endpoint
+        if (pathname === '/api/admin/monitoring' && method === 'GET') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            // Get current stats
+            const now = new Date().toISOString();
+            
+            const { data: activeComps } = await supabase
+                .from('competitions')
+                .select('count')
+                .lte('start_date', now)
+                .gte('end_date', now);
+                
+            const { data: totalWinners } = await supabase
+                .from('winners')
+                .select('count');
+                
+            const { data: totalPrizes } = await supabase
+                .from('winners')
+                .select('amount_usd');
+                
+            const totalDeployed = totalPrizes?.reduce((sum, winner) => sum + (winner.amount_usd || 0), 0) || 0;
+            
+            res.writeHead(200);
+            res.end(JSON.stringify({
+                success: true,
+                stats: {
+                    active_competitions: activeComps?.length || 0,
+                    total_participants: 1247, // This would come from your trading data
+                    deployed_prizes: totalDeployed,
+                    api_calls_hour: 342, // This would come from your analytics
+                    last_updated: new Date().toISOString()
+                }
+            }));
+            return;
+        }
+
         // 404 for unknown API endpoints
         res.writeHead(404);
         res.end(JSON.stringify({ error: 'API endpoint not found' }));

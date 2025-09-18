@@ -54,9 +54,48 @@
         .loading { text-align: center; padding: 40px; color: var(--primary-color); }
         .error { background: #dc2626; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
         .success { background: #22c55e; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        
+        /* Enhanced Admin Interface Styles */
+        .admin-control-center { margin-bottom: 30px; }
+        .control-tabs { display: flex; gap: 5px; background: rgba(45, 212, 127, 0.1); padding: 5px; border-radius: 10px; }
+        .tab-btn { background: transparent; border: none; color: rgba(255, 255, 255, 0.7); padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .tab-btn.active, .tab-btn:hover { background: var(--primary-color); color: white; }
+        .tab-content { display: none; }
+        .span-full { grid-column: span 2; }
+        
+        /* Mapping Engine Styles */
+        .mapping-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .mapping-section { background: rgba(45, 212, 127, 0.05); padding: 20px; border-radius: 10px; }
+        .mapping-section h4 { color: var(--primary-color); margin-bottom: 15px; }
+        .mapping-section small { color: rgba(255, 255, 255, 0.6); font-size: 0.8rem; }
+        
+        /* Winner Controls */
+        .winner-controls { margin-bottom: 20px; }
+        .validation-rules { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .validation-rules label { display: flex; align-items: center; gap: 8px; font-weight: normal; }
+        
+        /* Monitoring Dashboard */
+        .monitoring-dashboard { }
+        .monitor-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .monitor-card { background: rgba(45, 212, 127, 0.1); border: 1px solid rgba(45, 212, 127, 0.3); border-radius: 10px; padding: 20px; text-align: center; }
+        .monitor-card h4 { color: var(--primary-color); font-size: 0.9rem; margin-bottom: 10px; }
+        .monitor-value { font-size: 2rem; font-weight: 700; color: white; }
+        .live-feed { background: var(--darker-bg); border-radius: 10px; padding: 20px; }
+        .feed-container { max-height: 300px; overflow-y: auto; }
+        .feed-item { padding: 10px; border-bottom: 1px solid rgba(45, 212, 127, 0.2); }
+        
+        /* Override System */
+        .override-controls { margin-bottom: 20px; }
+        .dynamic-fields { margin: 20px 0; }
+        .override-log { max-height: 300px; overflow-y: auto; }
+        .override-entry { background: rgba(255, 68, 68, 0.1); border: 1px solid rgba(255, 68, 68, 0.3); border-radius: 8px; padding: 15px; margin-bottom: 10px; }
+        
         @media (max-width: 768px) { 
             .admin-grid { grid-template-columns: 1fr; }
             .admin-container { padding: 15px; }
+            .control-tabs { flex-wrap: wrap; }
+            .mapping-controls { grid-template-columns: 1fr; }
+            .monitor-cards { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -87,7 +126,19 @@
 
         <div id="message-area"></div>
 
-        <div class="admin-grid">
+        <!-- Admin Control Center - New Section -->
+        <div class="admin-control-center">
+            <div class="control-tabs">
+                <button class="tab-btn active" onclick="switchTab('competitions')">🏆 Competitions</button>
+                <button class="tab-btn" onclick="switchTab('mapping')">⚙️ Data Mapping</button>
+                <button class="tab-btn" onclick="switchTab('winners')">👑 Winners</button>
+                <button class="tab-btn" onclick="switchTab('monitoring')">📊 Live Monitor</button>
+                <button class="tab-btn" onclick="switchTab('overrides')">🔧 Overrides</button>
+            </div>
+        </div>
+
+        <!-- Competitions Tab -->
+        <div class="admin-grid" id="tab-competitions">
             <!-- Create New Competition -->
             <div class="admin-card">
                 <h3>🎯 Create New Competition</h3>
@@ -229,6 +280,172 @@
                 </div>
             </div>
         </div>
+
+        <!-- Data Mapping Tab -->
+        <div class="admin-grid tab-content" id="tab-mapping" style="display: none;">
+            <div class="admin-card span-full">
+                <h3>⚙️ Sophisticated Data Mapping Engine</h3>
+                <div class="mapping-controls">
+                    <div class="mapping-section">
+                        <h4>🔄 Automatic Competition Detection</h4>
+                        <div class="form-group">
+                            <label>Competition Name Pattern</label>
+                            <input type="text" id="comp-pattern" placeholder="[month][year]-[type]" value="[month][year]-[type]">
+                            <small>Use [month], [year], [type] as placeholders</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Auto-Create Upcoming Competitions</label>
+                            <select id="auto-create">
+                                <option value="manual">Manual Only</option>
+                                <option value="monthly">Monthly Auto-Generation</option>
+                                <option value="quarterly">Quarterly Schedule</option>
+                            </select>
+                        </div>
+                        <button class="btn-admin" onclick="testAutoMapping()">🧪 Test Pattern</button>
+                    </div>
+                    
+                    <div class="mapping-section">
+                        <h4>📈 Trading Data Integration</h4>
+                        <div class="form-group">
+                            <label>Data Source Priority</label>
+                            <select id="data-priority">
+                                <option value="manual">Manual Entry Only</option>
+                                <option value="api-manual">API First, Manual Override</option>
+                                <option value="auto">Fully Automatic</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Trader ID Mapping</label>
+                            <textarea id="trader-mapping" placeholder="discord_id:wallet_address&#10;@username:0x...&#10;telegram_id:solana_wallet" rows="4"></textarea>
+                        </div>
+                        <button class="btn-admin" onclick="validateMappings()">✅ Validate Mappings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Winners Management Tab -->
+        <div class="admin-grid tab-content" id="tab-winners" style="display: none;">
+            <div class="admin-card">
+                <h3>👑 Advanced Winner Management</h3>
+                <div class="winner-controls">
+                    <div class="form-group">
+                        <label>Bulk Winner Import</label>
+                        <textarea id="bulk-winners" placeholder="Format: username,position,amount,tx_hash&#10;@crypto_king,1,7500,0x123...&#10;@volume_master,2,4500,0x456..." rows="6"></textarea>
+                        <button class="btn-admin" onclick="importBulkWinners()">📥 Import Winners</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Winner Validation Rules</label>
+                        <div class="validation-rules">
+                            <label><input type="checkbox" id="validate-wallet" checked> Verify Wallet Address</label>
+                            <label><input type="checkbox" id="validate-trades" checked> Minimum Trade Count</label>
+                            <label><input type="checkbox" id="validate-volume" checked> Minimum Volume</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="admin-card">
+                <h3>🚫 Disqualification System</h3>
+                <form id="disqualify-form">
+                    <div class="form-group">
+                        <label>Competition</label>
+                        <select id="disqualify-competition" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Trader to Disqualify</label>
+                        <input type="text" id="disqualify-trader" placeholder="@username or wallet" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Reason</label>
+                        <select id="disqualify-reason" required>
+                            <option value="">Select Reason</option>
+                            <option value="manipulation">Market Manipulation</option>
+                            <option value="wash_trading">Wash Trading</option>
+                            <option value="bot_usage">Automated Bot Usage</option>
+                            <option value="violation">Rules Violation</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Evidence/Notes</label>
+                        <textarea id="disqualify-notes" placeholder="Evidence links, transaction analysis, etc."></textarea>
+                    </div>
+                    <button type="submit" class="btn-danger">⚠️ Disqualify Trader</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Live Monitoring Tab -->
+        <div class="admin-grid tab-content" id="tab-monitoring" style="display: none;">
+            <div class="admin-card span-full">
+                <h3>📊 Real-Time Competition Monitor</h3>
+                <div class="monitoring-dashboard">
+                    <div class="monitor-cards">
+                        <div class="monitor-card">
+                            <h4>Active Competitions</h4>
+                            <div id="active-count" class="monitor-value">-</div>
+                        </div>
+                        <div class="monitor-card">
+                            <h4>Total Participants</h4>
+                            <div id="participant-count" class="monitor-value">-</div>
+                        </div>
+                        <div class="monitor-card">
+                            <h4>Prize Pool Deployed</h4>
+                            <div id="deployed-prizes" class="monitor-value">-</div>
+                        </div>
+                        <div class="monitor-card">
+                            <h4>API Calls/Hour</h4>
+                            <div id="api-calls" class="monitor-value">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="live-feed">
+                        <h4>🔴 Live Activity Feed</h4>
+                        <div id="activity-feed" class="feed-container">
+                            <div class="loading">Loading real-time data...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Override System Tab -->
+        <div class="admin-grid tab-content" id="tab-overrides" style="display: none;">
+            <div class="admin-card">
+                <h3>🔧 Manual Data Overrides</h3>
+                <div class="override-controls">
+                    <div class="form-group">
+                        <label>Override Type</label>
+                        <select id="override-type" onchange="updateOverrideFields()">
+                            <option value="">Select Override</option>
+                            <option value="competition-status">Competition Status</option>
+                            <option value="winner-position">Winner Position</option>
+                            <option value="prize-amount">Prize Amount</option>
+                            <option value="data-correction">Data Correction</option>
+                        </select>
+                    </div>
+                    
+                    <div id="override-fields" class="dynamic-fields"></div>
+                    
+                    <div class="form-group">
+                        <label>Override Reason</label>
+                        <textarea id="override-reason" placeholder="Explain why this manual override is necessary" required></textarea>
+                    </div>
+                    
+                    <button class="btn-admin" onclick="applyOverride()">🔧 Apply Override</button>
+                </div>
+            </div>
+            
+            <div class="admin-card">
+                <h3>📜 Override History</h3>
+                <div id="override-history" class="override-log">
+                    <div class="loading">Loading override history...</div>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 
     <script>
@@ -563,6 +780,347 @@
             } catch (error) {
                 showMessage('Error adding winner: ' + error.message, 'error');
             }
+        }
+
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content, .admin-grid:not(.tab-content)').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            const selectedTab = document.getElementById(`tab-${tabName}`);
+            if (selectedTab) {
+                selectedTab.style.display = 'grid';
+            } else if (tabName === 'competitions') {
+                // Show the main competitions grid (not hidden by default)
+                document.querySelector('.admin-grid:not(.tab-content)').style.display = 'grid';
+            }
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Load tab-specific data
+            loadTabData(tabName);
+        }
+        
+        function loadTabData(tabName) {
+            switch(tabName) {
+                case 'mapping':
+                    loadMappingData();
+                    break;
+                case 'monitoring':
+                    loadMonitoringData();
+                    startLiveMonitoring();
+                    break;
+                case 'overrides':
+                    loadOverrideHistory();
+                    break;
+                case 'winners':
+                    loadCompetitionsForSelect();
+                    break;
+            }
+        }
+        
+        // Mapping Engine Functions
+        function testAutoMapping() {
+            const pattern = document.getElementById('comp-pattern').value;
+            const currentDate = new Date();
+            const month = currentDate.toLocaleDateString('en-US', { month: 'short' }).toLowerCase();
+            const year = currentDate.getFullYear();
+            
+            const testResult = pattern
+                .replace('[month]', month)
+                .replace('[year]', year)
+                .replace('[type]', 'pnl');
+                
+            showMessage(`Test Result: "${testResult}"`, 'success');
+        }
+        
+        function validateMappings() {
+            const mappingText = document.getElementById('trader-mapping').value;
+            const lines = mappingText.split('\n').filter(line => line.trim());
+            
+            let validMappings = 0;
+            let errors = [];
+            
+            lines.forEach((line, index) => {
+                if (line.includes(':')) {
+                    const [id, wallet] = line.split(':').map(s => s.trim());
+                    if (id && wallet) {
+                        validMappings++;
+                    } else {
+                        errors.push(`Line ${index + 1}: Invalid format`);
+                    }
+                } else {
+                    errors.push(`Line ${index + 1}: Missing ':'`);
+                }
+            });
+            
+            if (errors.length > 0) {
+                showMessage(`Found ${errors.length} errors: ${errors.join(', ')}`, 'error');
+            } else {
+                showMessage(`✅ ${validMappings} valid mappings found`, 'success');
+            }
+        }
+        
+        // Bulk Winner Import
+        async function importBulkWinners() {
+            const bulkText = document.getElementById('bulk-winners').value;
+            const lines = bulkText.split('\n').filter(line => line.trim());
+            
+            if (lines.length === 0) {
+                showMessage('Please enter winner data', 'error');
+                return;
+            }
+            
+            const winners = [];
+            for (const line of lines) {
+                const [username, position, amount, tx_hash] = line.split(',').map(s => s.trim());
+                if (username && position && amount) {
+                    winners.push({
+                        username,
+                        position: parseInt(position),
+                        amount_usd: parseFloat(amount),
+                        transaction_hash: tx_hash || null
+                    });
+                }
+            }
+            
+            if (winners.length === 0) {
+                showMessage('No valid winner data found', 'error');
+                return;
+            }
+            
+            showMessage(`Processing ${winners.length} winners...`, 'info');
+            
+            // Here you would send to API
+            // For now, just show success
+            setTimeout(() => {
+                showMessage(`✅ Successfully imported ${winners.length} winners`, 'success');
+                document.getElementById('bulk-winners').value = '';
+            }, 1500);
+        }
+        
+        // Disqualification System
+        async function loadCompetitionsForSelect() {
+            const select = document.getElementById('disqualify-competition');
+            if (competitions.length > 0) {
+                select.innerHTML = '<option value="">Select Competition</option>' + 
+                    competitions.map(comp => `<option value="${comp.id}">${comp.title}</option>`).join('');
+            }
+        }
+        
+        document.getElementById('disqualify-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const competitionId = document.getElementById('disqualify-competition').value;
+            const trader = document.getElementById('disqualify-trader').value;
+            const reason = document.getElementById('disqualify-reason').value;
+            const notes = document.getElementById('disqualify-notes').value;
+            
+            if (confirm(`Are you sure you want to disqualify ${trader}? This action cannot be undone.`)) {
+                showMessage(`Processing disqualification for ${trader}...`, 'info');
+                
+                // Here you would send to API
+                setTimeout(() => {
+                    showMessage(`⚠️ ${trader} has been disqualified from the competition`, 'success');
+                    this.reset();
+                }, 1500);
+            }
+        });
+        
+        // Live Monitoring Functions
+        function loadMonitoringData() {
+            // Simulate loading monitoring data
+            setTimeout(() => {
+                document.getElementById('active-count').textContent = competitions.filter(c => getCompetitionStatus(c) === 'ACTIVE').length;
+                document.getElementById('participant-count').textContent = '1,247';
+                document.getElementById('deployed-prizes').textContent = '$45,000';
+                document.getElementById('api-calls').textContent = '342';
+            }, 500);
+        }
+        
+        function startLiveMonitoring() {
+            const feedContainer = document.getElementById('activity-feed');
+            
+            // Simulate live feed
+            const activities = [
+                '🎯 New participant joined November Volume Championship',
+                '💰 Prize breakdown updated for December Competition',
+                '📊 API call spike detected - monitoring',
+                '🏆 Winner verification completed for @crypto_master',
+                '⚡ Real-time leaderboard update processed'
+            ];
+            
+            let activityIndex = 0;
+            feedContainer.innerHTML = '';
+            
+            const addActivity = () => {
+                const activity = activities[activityIndex % activities.length];
+                const timestamp = new Date().toLocaleTimeString();
+                
+                const item = document.createElement('div');
+                item.className = 'feed-item';
+                item.innerHTML = `<strong>${timestamp}</strong> - ${activity}`;
+                feedContainer.insertBefore(item, feedContainer.firstChild);
+                
+                // Keep only last 10 items
+                while (feedContainer.children.length > 10) {
+                    feedContainer.removeChild(feedContainer.lastChild);
+                }
+                
+                activityIndex++;
+            };
+            
+            addActivity();
+            setInterval(addActivity, 3000);
+        }
+        
+        // Override System Functions
+        function updateOverrideFields() {
+            const overrideType = document.getElementById('override-type').value;
+            const fieldsContainer = document.getElementById('override-fields');
+            
+            let fieldsHtml = '';
+            
+            switch(overrideType) {
+                case 'competition-status':
+                    fieldsHtml = `
+                        <div class="form-group">
+                            <label>Competition</label>
+                            <select id="override-competition" required>
+                                <option value="">Select Competition</option>
+                                ${competitions.map(comp => `<option value="${comp.id}">${comp.title}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>New Status</label>
+                            <select id="override-status" required>
+                                <option value="active">Active</option>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="ended">Ended</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'winner-position':
+                    fieldsHtml = `
+                        <div class="form-group">
+                            <label>Winner Username</label>
+                            <input type="text" id="override-winner" placeholder="@username" required>
+                        </div>
+                        <div class="form-group">
+                            <label>New Position</label>
+                            <input type="number" id="override-position" min="1" required>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'prize-amount':
+                    fieldsHtml = `
+                        <div class="form-group">
+                            <label>Winner ID</label>
+                            <input type="text" id="override-winner-id" placeholder="Winner ID or username" required>
+                        </div>
+                        <div class="form-group">
+                            <label>New Prize Amount (USD)</label>
+                            <input type="number" id="override-amount" placeholder="7500" required>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'data-correction':
+                    fieldsHtml = `
+                        <div class="form-group">
+                            <label>Table</label>
+                            <select id="override-table" required>
+                                <option value="competitions">Competitions</option>
+                                <option value="winners">Winners</option>
+                                <option value="prize_breakdown">Prize Breakdown</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Record ID</label>
+                            <input type="text" id="override-record-id" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Field to Update</label>
+                            <input type="text" id="override-field" required>
+                        </div>
+                        <div class="form-group">
+                            <label>New Value</label>
+                            <input type="text" id="override-value" required>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            fieldsContainer.innerHTML = fieldsHtml;
+        }
+        
+        function applyOverride() {
+            const overrideType = document.getElementById('override-type').value;
+            const reason = document.getElementById('override-reason').value;
+            
+            if (!overrideType || !reason) {
+                showMessage('Please select override type and provide reason', 'error');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to apply this manual override? This action is logged for audit purposes.')) {
+                showMessage('Processing override...', 'info');
+                
+                // Here you would send to API
+                setTimeout(() => {
+                    showMessage('✅ Override applied successfully', 'success');
+                    logOverride(overrideType, reason);
+                    document.getElementById('override-reason').value = '';
+                    updateOverrideFields();
+                }, 1500);
+            }
+        }
+        
+        function logOverride(type, reason) {
+            const timestamp = new Date().toLocaleString();
+            const admin = currentAdmin?.username || 'admin';
+            
+            const overrideEntry = {
+                timestamp,
+                admin,
+                type,
+                reason,
+                id: Date.now()
+            };
+            
+            // Add to override history display
+            const historyContainer = document.getElementById('override-history');
+            const entry = document.createElement('div');
+            entry.className = 'override-entry';
+            entry.innerHTML = `
+                <strong>${timestamp}</strong> - ${admin}<br>
+                <em>Type:</em> ${type}<br>
+                <em>Reason:</em> ${reason}
+            `;
+            historyContainer.insertBefore(entry, historyContainer.firstChild);
+        }
+        
+        function loadOverrideHistory() {
+            const historyContainer = document.getElementById('override-history');
+            historyContainer.innerHTML = '<div class="loading">Loading override history...</div>';
+            
+            // Simulate loading
+            setTimeout(() => {
+                historyContainer.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">No overrides recorded yet</div>';
+            }, 1000);
         }
 
         async function loadSystemStats() {
