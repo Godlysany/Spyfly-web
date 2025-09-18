@@ -254,6 +254,86 @@ function renderTransitionView(data) {
     prizeHub.innerHTML = content;
 }
 
+// Sophisticated view renderer for rich data
+function renderSophisticatedView(data) {
+    const prizeHub = document.getElementById('prize-hub');
+    prizeHub.innerHTML = `
+        <div class="container">
+            <h1 class="section-title">🏆 Prize Championships</h1>
+            
+            <!-- Current Live Competition -->
+            <div class="sophisticated-current">
+                <div class="current-prize-card">
+                    <div class="prize-header">
+                        <h2>${data.current.title}</h2>
+                        <div class="prize-badges">
+                            <span class="prize-badge live">🔴 LIVE</span>
+                            <span class="prize-badge monthly">MONTHLY</span>
+                        </div>
+                    </div>
+                    <div class="prize-pool">
+                        <div class="pool-amount">$${data.current.prize_pool_usd.toLocaleString()}</div>
+                        <div class="pool-label">Total Prize Pool</div>
+                    </div>
+                    <div class="prize-countdown-container">
+                        <div class="countdown-label">Competition Ends In:</div>
+                        <div class="countdown-timer">12d 14h 23m</div>
+                    </div>
+                    <div class="prize-actions">
+                        <a href="${data.current.cta_link || '#'}" class="btn btn-primary btn-large">
+                            ${data.current.cta_text || 'JOIN COMPETITION'}
+                        </a>
+                        <div class="eligibility-note">Min 50 trades • $10K volume</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Competitions -->
+            ${data.upcoming ? `
+            <div class="sophisticated-upcoming">
+                <h3 class="subsection-title">Next Championship</h3>
+                <div class="upcoming-card">
+                    <h4>${data.upcoming.title}</h4>
+                    <div class="upcoming-pool">$${data.upcoming.prize_pool_usd.toLocaleString()}</div>
+                    <p>Registration opens soon</p>
+                </div>
+            </div>
+            ` : ''}
+
+            <!-- Rich Historical Impact -->
+            <div class="sophisticated-history">
+                <h3 class="subsection-title">Champion Hall of Fame</h3>
+                <div class="history-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">$${data.stats.total_distributed_usd.toLocaleString()}</div>
+                        <div class="stat-label">Total Distributed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${data.stats.total_winners}</div>
+                        <div class="stat-label">Champions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${data.stats.months_active}</div>
+                        <div class="stat-label">Months Active</div>
+                    </div>
+                </div>
+                
+                <div class="winners-grid">
+                    ${data.history.slice(0, 6).map(winner => `
+                        <div class="winner-card">
+                            <div class="winner-place">#${winner.place}</div>
+                            <div class="winner-name">${winner.username}</div>
+                            <div class="winner-prize">$${winner.amount_usd.toLocaleString()}</div>
+                            <div class="winner-competition">${winner.competition_title}</div>
+                            <div class="winner-date">${new Date(winner.paid_at).toLocaleDateString()}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 function renderUpcomingPromise() {
     return `
         <div class="transition-promise">
@@ -285,6 +365,58 @@ function renderHistoryPreview() {
             </div>
         </div>
     `;
+}
+
+function renderCompetitionSection(data) {
+    // Render current/upcoming competitions
+    const competition = data.current || data.upcoming;
+    const isLive = !!data.current;
+    
+    return `
+        <div class="competition-active">
+            <div class="competition-card">
+                <div class="competition-header">
+                    <h3>${isLive ? '🔴 Live Competition' : '🔜 Next Competition'}</h3>
+                    ${isLive ? '<span class="live-badge">ACTIVE</span>' : '<span class="upcoming-badge">COMING SOON</span>'}
+                </div>
+                <div class="competition-details">
+                    <h4>${competition.title}</h4>
+                    <div class="competition-prize">$${competition.prize_pool_usd.toLocaleString()}</div>
+                    <div class="competition-actions">
+                        <a href="https://t.me/spyflybot" class="btn btn-primary">
+                            ${isLive ? 'JOIN NOW' : 'GET NOTIFIED'}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderHistorySection(data) {
+    // Render actual historical data
+    return `
+        <div class="history-rich">
+            <h3 class="subsection-title">Recent Champions</h3>
+            <div class="winners-showcase">
+                ${data.history.slice(0, 3).map(winner => `
+                    <div class="champion-card">
+                        <div class="champion-place">${getPlaceEmoji(winner.place)}</div>
+                        <div class="champion-name">@${winner.username}</div>
+                        <div class="champion-prize">$${winner.amount_usd.toLocaleString()}</div>
+                        <div class="champion-competition">${winner.competition_title}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function getPlaceEmoji(place) {
+    if (place === 1) return '🥇';
+    if (place === 2) return '🥈'; 
+    if (place === 3) return '🥉';
+    return `#${place}`;
 }
 
 function initLeaderboardInteractivity() {
@@ -389,111 +521,8 @@ function initLeaderboardInteractivity() {
         });
     }
 
-    // Sophisticated view renderer for rich data
-    function renderSophisticatedView(data) {
-        const prizeHub = document.getElementById('prize-hub');
-        prizeHub.innerHTML = `
-            <div class="container">
-                <h1 class="section-title">🏆 Prize Championships</h1>
-                
-                <!-- Current Live Competition -->
-                <div class="sophisticated-current">
-                    <div class="current-prize-card">
-                        <div class="prize-header">
-                            <h2>${data.current.title}</h2>
-                            <div class="prize-badges">
-                                <span class="prize-badge live">🔴 LIVE</span>
-                                <span class="prize-badge monthly">MONTHLY</span>
-                            </div>
-                        </div>
-                        <div class="prize-pool">
-                            <div class="pool-amount">$${data.current.prize_pool_usd.toLocaleString()}</div>
-                            <div class="pool-label">Total Prize Pool</div>
-                        </div>
-                        <div class="prize-countdown-container">
-                            <div class="countdown-label">Competition Ends In:</div>
-                            <div class="countdown-timer">12d 14h 23m</div>
-                        </div>
-                        <div class="prize-actions">
-                            <a href="${data.current.cta_link || '#'}" class="btn btn-primary btn-large">
-                                ${data.current.cta_text || 'JOIN COMPETITION'}
-                            </a>
-                            <div class="eligibility-note">Min 50 trades • $10K volume</div>
-                        </div>
-                    </div>
-                </div>
+    // The sophisticated view function is now defined globally
 
-                <!-- Upcoming Competitions -->
-                ${data.upcoming ? `
-                <div class="sophisticated-upcoming">
-                    <h3 class="subsection-title">Next Championship</h3>
-                    <div class="upcoming-card">
-                        <h4>${data.upcoming.title}</h4>
-                        <div class="upcoming-pool">$${data.upcoming.prize_pool_usd.toLocaleString()}</div>
-                        <p>Registration opens soon</p>
-                    </div>
-                </div>
-                ` : ''}
-
-                <!-- Rich Historical Impact -->
-                <div class="sophisticated-history">
-                    <h3 class="subsection-title">Champion Hall of Fame</h3>
-                    <div class="history-stats">
-                        <div class="stat-card">
-                            <div class="stat-value">$${data.stats.total_distributed_usd.toLocaleString()}</div>
-                            <div class="stat-label">Total Distributed</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">${data.stats.total_winners}</div>
-                            <div class="stat-label">Champions</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">${data.stats.months_active}</div>
-                            <div class="stat-label">Months Active</div>
-                        </div>
-                    </div>
-                    
-                    <div class="winners-grid">
-                        ${data.history.slice(0, 6).map(winner => `
-                            <div class="winner-card">
-                                <div class="winner-rank">${getPlaceEmoji(winner.place)}</div>
-                                <div class="winner-name">@${winner.username}</div>
-                                <div class="winner-prize">$${winner.amount_usd.toLocaleString()}</div>
-                                <div class="winner-competition">${winner.competition_title}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    function getPlaceEmoji(place) {
-        if (place === 1) return '🥇';
-        if (place === 2) return '🥈'; 
-        if (place === 3) return '🥉';
-        return `#${place}`;
-    }
-
-    function renderCompetitionSection(data) {
-        // Render current/upcoming competitions
-        return `
-            <div class="competition-active">
-                <h3>${data.current ? 'Live Competition' : 'Next Competition'}</h3>
-                <!-- Competition details -->
-            </div>
-        `;
-    }
-
-    function renderHistorySection(data) {
-        // Render actual historical data
-        return `
-            <div class="history-rich">
-                <h3>Past Champions</h3>
-                <!-- Real historical data -->
-            </div>
-        `;
-    }
 
     // Function to update leaderboard table
     function updateLeaderboard() {
