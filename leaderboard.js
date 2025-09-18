@@ -361,11 +361,34 @@ function renderTransitionView(data) {
     const currentComp = data.current && data.current.length > 0 ? data.current[0] : null;
     const upcomingComps = data.upcoming || [];
     
+    // Calculate total jackpot across all competitions
+    const currentPrize = currentComp ? currentComp.prize_pool_usd : 0;
+    const upcomingPrizes = upcomingComps.reduce((sum, comp) => sum + comp.prize_pool_usd, 0);
+    const totalJackpot = currentPrize + upcomingPrizes;
+    
+    // Format dates for display
+    const formatDate = (dateStr) => {
+        return new Date(dateStr).toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric', 
+            year: 'numeric' 
+        });
+    };
+    
     prizeHub.innerHTML = `
         <div class="container">
+            <!-- Total Jackpot Highlight Banner -->
+            <div class="total-jackpot-banner">
+                <div class="jackpot-content">
+                    <div class="jackpot-label">🎯 TOTAL CHAMPIONSHIP JACKPOT</div>
+                    <div class="jackpot-amount">$${(totalJackpot/1000).toFixed(0)}K</div>
+                    <div class="jackpot-description">Available across all current & upcoming competitions</div>
+                </div>
+            </div>
+            
             <h1 class="section-title">🏆 Prize Championships</h1>
             
-            <!-- Live Competition Hero Card (Similar to Launch View) -->
+            <!-- Live Competition Hero Card -->
             <div class="transition-hero-card">
                 <div class="transition-hero-content">
                     <div class="live-badge">🔴 LIVE NOW</div>
@@ -388,12 +411,26 @@ function renderTransitionView(data) {
                             </div>
                         </div>
                         <div class="transition-stat">
-                            <i class="fas fa-clock"></i>
+                            <i class="fas fa-calendar-alt"></i>
                             <div>
-                                <strong>Competition Status</strong>
-                                <span>Active & accepting participants</span>
+                                <strong>Competition Period</strong>
+                                <span>${currentComp ? `${formatDate(currentComp.start_date)} - ${formatDate(currentComp.end_date)}` : 'Sept 15 - Sept 30, 2025'}</span>
                             </div>
                         </div>
+                        ${currentComp && currentComp.end_date ? `
+                        <div class="transition-stat countdown-stat">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <strong>Time Remaining</strong>
+                                <div id="transition-countdown-timer" class="countdown-inline">
+                                    <span id="transition-countdown-days">00</span>d 
+                                    <span id="transition-countdown-hours">00</span>h 
+                                    <span id="transition-countdown-minutes">00</span>m 
+                                    <span id="transition-countdown-seconds">00</span>s
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
                     </div>
                     
                     <div class="transition-cta">
@@ -407,6 +444,16 @@ function renderTransitionView(data) {
                 </div>
                 
                 <div class="transition-visual">
+                    <!-- Big Prize Display -->
+                    <div class="big-prize-display">
+                        <div class="prize-spotlight">
+                            <div class="prize-icon">💰</div>
+                            <div class="prize-value">$${currentComp ? (currentComp.prize_pool_usd/1000).toFixed(0) : '15'}K</div>
+                            <div class="prize-label">LIVE PRIZE POOL</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Leaderboard Preview -->
                     <div class="current-standings-preview">
                         <div class="standings-title">Live Leaderboard Preview</div>
                         <div class="standings-list">
@@ -486,6 +533,43 @@ function renderTransitionView(data) {
             ` : ''}
         </div>
     `;
+    
+    // Start countdown timer for transition view if we have an end date
+    if (currentComp && currentComp.end_date) {
+        startTransitionCountdownTimer(new Date(currentComp.end_date));
+    }
+}
+
+// Countdown Timer for Transition View (competition end)
+function startTransitionCountdownTimer(endDate) {
+    const countdownInterval = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = endDate.getTime() - now;
+
+        if (distance < 0) {
+            clearInterval(countdownInterval);
+            const timerEl = document.getElementById('transition-countdown-timer');
+            if (timerEl) {
+                timerEl.innerHTML = '<span class="countdown-expired">🎉 Competition Ended!</span>';
+            }
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        const daysEl = document.getElementById('transition-countdown-days');
+        const hoursEl = document.getElementById('transition-countdown-hours');
+        const minutesEl = document.getElementById('transition-countdown-minutes');
+        const secondsEl = document.getElementById('transition-countdown-seconds');
+
+        if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+        if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+        if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+        if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+    }, 1000);
 }
 
 // Helper function to display competition types with proper formatting

@@ -2180,6 +2180,174 @@ nav ul li a.active {
     opacity: 1 !important; /* Force visibility - override any hiding rules */
 }
 
+/* Total Jackpot Banner - Prominent Display */
+.total-jackpot-banner {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(45, 212, 127, 0.1));
+    border: 2px solid rgba(255, 215, 0, 0.4);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.total-jackpot-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.jackpot-content {
+    position: relative;
+    z-index: 2;
+}
+
+.jackpot-label {
+    color: #ffd700;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.jackpot-amount {
+    color: #ffffff;
+    font-family: 'Orbitron', monospace;
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.jackpot-description {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Big Prize Display in Visual Section */
+.big-prize-display {
+    margin-bottom: 30px;
+}
+
+.prize-spotlight {
+    background: linear-gradient(135deg, rgba(45, 212, 127, 0.15), rgba(255, 215, 0, 0.1));
+    border: 2px solid var(--primary-color);
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.prize-spotlight::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 40%, rgba(45, 212, 127, 0.1) 50%, transparent 60%);
+    animation: prizeShine 2s infinite;
+}
+
+@keyframes prizeShine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.prize-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 2;
+}
+
+.prize-value {
+    color: var(--primary-color);
+    font-family: 'Orbitron', monospace;
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 8px;
+    text-shadow: 0 0 15px rgba(45, 212, 127, 0.5);
+    position: relative;
+    z-index: 2;
+}
+
+.prize-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Enhanced Transition Stats */
+.countdown-inline {
+    color: var(--primary-color);
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-top: 5px;
+}
+
+.countdown-inline span {
+    background: rgba(45, 212, 127, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin: 0 2px;
+}
+
+.countdown-expired {
+    color: #ffd700;
+    font-weight: 700;
+    animation: pulse 2s infinite;
+}
+
+/* Updated Transition Visual Layout */
+.transition-visual {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+/* Responsive Design Updates */
+@media (max-width: 768px) {
+    .jackpot-amount {
+        font-size: 2.5rem;
+    }
+    
+    .prize-value {
+        font-size: 2rem;
+    }
+    
+    .total-jackpot-banner {
+        padding: 20px;
+    }
+}
+
 /* Transition View Styles - Consistent with Launch View */
 .transition-hero-card {
     background: linear-gradient(135deg, rgba(45, 212, 127, 0.1), rgba(153, 69, 255, 0.05));
