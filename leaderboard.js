@@ -928,9 +928,9 @@ function renderSophisticatedStatus1(data, prizeHub) {
             
             <!-- ==== ADDITIONAL SOPHISTICATED SECTIONS BELOW ==== -->
             
-            <!-- Historical KPIs Section -->
-            <div class="sophisticated-historical-section">
-                <h3 class="subsection-title">📊 Platform Analytics & History</h3>
+            <!-- Championship Stats Section -->
+            <div class="sophisticated-historical-section" style="margin-top: 60px;">
+                <h1 class="section-title">📊 Championship Stats</h1>
                 
                 <!-- Core Historical KPIs -->
                 <div class="historical-kpis">
@@ -984,8 +984,8 @@ function renderSophisticatedStatus1(data, prizeHub) {
                             <div class="table-col">Competition</div>
                             <div class="table-col">Type</div>
                             <div class="table-col">Prize Pool</div>
-                            <div class="table-col">Winners</div>
-                            <div class="table-col">Date</div>
+                            <div class="table-col">Total Participants</div>
+                            <div class="table-col">Total Trades</div>
                             <div class="table-col">Action</div>
                         </div>
                         <div class="history-table-body">
@@ -1104,33 +1104,45 @@ function generateChampionshipHistoryTable(historyData) {
         `;
     }
     
-    return historyData.map((competition, index) => `
-        <div class="history-table-row">
-            <div class="table-col">
-                <div class="competition-name">${competition.title}</div>
-                <div class="competition-subtitle">${new Date(competition.end_date).toLocaleDateString()}</div>
+    return historyData.map((competition, index) => {
+        // Format start and end dates
+        const startDate = new Date(competition.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const endDate = new Date(competition.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        
+        // Get real participant count and total trades from database
+        const participantCount = competition.participants ? competition.participants.length : 0;
+        const totalTrades = competition.participants 
+            ? competition.participants.reduce((sum, participant) => sum + (participant.trades_count || 0), 0)
+            : 0;
+        
+        return `
+            <div class="history-table-row">
+                <div class="table-col">
+                    <div class="competition-name">${competition.title}</div>
+                    <div class="competition-subtitle">${startDate} - ${endDate}</div>
+                </div>
+                <div class="table-col">
+                    <span class="comp-type-badge ${competition.competition_type}">
+                        ${getCompetitionTypeDisplay(competition.competition_type)}
+                    </span>
+                </div>
+                <div class="table-col">
+                    <div class="prize-amount">$${(competition.prize_pool_usd/1000).toFixed(0)}K</div>
+                </div>
+                <div class="table-col">
+                    <div class="participants-count">${participantCount}</div>
+                </div>
+                <div class="table-col">
+                    <div class="total-trades">${totalTrades.toLocaleString()}</div>
+                </div>
+                <div class="table-col">
+                    <button class="btn btn-ghost btn-sm" onclick="openChampionshipModal(${index})">
+                        📊 View Details
+                    </button>
+                </div>
             </div>
-            <div class="table-col">
-                <span class="comp-type-badge ${competition.competition_type}">
-                    ${getCompetitionTypeDisplay(competition.competition_type)}
-                </span>
-            </div>
-            <div class="table-col">
-                <div class="prize-amount">$${(competition.prize_pool_usd/1000).toFixed(0)}K</div>
-            </div>
-            <div class="table-col">
-                <div class="winners-count">${competition.winners ? competition.winners.length : 0}</div>
-            </div>
-            <div class="table-col">
-                <div class="comp-date">${new Date(competition.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-            </div>
-            <div class="table-col">
-                <button class="btn btn-ghost btn-sm" onclick="openChampionshipModal(${index})">
-                    📊 View Details
-                </button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function generateTournamentsList(historyData) {
