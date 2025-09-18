@@ -117,10 +117,23 @@ window.testSimple = function() {
     console.log('🔧 Simple Test - Direct DOM Manipulation');
     const prizeHub = document.getElementById('prize-hub');
     if (prizeHub) {
-        console.log('Element found, setting simple test content...');
-        prizeHub.innerHTML = '<div style="background: red !important; color: white !important; padding: 20px !important; text-align: center !important; display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 999999 !important; position: relative !important; height: auto !important; width: 100% !important;"><h1 style="font-size: 2em !important; margin: 10px !important;">🔧 SIMPLE TEST WORKS!</h1><p style="font-size: 1.2em !important; margin: 10px !important;">This proves DOM manipulation is working</p></div>';
-        console.log('Simple test content set with !important overrides!');
-        console.log('Element computed styles:', window.getComputedStyle(prizeHub).display, window.getComputedStyle(prizeHub).visibility, window.getComputedStyle(prizeHub).opacity);
+        console.log('Element found, checking current state...');
+        const computedStyles = window.getComputedStyle(prizeHub);
+        console.log('Current computed styles:');
+        console.log('  display:', computedStyles.display);
+        console.log('  visibility:', computedStyles.visibility);
+        console.log('  opacity:', computedStyles.opacity);
+        console.log('  height:', computedStyles.height);
+        console.log('  overflow:', computedStyles.overflow);
+        console.log('  position:', computedStyles.position);
+        console.log('Element bounds:', prizeHub.getBoundingClientRect());
+        
+        prizeHub.innerHTML = '<div style="background: red !important; color: white !important; padding: 50px !important; text-align: center !important; display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 999999 !important; position: relative !important; height: 200px !important; width: 100% !important; min-height: 200px !important; font-size: 2em !important; margin: 20px 0 !important; border: 5px solid yellow !important; box-sizing: border-box !important;"><h1 style="font-size: 1.5em !important; margin: 10px !important; color: white !important;">🔧 SIMPLE TEST WORKS!</h1><p style="font-size: 1em !important; margin: 10px !important; color: white !important;">This proves DOM manipulation is working</p></div>';
+        console.log('Test content set! Element should now be 200px tall with red background and yellow border.');
+        
+        // Also try to scroll to it
+        prizeHub.scrollIntoView({behavior: 'smooth', block: 'center'});
+        console.log('Scrolled to element position');
     } else {
         console.log('ERROR: Could not find prize-hub element!');
     }
