@@ -369,26 +369,35 @@ function renderTransitionView(data) {
             <div class="live-ticker-section">
                 <div class="ticker-container">
                     <div class="live-competition-card">
-                        <div class="live-indicator">
-                            <span class="live-dot"></span>
-                            <span class="live-text">LIVE COMPETITION</span>
-                        </div>
-                        <div class="competition-details">
-                            <h3>${currentComp ? currentComp.title : 'September Championship'}</h3>
-                            <div class="competition-stats">
-                                <div class="stat-pill">
-                                    <span class="stat-value">$${currentComp ? (currentComp.prize_pool_usd/1000).toFixed(0) : '15'}K</span>
-                                    <span class="stat-label">Prize Pool</span>
-                                </div>
-                                <div class="stat-pill">
-                                    <span class="stat-value">${getCompetitionTypeDisplay(currentComp ? currentComp.competition_type : 'pnl')}</span>
-                                    <span class="stat-label">Category</span>
-                                </div>
+                        <div class="live-competition-header">
+                            <div class="live-indicator">
+                                <span class="live-dot"></span>
+                                <span class="live-text">LIVE COMPETITION</span>
+                            </div>
+                            <div class="competition-badges">
+                                <span class="badge-live">🔴 LIVE</span>
+                                <span class="badge-type">${getCompetitionTypeDisplay(currentComp ? currentComp.competition_type : 'pnl')}</span>
                             </div>
                         </div>
-                        <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-live">
-                            🚀 JOIN NOW
-                        </a>
+                        
+                        <div class="competition-main">
+                            <div class="competition-info">
+                                <h3 class="competition-title">${currentComp ? currentComp.title : 'September Championship'}</h3>
+                                <div class="prize-display">
+                                    <div class="prize-amount">$${currentComp ? (currentComp.prize_pool_usd/1000).toFixed(0) : '15'}K</div>
+                                    <div class="prize-label">Total Prize Pool</div>
+                                </div>
+                            </div>
+                            
+                            <div class="competition-actions">
+                                <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-join">
+                                    🚀 JOIN NOW
+                                </a>
+                                <a href="#main-leaderboard" class="btn btn-secondary btn-view-leaderboard">
+                                    📊 VIEW LEADERBOARD
+                                </a>
+                            </div>
+                        </div>
                     </div>
                     
                     ${upcomingComps.length > 0 ? `
@@ -442,34 +451,54 @@ function renderTransitionView(data) {
                     </div>
                 </div>
                 
-                <!-- Competition Progress Teaser -->
-                <div class="competition-progress-teaser">
-                    <div class="progress-header">
-                        <h4>🔥 Competition Heating Up!</h4>
-                        <p>Join now to climb the leaderboard and claim your share</p>
+                <!-- Live Battle Status -->
+                <div class="live-battle-status">
+                    <div class="battle-header">
+                        <div class="battle-title">
+                            <span class="fire-icon">🔥</span>
+                            <h4>BATTLE ROYALE IN PROGRESS</h4>
+                            <div class="battle-pulse"></div>
+                        </div>
+                        <p class="battle-subtitle">Top traders are fighting for supremacy. Join the war!</p>
                     </div>
-                    <div class="leader-preview">
-                        <div class="leader-item leader-first">
-                            <span class="leader-rank">🥇</span>
-                            <span class="leader-name">@current_leader</span>
-                            <span class="leader-performance">+$47.2K</span>
+                    
+                    <div class="current-leaders">
+                        <div class="leader-spotlight leader-gold">
+                            <div class="leader-crown">👑</div>
+                            <div class="leader-info">
+                                <div class="leader-name">@current_leader</div>
+                                <div class="leader-performance">+$47.2K</div>
+                                <div class="leader-status">DOMINATING</div>
+                            </div>
+                            <div class="leader-glow"></div>
                         </div>
-                        <div class="leader-item">
-                            <span class="leader-rank">🥈</span>
-                            <span class="leader-name">@runner_up</span>
-                            <span class="leader-performance">+$38.9K</span>
-                        </div>
-                        <div class="leader-item">
-                            <span class="leader-rank">🥉</span>
-                            <span class="leader-name">@third_place</span>
-                            <span class="leader-performance">+$31.5K</span>
+                        
+                        <div class="challengers-row">
+                            <div class="leader-challenger">
+                                <span class="rank-badge silver">🥈</span>
+                                <div class="challenger-info">
+                                    <span class="name">@runner_up</span>
+                                    <span class="performance">+$38.9K</span>
+                                </div>
+                            </div>
+                            <div class="leader-challenger">
+                                <span class="rank-badge bronze">🥉</span>
+                                <div class="challenger-info">
+                                    <span class="name">@third_place</span>
+                                    <span class="performance">+$31.5K</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="join-urgency">
-                        <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-secondary btn-large">
-                            ⚡ JOIN THE BATTLE
+                    
+                    <div class="battle-cta">
+                        <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-battle">
+                            ⚔️ ENTER THE ARENA
                         </a>
-                        <span class="urgency-text">Still time to make your move!</span>
+                        <div class="battle-urgency">
+                            <span class="urgency-pulse"></span>
+                            <span class="urgency-text">Limited spots available!</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -487,85 +516,208 @@ function getCompetitionTypeDisplay(type) {
     }
 }
 
+// Smooth scroll to leaderboard functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth scroll behavior to View Leaderboard buttons
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('.btn-view-leaderboard, .btn-view-leaderboard *')) {
+            e.preventDefault();
+            const target = document.querySelector('#main-leaderboard');
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+    });
+});
+
 // Sophisticated view renderer for rich data
 function renderSophisticatedView(data) {
     const prizeHub = document.getElementById('prize-hub');
+    const currentComp = data.current && data.current.length > 0 ? data.current[0] : null;
+    const upcomingComps = data.upcoming || [];
+    const recentWinners = data.history && data.history.length > 0 ? data.history[0].winners : [];
+    
     prizeHub.innerHTML = `
         <div class="container">
             <h1 class="section-title">🏆 Prize Championships</h1>
             
-            <!-- Current Live Competition -->
-            <div class="sophisticated-current">
-                <div class="current-prize-card">
-                    <div class="prize-header">
-                        <h2>${data.current.title}</h2>
-                        <div class="prize-badges">
-                            <span class="prize-badge live">🔴 LIVE</span>
-                            <span class="prize-badge monthly">MONTHLY</span>
-                        </div>
+            <!-- Sophisticated Header with KPIs -->
+            <div class="sophisticated-header">
+                <div class="kpi-grid">
+                    <div class="kpi-card highlight">
+                        <div class="kpi-icon">💰</div>
+                        <div class="kpi-value">$${(data.stats.total_distributed_usd || 0).toLocaleString()}</div>
+                        <div class="kpi-label">Total Distributed</div>
                     </div>
-                    <div class="prize-pool">
-                        <div class="pool-amount">$${data.current.prize_pool_usd.toLocaleString()}</div>
-                        <div class="pool-label">Total Prize Pool</div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">🏆</div>
+                        <div class="kpi-value">${data.stats.total_winners || 0}</div>
+                        <div class="kpi-label">Champions Crowned</div>
                     </div>
-                    <div class="prize-countdown-container">
-                        <div class="countdown-label">Competition Ends In:</div>
-                        <div class="countdown-timer">12d 14h 23m</div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">📈</div>
+                        <div class="kpi-value">${data.stats.months_active || 0}</div>
+                        <div class="kpi-label">Months Active</div>
                     </div>
-                    <div class="prize-actions">
-                        <a href="${data.current.cta_link || '#'}" class="btn btn-primary btn-large">
-                            ${data.current.cta_text || 'JOIN COMPETITION'}
-                        </a>
-                        <div class="eligibility-note">Min 50 trades • $10K volume</div>
+                    <div class="kpi-card highlight">
+                        <div class="kpi-icon">🚀</div>
+                        <div class="kpi-value">${currentComp ? 'LIVE' : 'UPCOMING'}</div>
+                        <div class="kpi-label">Competition Status</div>
                     </div>
                 </div>
             </div>
-
-            <!-- Upcoming Competitions -->
-            ${data.upcoming ? `
-            <div class="sophisticated-upcoming">
-                <h3 class="subsection-title">Next Championship</h3>
-                <div class="upcoming-card">
-                    <h4>${data.upcoming.title}</h4>
-                    <div class="upcoming-pool">$${data.upcoming.prize_pool_usd.toLocaleString()}</div>
-                    <p>Registration opens soon</p>
+            
+            <!-- Current Live Competition (Compact) -->
+            ${currentComp ? `
+            <div class="sophisticated-live-competition">
+                <div class="live-comp-header">
+                    <div class="live-status">
+                        <span class="live-indicator-dot"></span>
+                        <span class="live-label">LIVE NOW</span>
+                    </div>
+                    <h3 class="live-comp-title">${currentComp.title}</h3>
                 </div>
-            </div>
-            ` : ''}
-
-            <!-- Rich Historical Impact -->
-            <div class="sophisticated-history">
-                <h3 class="subsection-title">Champion Hall of Fame</h3>
-                <div class="history-stats">
-                    <div class="stat-card">
-                        <div class="stat-value">$${data.stats.total_distributed_usd.toLocaleString()}</div>
-                        <div class="stat-label">Total Distributed</div>
+                
+                <div class="live-comp-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Prize Pool</span>
+                        <span class="detail-value">$${(currentComp.prize_pool_usd/1000).toFixed(0)}K</span>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${data.stats.total_winners}</div>
-                        <div class="stat-label">Champions</div>
+                    <div class="detail-item">
+                        <span class="detail-label">Category</span>
+                        <span class="detail-value">${getCompetitionTypeDisplay(currentComp.competition_type)}</span>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${data.stats.months_active}</div>
-                        <div class="stat-label">Months Active</div>
+                    <div class="detail-item">
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value live-status-text">Active</span>
                     </div>
                 </div>
                 
-                <div class="winners-grid">
-                    ${data.history.slice(0, 6).map(winner => `
-                        <div class="winner-card">
-                            <div class="winner-place">#${winner.place}</div>
-                            <div class="winner-name">${winner.username}</div>
-                            <div class="winner-prize">$${winner.amount_usd.toLocaleString()}</div>
-                            <div class="winner-competition">${winner.competition_title}</div>
-                            <div class="winner-date">${new Date(winner.paid_at).toLocaleDateString()}</div>
+                <div class="live-comp-actions">
+                    <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-compact">Join Competition</a>
+                    <a href="#main-leaderboard" class="btn btn-secondary btn-compact btn-view-leaderboard">View Rankings</a>
+                </div>
+            </div>
+            ` : ''}
+            
+            <!-- Upcoming Competitions Carousel -->
+            ${upcomingComps.length > 0 ? `
+            <div class="upcoming-competitions-section">
+                <h3 class="section-subtitle">🔥 Upcoming Championships</h3>
+                <div class="upcoming-carousel">
+                    ${upcomingComps.map(comp => `
+                        <div class="upcoming-card ${comp.competition_type}">
+                            <div class="upcoming-card-header">
+                                <span class="upcoming-type-badge">${getCompetitionTypeDisplay(comp.competition_type)}</span>
+                                <span class="upcoming-prize">$${(comp.prize_pool_usd/1000).toFixed(0)}K</span>
+                            </div>
+                            <h4 class="upcoming-title">${comp.title}</h4>
+                            <div class="upcoming-date">
+                                ${new Date(comp.start_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                            </div>
                         </div>
                     `).join('')}
+                </div>
+            </div>
+            ` : ''}
+            
+            <!-- Hall of Fame Section -->
+            ${recentWinners.length > 0 ? `
+            <div class="hall-of-fame-section">
+                <h3 class="section-subtitle">🏛️ Hall of Fame - Latest Champions</h3>
+                <div class="champions-showcase">
+                    ${recentWinners.slice(0, 3).map((winner, index) => `
+                        <div class="champion-card ${index === 0 ? 'champion-winner' : ''}">
+                            <div class="champion-rank">${['👑', '🥈', '🥉'][index]}</div>
+                            <div class="champion-info">
+                                <div class="champion-name">${winner.username}</div>
+                                <div class="champion-prize">$${winner.amount_usd.toLocaleString()}</div>
+                                <div class="champion-performance">${winner.performance_metric || 'Winner'}</div>
+                            </div>
+                            ${winner.transaction_hash ? `
+                            <div class="champion-proof">
+                                <a href="https://solscan.io/tx/${winner.transaction_hash}" target="_blank" class="proof-link">
+                                    📜 View Payout
+                                </a>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
+            
+            <!-- Historical Deep Dive -->
+            <div class="historical-section">
+                <h3 class="section-subtitle">📊 Competition History</h3>
+                <div class="history-controls">
+                    <button class="btn btn-ghost active" onclick="showHistoryView('overview')">Overview</button>
+                    <button class="btn btn-ghost" onclick="showHistoryView('detailed')">Detailed Results</button>
+                    <button class="btn btn-ghost" onclick="showHistoryView('analytics')">Analytics</button>
+                </div>
+                
+                <div id="history-overview" class="history-view active">
+                    ${data.history && data.history.length > 0 ? `
+                        <div class="competition-timeline">
+                            ${data.history.map(comp => `
+                                <div class="timeline-item">
+                                    <div class="timeline-marker">${getCompetitionTypeDisplay(comp.competition_type)}</div>
+                                    <div class="timeline-content">
+                                        <h4>${comp.title}</h4>
+                                        <div class="timeline-details">
+                                            <span>$${(comp.prize_pool_usd/1000).toFixed(0)}K Prize Pool</span>
+                                            <span>${comp.winners?.length || 0} Winners</span>
+                                            <span>${new Date(comp.end_date).toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<div class="no-history">No competition history available yet. Be part of our first champions!</div>'}
+                </div>
+                
+                <div id="history-detailed" class="history-view">
+                    <div class="detailed-placeholder">
+                        <p>📋 Detailed competition results and winner breakdowns will be shown here.</p>
+                        <p>Coming soon with full transaction history and performance analytics.</p>
+                    </div>
+                </div>
+                
+                <div id="history-analytics" class="history-view">
+                    <div class="analytics-placeholder">
+                        <p>📈 Advanced analytics dashboard with charts and insights.</p>
+                        <p>Track performance trends, winner patterns, and competition statistics.</p>
+                    </div>
                 </div>
             </div>
         </div>
     `;
 }
+
+// History view switcher for sophisticated view
+window.showHistoryView = function(viewName) {
+    // Hide all views
+    document.querySelectorAll('.history-view').forEach(view => {
+        view.classList.remove('active');
+    });
+    
+    // Remove active from all buttons
+    document.querySelectorAll('.history-controls .btn-ghost').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected view
+    const targetView = document.getElementById(`history-${viewName}`);
+    if (targetView) {
+        targetView.classList.add('active');
+    }
+    
+    // Add active to clicked button
+    event.target.classList.add('active');
+};
 
 function renderUpcomingPromise() {
     return `
