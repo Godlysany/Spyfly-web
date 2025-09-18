@@ -2168,6 +2168,7 @@ nav ul li a.active {
 #prize-hub {
     background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
     padding: 60px 0;
+    opacity: 1 !important; /* Force visibility - override any hiding rules */
 }
 
 .prize-section {
