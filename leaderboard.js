@@ -24,20 +24,32 @@ function addViewTesterInterface() {
     tester.innerHTML = `
         <div style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: rgba(0,0,0,0.9); border: 2px solid #2DD47F; border-radius: 10px; padding: 15px;">
             <div style="color: #2DD47F; font-weight: bold; margin-bottom: 10px;">🧪 VIEW TESTER</div>
+            <button onclick="testZeroDataView()" style="background: #666; color: white; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">⚪ Zero Data</button>
             <button onclick="testLaunchView()" style="background: #2DD47F; color: black; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">🚀 Launch</button>
             <button onclick="testTransitionView()" style="background: #9945ff; color: white; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">🔄 Transition</button>
             <button onclick="testSophisticatedView()" style="background: #FFD700; color: black; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">💎 Sophisticated</button>
             <button onclick="testRealData()" style="background: #ffffff; color: black; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">📊 Real Data</button>
-            <button onclick="testSimple()" style="background: #ff0000; color: white; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">🔧 Test</button>
         </div>
     `;
     document.body.appendChild(tester);
 }
 
 // Test Functions
+window.testZeroDataView = function() {
+    console.log('⚪ Testing Zero Data View');
+    renderZeroDataView();
+}
+
 window.testLaunchView = function() {
     console.log('🚀 Testing Launch View');
-    renderLaunchView();
+    const mockUpcomingData = {
+        upcoming: [{
+            title: 'October Mega Championship',
+            prize_pool_usd: 25000,
+            start_date: '2025-10-01T00:00:00Z'
+        }]
+    };
+    renderLaunchView(mockUpcomingData);
 }
 
 window.testTransitionView = function() {
@@ -121,35 +133,59 @@ async function initSmartPrizeHub() {
         const response = await fetch('/api/prizes');
         const data = await response.json();
         
-        // Detect data richness to choose view
-        const hasCompetitions = data.current || data.upcoming;
+        // Enhanced detection logic for 4 distinct states
+        const hasCurrent = data.current && data.current.length > 0;
+        const hasUpcoming = data.upcoming && data.upcoming.length > 0;
         const hasHistory = data.history && data.history.length > 0;
         const hasStats = data.stats && data.stats.total_winners > 0;
         
-        if (!hasCompetitions && !hasHistory && !hasStats) {
-            renderLaunchView();
-        } else if (hasCompetitions && hasHistory && hasStats) {
+        if (!hasCurrent && !hasUpcoming && !hasHistory && !hasStats) {
+            // ZERO DATA: Nothing configured in CMS - hide prize section entirely
+            renderZeroDataView();
+        } else if (!hasCurrent && hasUpcoming && !hasHistory && !hasStats) {
+            // LAUNCH: Upcoming competitions exist but none started yet - show launch with real data
+            renderLaunchView(data);
+        } else if (hasCurrent && !hasHistory && !hasStats) {
+            // TRANSITION: Live competitions but no winners yet
+            renderTransitionView(data);
+        } else if (hasHistory && hasStats) {
+            // SOPHISTICATED: Full ecosystem with completed competitions and winners
             renderSophisticatedView(data);
         } else {
+            // FALLBACK: Any other combination defaults to transition
             renderTransitionView(data);
         }
     } catch (error) {
-        console.log('API not available, using launch view');
-        renderLaunchView();
+        console.log('API not available, using zero data view');
+        renderZeroDataView();
     }
 }
 
-function renderLaunchView() {
+// NEW: Zero Data View - Hide prize section entirely, focus on leaderboard
+function renderZeroDataView() {
     const prizeHub = document.getElementById('prize-hub');
+    prizeHub.style.display = 'none'; // Hide the entire section
+    console.log('Zero data state: Prize section hidden, showing leaderboard only');
+}
+
+function renderLaunchView(data = null) {
+    const prizeHub = document.getElementById('prize-hub');
+    prizeHub.style.display = 'block'; // Ensure it's visible
+    
+    // Use real upcoming competition data if available
+    const upcomingComp = data && data.upcoming && data.upcoming.length > 0 ? data.upcoming[0] : null;
+    const prizeAmount = upcomingComp ? upcomingComp.prize_pool_usd : 15000;
+    const competitionTitle = upcomingComp ? upcomingComp.title : 'The Ultimate Trading Championship';
+    
     prizeHub.innerHTML = `
         <div class="container">
             <h1 class="section-title">🏆 Prize Championships</h1>
             
-            <!-- Launch Hero -->
+            <!-- Launch Hero with Real Data -->
             <div class="launch-hero-card">
                 <div class="launch-hero-content">
                     <div class="launch-badge">🚀 LAUNCHING SOON</div>
-                    <h2 class="launch-title">The Ultimate Trading Championship</h2>
+                    <h2 class="launch-title">${competitionTitle}</h2>
                     <p class="launch-subtitle">Compete with elite traders. Win life-changing prizes. Prove your alpha.</p>
                     
                     <div class="launch-features">
@@ -157,7 +193,7 @@ function renderLaunchView() {
                             <i class="fas fa-trophy"></i>
                             <div>
                                 <strong>Massive Prize Pools</strong>
-                                <span>$15K+ monthly competitions</span>
+                                <span>$${(prizeAmount/1000).toFixed(0)}K+ upcoming competition</span>
                             </div>
                         </div>
                         <div class="launch-feature">
@@ -187,7 +223,7 @@ function renderLaunchView() {
                 <div class="launch-visual">
                     <div class="launch-stats-preview">
                         <div class="stat-item">
-                            <div class="stat-number">$50K+</div>
+                            <div class="stat-number">$${(prizeAmount/1000).toFixed(0)}K</div>
                             <div class="stat-label">Prize Pool Ready</div>
                         </div>
                         <div class="stat-item">
