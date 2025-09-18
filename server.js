@@ -4,10 +4,13 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const { createClient } = require('@supabase/supabase-js');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // Environment variables
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const JWT_SECRET = process.env.JWT_SECRET || 'spyfly-jwt-secret-change-in-production-2025';
 const PORT = 5000;
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
@@ -44,7 +47,7 @@ const server = http.createServer(async (req, res) => {
     // Set CORS headers for all responses
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     // Handle preflight OPTIONS requests
     if (method === 'OPTIONS') {
@@ -71,9 +74,175 @@ const server = http.createServer(async (req, res) => {
     }
 });
 
+// Authentication helper functions
+async function verifyAdminToken(req) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return null;
+    }
+    
+    const token = authHeader.substring(7);
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const { data: admin, error } = await supabase
+            .from('admin_users')
+            .select('*')
+            .eq('id', decoded.adminId)
+            .eq('is_active', true)
+            .single();
+            
+        if (error || !admin) return null;
+        return admin;
+    } catch (error) {
+        return null;
+    }
+}
+
 // API request handler
 async function handleApiRequest(req, res, pathname, method) {
     try {
+        // ===== AUTHENTICATION ENDPOINTS =====
+        
+        // Admin login
+        if (pathname === '/api/admin/login' && method === 'POST') {
+            const body = await getRequestBody(req);
+            const { username, password } = JSON.parse(body);
+            
+            if (!username || !password) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ error: 'Username and password required' }));
+                return;
+            }
+            
+            // Get admin user
+            const { data: admin, error: adminError } = await supabase
+                .from('admin_users')
+                .select('*')
+                .eq('username', username)
+                .eq('is_active', true)
+                .single();
+                
+            if (adminError || !admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Invalid credentials' }));
+                return;
+            }
+            
+            // Check if account is locked
+            if (admin.locked_until && new Date(admin.locked_until) > new Date()) {
+                res.writeHead(423);
+                res.end(JSON.stringify({ error: 'Account temporarily locked due to failed attempts' }));
+                return;
+            }
+            
+            // Verify password
+            const isValidPassword = await bcrypt.compare(password, admin.password_hash);
+            if (!isValidPassword) {
+                // Increment failed attempts
+                await supabase
+                    .from('admin_users')
+                    .update({ 
+                        failed_login_attempts: admin.failed_login_attempts + 1,
+                        locked_until: admin.failed_login_attempts >= 4 ? 
+                            new Date(Date.now() + 15 * 60 * 1000).toISOString() : null // 15 min lock
+                    })
+                    .eq('id', admin.id);
+                    
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Invalid credentials' }));
+                return;
+            }
+            
+            // Generate JWT
+            const token = jwt.sign(
+                { adminId: admin.id, username: admin.username },
+                JWT_SECRET,
+                { expiresIn: '8h' }
+            );
+            
+            // Update last login and reset failed attempts
+            await supabase
+                .from('admin_users')
+                .update({ 
+                    last_login_at: new Date().toISOString(),
+                    failed_login_attempts: 0,
+                    locked_until: null
+                })
+                .eq('id', admin.id);
+                
+            res.writeHead(200);
+            res.end(JSON.stringify({
+                success: true,
+                token,
+                admin: {
+                    id: admin.id,
+                    username: admin.username,
+                    role: admin.role,
+                    created_at: admin.created_at
+                }
+            }));
+            return;
+        }
+
+        // Verify admin token
+        if (pathname === '/api/admin/verify' && method === 'GET') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Invalid token' }));
+                return;
+            }
+            
+            res.writeHead(200);
+            res.end(JSON.stringify({
+                success: true,
+                admin: {
+                    id: admin.id,
+                    username: admin.username,
+                    role: admin.role
+                }
+            }));
+            return;
+        }
+
+        // Change admin password (requires current password)
+        if (pathname === '/api/admin/change-password' && method === 'POST') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const body = await getRequestBody(req);
+            const { current_password, new_password } = JSON.parse(body);
+            
+            // Verify current password
+            const isCurrentValid = await bcrypt.compare(current_password, admin.password_hash);
+            if (!isCurrentValid) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ error: 'Current password incorrect' }));
+                return;
+            }
+            
+            // Hash new password
+            const newPasswordHash = await bcrypt.hash(new_password, 12);
+            
+            // Update password
+            const { error } = await supabase
+                .from('admin_users')
+                .update({ password_hash: newPasswordHash })
+                .eq('id', admin.id);
+                
+            if (error) throw error;
+            
+            res.writeHead(200);
+            res.end(JSON.stringify({ success: true, message: 'Password updated successfully' }));
+            return;
+        }
+
+        // ===== PROTECTED ADMIN ENDPOINTS =====
+        
         // Test endpoint
         if (pathname === '/api/test' && method === 'GET') {
             const { data, error } = await supabase.from('competitions').select('count').limit(1);
@@ -96,8 +265,15 @@ async function handleApiRequest(req, res, pathname, method) {
             return;
         }
 
-        // Create new competition
+        // Create new competition (PROTECTED)
         if (pathname === '/api/competitions' && method === 'POST') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
             const body = await getRequestBody(req);
             const comp = JSON.parse(body);
             
@@ -112,8 +288,15 @@ async function handleApiRequest(req, res, pathname, method) {
             return;
         }
 
-        // Add winner
+        // Add winner (PROTECTED)
         if (pathname === '/api/winners' && method === 'POST') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
             const body = await getRequestBody(req);
             const winner = JSON.parse(body);
             
@@ -154,8 +337,15 @@ async function handleApiRequest(req, res, pathname, method) {
             return;
         }
 
-        // Update settings
+        // Update settings (PROTECTED)
         if (pathname === '/api/settings' && method === 'PUT') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
             const body = await getRequestBody(req);
             const { key, value } = JSON.parse(body);
             
