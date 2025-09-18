@@ -153,6 +153,35 @@
 
         <div id="message-area"></div>
 
+        <!-- MAIN LEADERBOARD TOGGLE - Prominent Position -->
+        <div class="admin-card" style="background: linear-gradient(135deg, rgba(45, 212, 127, 0.1), rgba(45, 212, 127, 0.05)); border: 2px solid rgba(45, 212, 127, 0.4); margin-bottom: 30px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h3 style="margin: 0; color: var(--primary-color); display: flex; align-items: center; gap: 10px;">
+                        🎯 <span>Production Leaderboard Control</span>
+                    </h3>
+                    <p style="margin: 5px 0 0 0; color: rgba(255,255,255,0.7); font-size: 0.9rem;">
+                        Master switch for all leaderboard features on the website
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <select id="leaderboard-toggle" style="padding: 12px; background: var(--dark-bg); border: 2px solid var(--primary-color); border-radius: 8px; color: white; font-weight: 600;">
+                        <option value="true">🟢 ON - Full leaderboard features enabled</option>
+                        <option value="false">🔴 OFF - Hide all leaderboard elements</option>
+                    </select>
+                    <button class="btn-admin" onclick="updateLeaderboardToggle()" style="background: var(--primary-color); padding: 12px 20px; font-weight: 600;">
+                        Update Control
+                    </button>
+                </div>
+            </div>
+            <div style="margin-top: 10px; padding: 10px; background: rgba(45, 212, 127, 0.05); border-radius: 6px; border-left: 4px solid var(--primary-color);">
+                <small style="color: rgba(255,255,255,0.8); font-style: italic;">
+                    ℹ️ <strong>OFF:</strong> Clean conversion landing page (hides hero banner, leaderboard section, navigation buttons)<br>
+                    ℹ️ <strong>ON:</strong> Full sophisticated leaderboard app with competitions and prize displays
+                </small>
+            </div>
+        </div>
+
         <!-- Admin Control Center - New Section -->
         <div class="admin-control-center">
             <div class="control-tabs">
@@ -394,19 +423,6 @@
                         <input type="text" id="cache-version" placeholder="202509">
                         <button class="btn-admin" onclick="updateCacheVersion()">Update</button>
                     </div>
-                </div>
-                <div class="form-group" style="margin-top: 20px;">
-                    <label>🎯 Leaderboard Production Control</label>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <select id="leaderboard-toggle" style="flex: 1;">
-                            <option value="true">ON - Full leaderboard features enabled</option>
-                            <option value="false">OFF - Hide all leaderboard elements</option>
-                        </select>
-                        <button class="btn-admin" onclick="updateLeaderboardToggle()">Update</button>
-                    </div>
-                    <small style="color: rgba(255,255,255,0.7); margin-top: 5px; display: block;">
-                        Controls leaderboard section, navigation button, and hero jackpot display on landing page
-                    </small>
                 </div>
             </div>
         </div>
@@ -1600,6 +1616,40 @@
             }
         }
 
+        // Load Winners function - was missing
+        async function loadWinners() {
+            const listEl = document.getElementById('winners-list');
+            try {
+                const response = await authenticatedFetch('/api/winners');
+                const winners = await response.json();
+                
+                if (winners.length === 0) {
+                    listEl.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.6); padding: 20px;">No winners found</div>';
+                    return;
+                }
+                
+                // Display winners list
+                listEl.innerHTML = winners.map(winner => `
+                    <div class="competition-item" style="margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="margin: 0; color: var(--primary-color);">${winner.username}</h4>
+                                <p style="margin: 5px 0; opacity: 0.8;">Position #${winner.place} - ${winner.competition_title || 'Unknown Competition'}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary-color);">$${winner.amount_usd.toLocaleString()}</div>
+                                <div style="font-size: 0.8rem; opacity: 0.6;">${new Date(winner.created_at).toLocaleDateString()}</div>
+                            </div>
+                        </div>
+                        ${winner.tx_url ? `<a href="${winner.tx_url}" target="_blank" style="color: #2DD47F; font-size: 0.9rem;">View Transaction</a>` : ''}
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                listEl.innerHTML = '<div class="error">Failed to load winners</div>';
+            }
+        }
+
         async function updateLeaderboardToggle() {
             const enabled = document.getElementById('leaderboard-toggle').value;
             try {
@@ -1610,12 +1660,13 @@
                 
                 if (response.ok) {
                     const status = enabled === 'true' ? 'ON' : 'OFF';
-                    showMessage(`Leaderboard control updated to ${status}! Website will reflect changes immediately.`, 'success');
+                    showMessage(`✅ Leaderboard control updated to ${status}! Website will reflect changes immediately.`, 'success');
                 } else {
-                    throw new Error('Failed to update leaderboard control');
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to update leaderboard control');
                 }
             } catch (error) {
-                showMessage('Error updating leaderboard control: ' + error.message, 'error');
+                showMessage('❌ Error updating leaderboard control: ' + error.message, 'error');
             }
         }
 

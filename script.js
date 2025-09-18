@@ -662,6 +662,12 @@ function updateHeroPrizeBanner(data) {
     
     if (!banner || !data.current || data.current.length === 0) return;
     
+    // CRITICAL: Check leaderboard toggle first - if disabled, don't show banner at all
+    if (!data.config?.leaderboard_enabled) {
+        banner.style.display = 'none';
+        return;
+    }
+    
     const currentPrize = data.current[0]; // Get first current competition
     const now = new Date();
     const startDate = new Date(currentPrize.start_date);
@@ -683,13 +689,15 @@ function updateHeroPrizeBanner(data) {
             ctaBtn.href = currentPrize.cta_link || 'leaderboard.html#prize-hub';
         }
         
-        // Force banner to be visible and remove any conflicting styles
+        // Show banner only if leaderboard is enabled
         banner.style.display = 'block';
         banner.style.visibility = 'visible';
         banner.style.opacity = '1';
         
         // Update countdown
         if (countdown) updateCountdown(countdown, endDate);
+    } else {
+        banner.style.display = 'none';
     }
 }
 
