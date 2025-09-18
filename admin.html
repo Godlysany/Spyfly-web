@@ -395,6 +395,19 @@
                         <button class="btn-admin" onclick="updateCacheVersion()">Update</button>
                     </div>
                 </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>🎯 Leaderboard Production Control</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select id="leaderboard-toggle" style="flex: 1;">
+                            <option value="true">ON - Full leaderboard features enabled</option>
+                            <option value="false">OFF - Hide all leaderboard elements</option>
+                        </select>
+                        <button class="btn-admin" onclick="updateLeaderboardToggle()">Update</button>
+                    </div>
+                    <small style="color: rgba(255,255,255,0.7); margin-top: 5px; display: block;">
+                        Controls leaderboard section, navigation button, and hero jackpot display on landing page
+                    </small>
+                </div>
             </div>
         </div>
 
@@ -1563,6 +1576,7 @@
                 `;
                 
                 document.getElementById('cache-version').value = stats.cache_version;
+                document.getElementById('leaderboard-toggle').value = stats.leaderboard_enabled !== undefined ? stats.leaderboard_enabled : 'true';
             } catch (error) {
                 statsEl.innerHTML = '<div class="error">Failed to load stats</div>';
             }
@@ -1583,6 +1597,25 @@
                 }
             } catch (error) {
                 showMessage('Error updating cache: ' + error.message, 'error');
+            }
+        }
+
+        async function updateLeaderboardToggle() {
+            const enabled = document.getElementById('leaderboard-toggle').value;
+            try {
+                const response = await authenticatedFetch('/api/settings', {
+                    method: 'PUT',
+                    body: JSON.stringify({ key: 'leaderboard_enabled', value: enabled })
+                });
+                
+                if (response.ok) {
+                    const status = enabled === 'true' ? 'ON' : 'OFF';
+                    showMessage(`Leaderboard control updated to ${status}! Website will reflect changes immediately.`, 'success');
+                } else {
+                    throw new Error('Failed to update leaderboard control');
+                }
+            } catch (error) {
+                showMessage('Error updating leaderboard control: ' + error.message, 'error');
             }
         }
 

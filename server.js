@@ -413,20 +413,23 @@ async function handleApiRequest(req, res, pathname, method) {
             ] = await Promise.all([
                 supabase.from('winners').select('amount_usd'),
                 supabase.from('competitions').select('id, created_at'),
-                supabase.from('app_settings').select('*').eq('key', 'cache_version')
+                supabase.from('app_settings').select('*')
             ]);
             
             const totalDistributed = winners?.reduce((sum, w) => sum + w.amount_usd, 0) || 0;
             const totalWinners = winners?.length || 0;
             const monthsActive = competitions?.length || 0;
-            const cacheVersion = settings?.[0]?.value || '202509';
+            
+            const settingsMap = {};
+            settings?.forEach(s => settingsMap[s.key] = s.value);
             
             res.writeHead(200);
             res.end(JSON.stringify({
                 total_distributed: totalDistributed,
                 total_winners: totalWinners,
                 months_active: monthsActive,
-                cache_version: cacheVersion
+                cache_version: settingsMap.cache_version || '202509',
+                leaderboard_enabled: settingsMap.leaderboard_enabled || 'true'
             }));
             return;
         }
@@ -508,7 +511,8 @@ async function handleApiRequest(req, res, pathname, method) {
                 },
                 config: {
                     hero_promo_days_before_start: parseInt(settingsMap.hero_promo_days_before_start) || 7,
-                    cache_version: settingsMap.cache_version || '202509'
+                    cache_version: settingsMap.cache_version || '202509',
+                    leaderboard_enabled: settingsMap.leaderboard_enabled === 'true' || settingsMap.leaderboard_enabled === undefined
                 }
             };
 

@@ -608,7 +608,10 @@ async function initPrizeSystem() {
         prizeData.current = computePrizeState(prizeData.current);
         prizeData.upcoming = computePrizeState(prizeData.upcoming);
         
-        // Update hero banner
+        // Check leaderboard toggle setting and apply visibility controls
+        applyLeaderboardToggle(prizeData.config.leaderboard_enabled);
+        
+        // Update hero banner (will be hidden if leaderboard disabled)
         updateHeroPrizeBanner(prizeData);
         
         // Prize pill removed from leaderboard section
@@ -622,6 +625,28 @@ async function initPrizeSystem() {
         }
     } catch (error) {
         console.log('Prize data loading failed:', error);
+    }
+}
+
+// Apply leaderboard visibility controls based on admin toggle
+function applyLeaderboardToggle(leaderboardEnabled) {
+    // Elements to control based on leaderboard toggle
+    const leaderboardSection = document.getElementById('leaderboard-preview');
+    const prizeBanner = document.getElementById('prize-promotion-banner');
+    
+    // Find navigation links to leaderboard
+    const navLinks = document.querySelectorAll('a[href="leaderboard.html"], a[href="#leaderboard-preview"]');
+    
+    if (leaderboardEnabled) {
+        // Show all leaderboard elements
+        if (leaderboardSection) leaderboardSection.style.display = 'block';
+        if (prizeBanner) prizeBanner.style.display = 'block';
+        navLinks.forEach(link => link.style.display = '');
+    } else {
+        // Hide all leaderboard elements for production control
+        if (leaderboardSection) leaderboardSection.style.display = 'none';
+        if (prizeBanner) prizeBanner.style.display = 'none';
+        navLinks.forEach(link => link.style.display = 'none');
     }
 }
 
