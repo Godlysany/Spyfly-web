@@ -42,11 +42,15 @@ window.testZeroDataView = function() {
 
 window.testLaunchView = function() {
     console.log('🚀 Testing Launch View');
+    // Create a start date 7 days from now for countdown demo
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 7);
+    
     const mockUpcomingData = {
         upcoming: [{
             title: 'October Mega Championship',
             prize_pool_usd: 25000,
-            start_date: '2025-10-01T00:00:00Z'
+            start_date: futureDate.toISOString()
         }]
     };
     renderLaunchView(mockUpcomingData);
@@ -174,10 +178,19 @@ function renderLaunchView(data = null) {
     const prizeHub = document.getElementById('prize-hub');
     prizeHub.style.display = 'block'; // Ensure it's visible
     
-    // Use real upcoming competition data if available
-    const upcomingComp = data && data.upcoming && data.upcoming.length > 0 ? data.upcoming[0] : null;
+    // Find the closest upcoming competition (sorted by start date)
+    let upcomingComp = null;
+    if (data && data.upcoming && data.upcoming.length > 0) {
+        // Sort upcoming competitions by start_date to get the closest one
+        const sortedUpcoming = [...data.upcoming].sort((a, b) => 
+            new Date(a.start_date) - new Date(b.start_date)
+        );
+        upcomingComp = sortedUpcoming[0];
+    }
+    
     const prizeAmount = upcomingComp ? upcomingComp.prize_pool_usd : 15000;
     const competitionTitle = upcomingComp ? upcomingComp.title : 'The Ultimate Trading Championship';
+    const startDate = upcomingComp ? new Date(upcomingComp.start_date) : null;
     
     prizeHub.innerHTML = `
         <div class="container">
@@ -214,8 +227,32 @@ function renderLaunchView(data = null) {
                         </div>
                     </div>
                     
+                    ${startDate ? `
+                    <div class="launch-countdown">
+                        <h4>Competition Starts In:</h4>
+                        <div id="countdown-timer" class="countdown-display">
+                            <div class="countdown-item">
+                                <span id="countdown-days">00</span>
+                                <label>Days</label>
+                            </div>
+                            <div class="countdown-item">
+                                <span id="countdown-hours">00</span>
+                                <label>Hours</label>
+                            </div>
+                            <div class="countdown-item">
+                                <span id="countdown-minutes">00</span>
+                                <label>Minutes</label>
+                            </div>
+                            <div class="countdown-item">
+                                <span id="countdown-seconds">00</span>
+                                <label>Seconds</label>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
                     <div class="launch-cta">
-                        <a href="https://t.me/spyflybot" class="btn btn-primary btn-large">
+                        <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-large">
                             🎯 GET EARLY ACCESS
                         </a>
                         <p class="launch-note">Be among the first competitors when we launch</p>
@@ -279,6 +316,40 @@ function renderLaunchView(data = null) {
             </div>
         </div>
     `;
+    
+    // Start countdown timer if we have a start date
+    if (startDate) {
+        startCountdownTimer(startDate);
+    }
+}
+
+// Countdown Timer Function
+function startCountdownTimer(targetDate) {
+    const countdownInterval = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = targetDate.getTime() - now;
+
+        if (distance < 0) {
+            clearInterval(countdownInterval);
+            document.getElementById('countdown-timer').innerHTML = '<div class="countdown-expired">🎉 Competition Started!</div>';
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        const daysEl = document.getElementById('countdown-days');
+        const hoursEl = document.getElementById('countdown-hours');
+        const minutesEl = document.getElementById('countdown-minutes');
+        const secondsEl = document.getElementById('countdown-seconds');
+
+        if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+        if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+        if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+        if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+    }, 1000);
 }
 
 function renderTransitionView(data) {
