@@ -605,8 +605,12 @@ async function initPrizeSystem() {
         const prizeData = await response.json();
         
         // Compute automatic states from dates
-        prizeData.current = computePrizeState(prizeData.current);
-        prizeData.upcoming = computePrizeState(prizeData.upcoming);
+        if (prizeData.current && prizeData.current.length > 0) {
+            prizeData.current = prizeData.current.map(prize => computePrizeState(prize));
+        }
+        if (prizeData.upcoming && prizeData.upcoming.length > 0) {
+            prizeData.upcoming = prizeData.upcoming.map(prize => computePrizeState(prize));
+        }
         
         // Check leaderboard toggle setting and apply visibility controls
         applyLeaderboardToggle(prizeData.config.leaderboard_enabled);
@@ -656,9 +660,9 @@ function updateHeroPrizeBanner(data) {
     const countdown = document.getElementById('prize-countdown');
     const ctaBtn = document.getElementById('prize-cta-btn');
     
-    if (!banner || !data.current) return;
+    if (!banner || !data.current || data.current.length === 0) return;
     
-    const currentPrize = data.current;
+    const currentPrize = data.current[0]; // Get first current competition
     const now = new Date();
     const startDate = new Date(currentPrize.start_date);
     const endDate = new Date(currentPrize.end_date);
@@ -672,15 +676,20 @@ function updateHeroPrizeBanner(data) {
                       (currentPrize.computed_status === 'upcoming' && now >= promoStart);
     
     if (showPromo && now <= endDate) {
-        headline.textContent = currentPrize.highlight_copy;
-        ctaBtn.textContent = currentPrize.cta_text;
-        ctaBtn.href = currentPrize.cta_link || 'leaderboard.html#prize-hub'; // Fallback to safe target
+        // Update content immediately with fallback
+        if (headline) headline.textContent = currentPrize.highlight_copy || `🔥 ${currentPrize.title} - ${Math.round(currentPrize.prize_pool_usd/1000)}K Prize Pool!`;
+        if (ctaBtn) {
+            ctaBtn.textContent = currentPrize.cta_text || 'JOIN NOW';
+            ctaBtn.href = currentPrize.cta_link || 'leaderboard.html#prize-hub';
+        }
         
-        // Show banner
+        // Force banner to be visible and remove any conflicting styles
         banner.style.display = 'block';
+        banner.style.visibility = 'visible';
+        banner.style.opacity = '1';
         
         // Update countdown
-        updateCountdown(countdown, endDate);
+        if (countdown) updateCountdown(countdown, endDate);
     }
 }
 

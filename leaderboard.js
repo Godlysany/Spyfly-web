@@ -1104,7 +1104,7 @@ function renderSophisticatedStatus2(data, prizeHub) {
                             <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-large btn-full-width">
                                 🚀 Join Bot
                             </a>
-                            <a href="#leaderboard-container" class="btn btn-secondary btn-large btn-full-width">
+                            <a href="#main-leaderboard" class="btn btn-secondary btn-large btn-full-width">
                                 📊 View Leaderboard
                             </a>
                         </div>
@@ -1347,7 +1347,7 @@ function renderSophisticatedStatus3(data, prizeHub) {
                         <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-large">
                             🚀 Start Trading
                         </a>
-                        <a href="#leaderboard-container" class="btn btn-secondary btn-large">
+                        <a href="#main-leaderboard" class="btn btn-secondary btn-large">
                             📊 View Leaderboard
                         </a>
                     </div>
