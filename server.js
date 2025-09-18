@@ -595,6 +595,42 @@ async function handleApiRequest(req, res, pathname, method) {
             return;
         }
 
+        // Get participants/leaderboard for a specific competition
+        if (pathname.startsWith('/api/competitions/') && pathname.endsWith('/participants') && method === 'GET') {
+            const competitionId = pathname.split('/')[3];
+            
+            // Get competition info
+            const { data: competition, error: compError } = await supabase
+                .from('competitions')
+                .select(`*, prize_breakdown(*)`)
+                .eq('id', competitionId)
+                .single();
+                
+            if (compError || !competition) {
+                res.writeHead(404);
+                res.end(JSON.stringify({ error: 'Competition not found' }));
+                return;
+            }
+            
+            // Get participants/leaderboard for this competition
+            const { data: participants, error: participantsError } = await supabase
+                .from('participants')
+                .select('*')
+                .eq('competition_id', competitionId)
+                .order('rank', { ascending: true });
+                
+            if (participantsError) throw participantsError;
+            
+            const response = {
+                competition: competition,
+                participants: participants || []
+            };
+            
+            res.writeHead(200);
+            res.end(JSON.stringify(response));
+            return;
+        }
+
         // ===== SOPHISTICATED ADMIN FEATURES =====
         
         // Bulk winner import endpoint
