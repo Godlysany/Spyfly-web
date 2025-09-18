@@ -1100,13 +1100,14 @@ function renderSophisticatedStatus2(data, prizeHub) {
                     ` : ''}
                     
                     <div class="launch-cta">
-                        <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-large">
-                            🚀 Join Bot
-                        </a>
-                        <a href="#leaderboard-container" class="btn btn-secondary btn-large">
-                            📊 View Leaderboard
-                        </a>
-                        <p class="launch-note">Be ready when registration opens</p>
+                        <div class="launch-buttons-row">
+                            <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-large btn-full-width">
+                                🚀 Join Bot
+                            </a>
+                            <a href="#leaderboard-container" class="btn btn-secondary btn-large btn-full-width">
+                                📊 View Leaderboard
+                            </a>
+                        </div>
                     </div>
                 </div>
                 
@@ -1453,7 +1454,7 @@ function generateWinnersCarousel(historyData) {
         <div class="winner-card">
             <div class="winner-rank">${['🥇', '🥈', '🥉'][winner.place - 1] || '🏆'}</div>
             <div class="winner-info">
-                <div class="winner-name">@${winner.username}</div>
+                <div class="winner-name">${winner.username.startsWith('@') ? winner.username : '@' + winner.username}</div>
                 <div class="winner-prize">$${winner.amount_usd.toLocaleString()}</div>
                 <div class="winner-competition">${winner.competition_title}</div>
                 <div class="winner-type">${getCompetitionTypeDisplay(winner.competition_type)}</div>
@@ -1485,7 +1486,7 @@ function generateHallOfFameDisplay(historyData, specificIndex = null) {
                 <div class="hall-winner-card ${winner.place === 1 ? 'champion' : ''}">
                     <div class="winner-position">${['🥇', '🥈', '🥉'][winner.place - 1] || '🏆'}</div>
                     <div class="winner-details">
-                        <div class="winner-username">@${winner.username}</div>
+                        <div class="winner-username">${winner.username.startsWith('@') ? winner.username : '@' + winner.username}</div>
                         <div class="winner-prize">$${winner.amount_usd.toLocaleString()}</div>
                         <div class="winner-performance">${getWinnerPerformanceLabel(winner, competition)}</div>
                     </div>

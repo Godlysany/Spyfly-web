@@ -5014,6 +5014,35 @@ nav ul li a.active {
     }
 }
 
+/* Launch buttons row layout (Status 2 specific) */
+.launch-buttons-row {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.btn-full-width {
+    min-width: 200px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+
+/* Ensure buttons don't break on smaller screens */
+@media (max-width: 639px) {
+    .launch-buttons-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .btn-full-width {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
 .launch-note {
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.9rem;
