@@ -448,7 +448,10 @@ async function handleApiRequest(req, res, pathname, method) {
             
             const { error } = await supabase
                 .from('app_settings')
-                .upsert([{ key, value, updated_at: new Date().toISOString() }]);
+                .upsert([{ key, value, updated_at: new Date().toISOString() }], { 
+                    onConflict: 'key',
+                    ignoreDuplicates: false 
+                });
             
             if (error) throw error;
             res.writeHead(200);

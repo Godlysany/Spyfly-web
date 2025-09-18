@@ -1651,7 +1651,10 @@
         }
 
         async function updateLeaderboardToggle() {
-            const enabled = document.getElementById('leaderboard-toggle').value;
+            const toggleElement = document.getElementById('leaderboard-toggle');
+            const enabled = toggleElement.value;
+            const originalValue = toggleElement.value === 'true' ? 'false' : 'true'; // Store opposite of current
+            
             try {
                 const response = await authenticatedFetch('/api/settings', {
                     method: 'PUT',
@@ -1662,11 +1665,16 @@
                     const status = enabled === 'true' ? 'ON' : 'OFF';
                     showMessage(`✅ Leaderboard control updated to ${status}! Website will reflect changes immediately.`, 'success');
                 } else {
+                    // Revert toggle to original state on failure
+                    toggleElement.value = originalValue;
                     const errorData = await response.json();
                     throw new Error(errorData.error || 'Failed to update leaderboard control');
                 }
             } catch (error) {
+                // Revert toggle to original state on error
+                toggleElement.value = originalValue;
                 showMessage('❌ Error updating leaderboard control: ' + error.message, 'error');
+                console.error('Toggle update failed:', error);
             }
         }
 
