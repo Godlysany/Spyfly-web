@@ -1044,74 +1044,99 @@ function renderSophisticatedStatus2(data, prizeHub) {
             
             <h1 class="section-title">🏆 Prize Championships</h1>
             
-            <!-- Upcoming Competition Hero Card (Modified from Live Competition) -->
-            <div class="transition-hero-card">
-                <div class="transition-hero-content">
-                    <div class="upcoming-badge">🔜 COMING SOON</div>
-                    <h2 class="transition-title">${upcomingComp ? upcomingComp.title : 'Next Trading Championship'}</h2>
-                    <p class="transition-subtitle">Get ready for the next elite trading championship. Registration opens soon.</p>
+            <!-- Launch Mode Style Hero for Upcoming Competition -->
+            <div class="launch-hero-card">
+                <div class="launch-hero-content">
+                    <div class="launch-badge">🔜 COMING SOON</div>
+                    <h2 class="launch-title">${upcomingComp ? upcomingComp.title : 'Next Trading Championship'}</h2>
+                    <p class="launch-subtitle">Get ready for the next elite trading championship. Registration opens soon.</p>
                     
-                    <div class="transition-stats">
-                        <div class="transition-stat">
+                    <div class="launch-features">
+                        <div class="launch-feature">
                             <i class="fas fa-trophy"></i>
                             <div>
-                                <strong>Prize Pool</strong>
+                                <strong>Prize Pool Ready</strong>
                                 <span>$${upcomingComp ? (upcomingComp.prize_pool_usd/1000).toFixed(0) : '18'}K awaiting winners</span>
                             </div>
                         </div>
-                        <div class="transition-stat">
+                        <div class="launch-feature">
                             <i class="fas fa-chart-line"></i>
                             <div>
                                 <strong>Competition Type</strong>
-                                <span>${upcomingComp ? getCompetitionTypeDisplay(upcomingComp.competition_type) : 'Multi-Category'}</span>
+                                <span>${upcomingComp ? getCompetitionTypeDisplay(upcomingComp.competition_type) : 'Multi-Category'} championship</span>
                             </div>
                         </div>
-                        <div class="transition-stat">
-                            <i class="fas fa-calendar-alt"></i>
-                            <div>
-                                <strong>Starts</strong>
-                                <span>${upcomingComp ? formatDate(upcomingComp.start_date) : 'TBA'}</span>
-                            </div>
-                        </div>
-                        <div class="transition-stat">
+                        <div class="launch-feature">
                             <i class="fas fa-users"></i>
                             <div>
-                                <strong>Min Requirements</strong>
-                                <span>${upcomingComp ? upcomingComp.min_trades : 50} trades, $${upcomingComp ? (upcomingComp.min_volume_usd/1000).toFixed(0) : '10'}K volume</span>
+                                <strong>Elite Requirements</strong>
+                                <span>${upcomingComp ? upcomingComp.min_trades : 50} trades, $${upcomingComp ? (upcomingComp.min_volume_usd/1000).toFixed(0) : '10'}K volume minimum</span>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Countdown Timer for Start Date -->
-                    <div class="countdown-container">
-                        <h3>⏰ Competition Starts In</h3>
-                        <div class="countdown-timer" id="sophisticated-countdown">
+                    ${upcomingComp && upcomingComp.start_date ? `
+                    <div class="launch-countdown">
+                        <h4>⏰ Competition Starts In:</h4>
+                        <div id="countdown-timer" class="countdown-display">
                             <div class="countdown-item">
-                                <span class="countdown-number" id="countdown-days">--</span>
-                                <span class="countdown-label">Days</span>
+                                <span id="countdown-days">00</span>
+                                <label>Days</label>
                             </div>
                             <div class="countdown-item">
-                                <span class="countdown-number" id="countdown-hours">--</span>
-                                <span class="countdown-label">Hours</span>
+                                <span id="countdown-hours">00</span>
+                                <label>Hours</label>
                             </div>
                             <div class="countdown-item">
-                                <span class="countdown-number" id="countdown-minutes">--</span>
-                                <span class="countdown-label">Minutes</span>
+                                <span id="countdown-minutes">00</span>
+                                <label>Minutes</label>
                             </div>
                             <div class="countdown-item">
-                                <span class="countdown-number" id="countdown-seconds">--</span>
-                                <span class="countdown-label">Seconds</span>
+                                <span id="countdown-seconds">00</span>
+                                <label>Seconds</label>
                             </div>
                         </div>
                     </div>
+                    ` : ''}
                     
-                    <div class="transition-actions">
+                    <div class="launch-cta">
                         <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-large">
-                            📢 Get Notified
+                            📢 GET NOTIFIED
                         </a>
-                        <a href="#main-leaderboard" class="btn btn-secondary btn-large btn-view-leaderboard">
-                            📊 View Past Results
-                        </a>
+                        <p class="launch-note">Be ready when registration opens</p>
+                    </div>
+                </div>
+                
+                <div class="launch-visual">
+                    <div class="launch-stats-preview">
+                        <div class="stat-item">
+                            <div class="stat-number">$${upcomingComp ? (upcomingComp.prize_pool_usd/1000).toFixed(0) : '18'}K</div>
+                            <div class="stat-label">Prize Pool Ready</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${upcomingComp ? formatDate(upcomingComp.start_date) : 'TBA'}</div>
+                            <div class="stat-label">Start Date</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">1st</div>
+                            <div class="stat-label">On Solana</div>
+                        </div>
+                    </div>
+                    
+                    <div class="launch-preview-leaderboard">
+                        <div class="preview-title">Championship Preview</div>
+                        <div class="preview-row preview-winner">
+                            <span>🥇 @your_username</span>
+                            <span class="preview-pnl">$${upcomingComp ? Math.round(upcomingComp.prize_pool_usd * 0.5).toLocaleString() : '9,000'}</span>
+                        </div>
+                        <div class="preview-row">
+                            <span>🥈 @elite_trader</span>
+                            <span class="preview-pnl">$${upcomingComp ? Math.round(upcomingComp.prize_pool_usd * 0.3).toLocaleString() : '5,400'}</span>
+                        </div>
+                        <div class="preview-row">
+                            <span>🥉 @alpha_pro</span>
+                            <span class="preview-pnl">$${upcomingComp ? Math.round(upcomingComp.prize_pool_usd * 0.2).toLocaleString() : '3,600'}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1261,7 +1286,7 @@ function renderSophisticatedStatus2(data, prizeHub) {
     
     // Start countdown timer to START date if we have an upcoming competition
     if (upcomingComp && upcomingComp.start_date) {
-        startSophisticatedCountdownTimer(new Date(upcomingComp.start_date));
+        startCountdownTimer(new Date(upcomingComp.start_date));
     }
 }
 
