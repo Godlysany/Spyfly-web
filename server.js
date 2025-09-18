@@ -277,12 +277,33 @@ async function handleApiRequest(req, res, pathname, method) {
             const body = await getRequestBody(req);
             const comp = JSON.parse(body);
             
+            // Extract prize breakdown if provided
+            const prizeBreakdown = comp.prize_breakdown;
+            delete comp.prize_breakdown; // Remove from competition object
+            
             const { data, error } = await supabase
                 .from('competitions')
                 .insert([comp])
                 .select();
             
             if (error) throw error;
+            
+            // Add prize breakdown if provided
+            if (prizeBreakdown && prizeBreakdown.length > 0) {
+                const breakdownInserts = prizeBreakdown.map(breakdown => ({
+                    competition_id: data[0].id,
+                    ...breakdown
+                }));
+                
+                const { error: breakdownError } = await supabase
+                    .from('prize_breakdown')
+                    .insert(breakdownInserts);
+                    
+                if (breakdownError) {
+                    console.error('Prize breakdown insert error:', breakdownError);
+                }
+            }
+            
             res.writeHead(201);
             res.end(JSON.stringify({ success: true, id: data[0].id }));
             return;
