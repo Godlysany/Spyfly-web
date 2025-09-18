@@ -1267,16 +1267,168 @@ function renderSophisticatedStatus2(data, prizeHub) {
 
 // Status 3: No active, no upcoming, only history
 function renderSophisticatedStatus3(data, prizeHub) {
-    // History-focused view
+    const historyData = data.history || [];
+    const stats = data.stats || {};
+    
+    // Calculate historical total for the banner
+    const historicalPrizes = stats.total_distributed_usd || 0;
+    
     prizeHub.innerHTML = `
         <div class="container">
+            <!-- Total Historical Jackpot Banner -->
+            ${historicalPrizes > 0 ? `
+            <div class="total-jackpot-banner">
+                <div class="jackpot-content">
+                    <div class="jackpot-label">💰 TOTAL PRIZES DISTRIBUTED</div>
+                    <div class="jackpot-amount">$${(historicalPrizes/1000).toFixed(0)}K</div>
+                    <div class="jackpot-description">Awarded to champions across all completed competitions</div>
+                </div>
+            </div>
+            ` : ''}
+            
             <h1 class="section-title">🏆 Prize Championships</h1>
-            <div class="status-message">
-                <h2>📜 Status 3: Historical Championships Only</h2>
-                <p>No active or upcoming competitions, showing tournament history and hall of fame</p>
+            
+            <!-- Stay Tuned Hero Section -->
+            <div class="stay-tuned-hero">
+                <div class="stay-tuned-content">
+                    <div class="stay-tuned-badge">🚀 STAY TUNED</div>
+                    <h2 class="stay-tuned-title">Next Championships Coming Soon</h2>
+                    <p class="stay-tuned-subtitle">We're preparing exciting new trading competitions with bigger prizes and better rewards. Don't miss out when they launch!</p>
+                    
+                    <div class="stay-tuned-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">💎</div>
+                            <div class="feature-text">
+                                <strong>Bigger Prize Pools</strong>
+                                <span>Enhanced rewards for top performers</span>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">⚡</div>
+                            <div class="feature-text">
+                                <strong>New Competition Types</strong>
+                                <span>More ways to showcase your trading skills</span>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🎯</div>
+                            <div class="feature-text">
+                                <strong>Advanced Analytics</strong>
+                                <span>Better tracking and performance insights</span>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🏅</div>
+                            <div class="feature-text">
+                                <strong>Elite Recognition</strong>
+                                <span>Special badges and leaderboard status</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stay-tuned-actions">
+                        <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-large">
+                            🔔 Get Notified First
+                        </a>
+                        <a href="https://x.com/spyfly_app" target="_blank" class="btn btn-secondary btn-large">
+                            📱 Follow Updates
+                        </a>
+                    </div>
+                    
+                    <div class="stay-tuned-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">${stats.total_winners || 0}</span>
+                            <span class="stat-label">Past Champions</span>
+                        </div>
+                        <div class="stat-separator">•</div>
+                        <div class="stat-item">
+                            <span class="stat-value">${historyData.length || 0}</span>
+                            <span class="stat-label">Completed Tournaments</span>
+                        </div>
+                        <div class="stat-separator">•</div>
+                        <div class="stat-item">
+                            <span class="stat-value">$${(historicalPrizes/1000).toFixed(0)}K</span>
+                            <span class="stat-label">Total Distributed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Championship Stats Section (Same as Status 1 & 2) -->
+            <div class="sophisticated-historical-section" style="margin-top: 80px; margin-bottom: 60px;">
+                <h1 class="section-title">🏆 Championship Stats</h1>
+                
+                <!-- Core Historical KPIs -->
+                <div class="historical-kpis" style="margin-bottom: 50px;">
+                    <div class="historical-kpi-grid">
+                        <div class="kpi-card highlight">
+                            <div class="kpi-icon">💰</div>
+                            <div class="kpi-value">$${(stats.total_distributed_usd || 45000).toLocaleString()}</div>
+                            <div class="kpi-label">Total Distributed</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">🏆</div>
+                            <div class="kpi-value">${stats.total_competitions || historyData.length || 3}</div>
+                            <div class="kpi-label">Championships Finished</div>
+                        </div>
+                        <div class="kpi-card highlight">
+                            <div class="kpi-icon">📊</div>
+                            <div class="kpi-value">$${stats.total_volume ? (stats.total_volume/1000000).toFixed(1) + 'M' : '18.3M'}</div>
+                            <div class="kpi-label">Total Volume</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">📈</div>
+                            <div class="kpi-value">${stats.total_trades ? (stats.total_trades/1000).toFixed(1) + 'K' : '45.2K'}</div>
+                            <div class="kpi-label">Total Trades</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hall of Fame Section -->
+                <div class="hall-of-fame-section" style="margin-bottom: 50px;">
+                    <div class="hall-header">
+                        <h4>🏅 Hall of Fame</h4>
+                        <div class="hall-navigation">
+                            <button class="carousel-btn" onclick="previousCompetition()">&lt;</button>
+                            <span class="competition-indicator" id="competition-indicator">
+                                ${historyData.length > 0 ? historyData[0].title : 'Championship History'}
+                            </span>
+                            <button class="carousel-btn" onclick="nextCompetition()">&gt;</button>
+                        </div>
+                    </div>
+                    
+                    <div class="hall-of-fame-display" id="hall-of-fame-display">
+                        ${generateHallOfFameDisplay(historyData)}
+                    </div>
+                </div>
+                
+                <!-- Championship History Table -->
+                <div class="championship-history-section">
+                    <h4>📋 Championship History</h4>
+                    <div class="championship-history-table">
+                        <div class="history-table-header">
+                            <div class="table-col">Competition</div>
+                            <div class="table-col">Type</div>
+                            <div class="table-col">Prize Pool</div>
+                            <div class="table-col">Total Participants</div>
+                            <div class="table-col">Total Trades</div>
+                            <div class="table-col">Action</div>
+                        </div>
+                        <div class="history-table-body">
+                            ${generateChampionshipHistoryTable(historyData)}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     `;
+    
+    // Store all prize data globally for modal access
+    window.currentPrizeData = data;
+    
+    // Store history data globally for navigation
+    currentHistoryData = historyData;
+    currentCompetitionIndex = 0;
 }
 
 // Helper functions for sophisticated view
