@@ -360,9 +360,17 @@ nav ul li a:hover::after {
     margin: 60px auto;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(45, 212, 127, 0.15);
     position: relative;
     background-color: #000;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    animation: containerGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes containerGlow {
+    0% { box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(45, 212, 127, 0.15); }
+    100% { box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 60px rgba(45, 212, 127, 0.3); }
 }
 
 .image-comparison {
@@ -395,6 +403,7 @@ nav ul li a:hover::after {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: clip-path 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .after-image img, .before-image img {
@@ -420,6 +429,8 @@ nav ul li a:hover::after {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 0 8px rgba(45, 212, 127, 0.6));
 }
 
 .slider-line {
@@ -427,6 +438,13 @@ nav ul li a:hover::after {
     width: 4px;
     height: 100%;
     background-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(45, 212, 127, 0.8);
+    animation: lineGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes lineGlow {
+    0% { box-shadow: 0 0 15px rgba(45, 212, 127, 0.8); }
+    100% { box-shadow: 0 0 25px rgba(45, 212, 127, 1), 0 0 35px rgba(45, 212, 127, 0.6); }
 }
 
 .slider-circle {
@@ -434,13 +452,26 @@ nav ul li a:hover::after {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: var(--primary-color);
+    background: radial-gradient(circle at center, var(--primary-color), #22c55e);
     color: var(--dark-bg);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 20px rgba(45, 212, 127, 0.8), 0 0 30px rgba(45, 212, 127, 0.4);
+    animation: circleGlow 2.5s ease-in-out infinite;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+@keyframes circleGlow {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(45, 212, 127, 0.8), 0 0 30px rgba(45, 212, 127, 0.4);
+    }
+    50% { 
+        transform: scale(1.1);
+        box-shadow: 0 0 30px rgba(45, 212, 127, 1), 0 0 45px rgba(45, 212, 127, 0.6);
+    }
 }
 
 /* SpyFly Genesis Pass Section */

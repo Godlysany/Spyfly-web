@@ -61,20 +61,29 @@ function initImageComparisonSlider() {
     if (!slider || !beforeImage || !sliderHandle) return;
     
     let isDragging = false;
+    let autoAnimation = true;
+    let animationInterval;
+    let currentPosition = 25;
+    let direction = 1; // 1 for right, -1 for left
     
     // Initialize slider position to left side (25% from left)
     updateSliderPosition(25);
+    
+    // Start automatic animation
+    startAutoAnimation();
     
     // Mouse down on slider handle
     sliderHandle.addEventListener('mousedown', function(e) {
         e.preventDefault();
         isDragging = true;
+        pauseAutoAnimation();
     });
     
     // Touch start on slider handle
     sliderHandle.addEventListener('touchstart', function(e) {
         e.preventDefault();
         isDragging = true;
+        pauseAutoAnimation();
     }, { passive: false });
     
     // Move events
@@ -83,11 +92,23 @@ function initImageComparisonSlider() {
     
     // Release events
     document.addEventListener('mouseup', function() {
-        isDragging = false;
+        if (isDragging) {
+            isDragging = false;
+            // Resume auto-animation after 3 seconds of inactivity
+            setTimeout(() => {
+                if (!isDragging) startAutoAnimation();
+            }, 3000);
+        }
     });
     
     document.addEventListener('touchend', function() {
-        isDragging = false;
+        if (isDragging) {
+            isDragging = false;
+            // Resume auto-animation after 3 seconds of inactivity
+            setTimeout(() => {
+                if (!isDragging) startAutoAnimation();
+            }, 3000);
+        }
     });
     
     // Click on slider container
@@ -99,9 +120,47 @@ function initImageComparisonSlider() {
         const x = e.clientX - rect.left;
         const percent = (x / rect.width) * 100;
         
-        // Update position
+        pauseAutoAnimation();
         updateSliderPosition(percent);
+        currentPosition = percent;
+        
+        // Resume auto-animation after 3 seconds
+        setTimeout(() => {
+            if (!isDragging) startAutoAnimation();
+        }, 3000);
     });
+    
+    function startAutoAnimation() {
+        if (animationInterval) return;
+        autoAnimation = true;
+        
+        animationInterval = setInterval(() => {
+            if (isDragging) return;
+            
+            // Smooth cycling between 15% and 85%
+            if (direction === 1 && currentPosition >= 85) {
+                direction = -1;
+            } else if (direction === -1 && currentPosition <= 15) {
+                direction = 1;
+            }
+            
+            // Move in smooth increments
+            currentPosition += direction * 2;
+            
+            // Clamp position
+            currentPosition = Math.min(85, Math.max(15, currentPosition));
+            
+            updateSliderPosition(currentPosition);
+        }, 50); // 50ms intervals for smooth animation
+    }
+    
+    function pauseAutoAnimation() {
+        autoAnimation = false;
+        if (animationInterval) {
+            clearInterval(animationInterval);
+            animationInterval = null;
+        }
+    }
     
     function moveSlider(e) {
         if (!isDragging) return;
@@ -127,6 +186,7 @@ function initImageComparisonSlider() {
         
         // Update positions
         updateSliderPosition(limitedPercent);
+        currentPosition = limitedPercent;
     }
     
     function updateSliderPosition(percent) {
