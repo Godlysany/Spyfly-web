@@ -4924,13 +4924,29 @@ nav ul li a.active {
 .launch-cta {
     text-align: center;
     margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
 .launch-cta .btn {
     font-size: 1.2rem;
     padding: 15px 40px;
-    margin-bottom: 15px;
+    margin: 0;
     animation: bounce-subtle 3s ease-in-out infinite;
+}
+
+.launch-cta .btn:not(:last-child) {
+    margin-right: 15px;
+}
+
+/* For desktop, show buttons side by side */
+@media (min-width: 640px) {
+    .launch-cta {
+        flex-direction: row;
+        justify-content: center;
+    }
 }
 
 .launch-note {
@@ -5284,7 +5300,7 @@ nav ul li a.active {
 }
 
 /* Launch View Mobile Responsiveness */
-@media (max-width: 768px) {
+@media (max-width: 640px) {
     .launch-hero-card {
         grid-template-columns: 1fr;
         gap: 30px;

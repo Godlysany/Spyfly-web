@@ -1101,7 +1101,10 @@ function renderSophisticatedStatus2(data, prizeHub) {
                     
                     <div class="launch-cta">
                         <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-large">
-                            📢 GET NOTIFIED
+                            🚀 Join Bot
+                        </a>
+                        <a href="#leaderboard-container" class="btn btn-secondary btn-large">
+                            📊 View Leaderboard
                         </a>
                         <p class="launch-note">Be ready when registration opens</p>
                     </div>
