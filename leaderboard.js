@@ -209,13 +209,29 @@ function updateCurrentPrizeSection(data) {
     }).format(current.prize_pool_usd);
     
     // Generate breakdown
-    if (current.breakdown) {
-        breakdown.innerHTML = current.breakdown.map(item => `
+    if (current.prize_breakdown && current.prize_breakdown.length > 0) {
+        breakdown.innerHTML = current.prize_breakdown.map(item => `
             <div class="breakdown-item">
                 <div class="breakdown-place">${item.place}${getPlaceSuffix(item.place)}</div>
                 <div class="breakdown-amount">$${item.amount_usd.toLocaleString()}</div>
             </div>
         `).join('');
+    } else {
+        // Show default breakdown if none configured
+        breakdown.innerHTML = `
+            <div class="breakdown-item">
+                <div class="breakdown-place">1st</div>
+                <div class="breakdown-amount">$${Math.floor(current.prize_pool_usd * 0.5).toLocaleString()}</div>
+            </div>
+            <div class="breakdown-item">
+                <div class="breakdown-place">2nd</div>
+                <div class="breakdown-amount">$${Math.floor(current.prize_pool_usd * 0.3).toLocaleString()}</div>
+            </div>
+            <div class="breakdown-item">
+                <div class="breakdown-place">3rd</div>
+                <div class="breakdown-amount">$${Math.floor(current.prize_pool_usd * 0.2).toLocaleString()}</div>
+            </div>
+        `;
     }
     
     // Start countdown
