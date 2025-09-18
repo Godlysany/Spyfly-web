@@ -2516,6 +2516,113 @@ nav ul li a.active {
     50% { opacity: 0.8; }
 }
 
+/* Sophisticated View Styles */
+.sophisticated-current {
+    margin: 40px 0;
+}
+
+.sophisticated-upcoming {
+    margin: 40px 0;
+}
+
+.upcoming-card {
+    background: rgba(153, 69, 255, 0.1);
+    border: 1px solid rgba(153, 69, 255, 0.3);
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+}
+
+.upcoming-card h4 {
+    color: #9945ff;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.upcoming-pool {
+    font-size: 2rem;
+    color: #2DD47F;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+.sophisticated-history {
+    margin: 60px 0;
+}
+
+.history-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.stat-card {
+    background: rgba(45, 212, 127, 0.1);
+    border: 1px solid rgba(45, 212, 127, 0.3);
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    color: #2DD47F;
+    font-weight: bold;
+    text-shadow: 0 0 15px rgba(45, 212, 127, 0.5);
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    margin-top: 10px;
+}
+
+.winners-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.winner-card {
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.winner-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+}
+
+.winner-rank {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.winner-name {
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.winner-prize {
+    color: #FFD700;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.winner-competition {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
 /* Launch View Mobile Responsiveness */
 @media (max-width: 768px) {
     .launch-hero-card {
@@ -2540,6 +2647,14 @@ nav ul li a.active {
     .history-preview {
         grid-template-columns: 1fr;
         gap: 30px;
+    }
+    
+    .history-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .winners-grid {
+        grid-template-columns: 1fr;
     }
 }
 

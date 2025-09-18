@@ -6,7 +6,99 @@
 document.addEventListener('DOMContentLoaded', function() {
     initLeaderboardInteractivity();
     initSmartPrizeHub();
+    initViewTester();
 });
+
+// ===================================================================
+// VIEW TESTING INTERFACE - FOR VERIFICATION ONLY
+// ===================================================================
+function initViewTester() {
+    // Add view tester only if URL contains ?test=views
+    if (window.location.search.includes('test=views')) {
+        addViewTesterInterface();
+    }
+}
+
+function addViewTesterInterface() {
+    const tester = document.createElement('div');
+    tester.innerHTML = `
+        <div style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: rgba(0,0,0,0.9); border: 2px solid #2DD47F; border-radius: 10px; padding: 15px;">
+            <div style="color: #2DD47F; font-weight: bold; margin-bottom: 10px;">🧪 VIEW TESTER</div>
+            <button onclick="testLaunchView()" style="background: #2DD47F; color: black; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">🚀 Launch</button>
+            <button onclick="testTransitionView()" style="background: #9945ff; color: white; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">🔄 Transition</button>
+            <button onclick="testSophisticatedView()" style="background: #FFD700; color: black; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">💎 Sophisticated</button>
+            <button onclick="testRealData()" style="background: #ffffff; color: black; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">📊 Real Data</button>
+        </div>
+    `;
+    document.body.appendChild(tester);
+}
+
+// Test Functions
+window.testLaunchView = function() {
+    console.log('🚀 Testing Launch View');
+    renderLaunchView();
+}
+
+window.testTransitionView = function() {
+    console.log('🔄 Testing Transition View');
+    const mockTransitionData = {
+        current: {
+            title: 'September Championship',
+            prize_pool_usd: 15000
+        },
+        upcoming: null,
+        history: [],
+        stats: { total_winners: 0, total_distributed_usd: 0 }
+    };
+    renderTransitionView(mockTransitionData);
+}
+
+window.testSophisticatedView = function() {
+    console.log('💎 Testing Sophisticated View');
+    const mockRichData = {
+        current: {
+            id: '1',
+            title: 'September Championship',
+            prize_pool_usd: 15000,
+            start_date: '2025-09-15T00:00:00Z',
+            end_date: '2025-09-30T23:59:59Z',
+            highlight_copy: '🔥 $15K Prize Pool - Ends This Month!',
+            cta_text: 'JOIN COMPETITION',
+            cta_link: '#'
+        },
+        upcoming: {
+            title: 'October Mega Championship',
+            prize_pool_usd: 25000
+        },
+        history: [
+            {
+                username: 'cryptowizard',
+                place: 1,
+                amount_usd: 7500,
+                competition_title: 'August Championship',
+                paid_at: '2025-08-31'
+            },
+            {
+                username: 'alphahunter',
+                place: 2, 
+                amount_usd: 4500,
+                competition_title: 'August Championship',
+                paid_at: '2025-08-31'
+            }
+        ],
+        stats: {
+            total_winners: 12,
+            total_distributed_usd: 45000,
+            months_active: 3
+        }
+    };
+    renderSophisticatedView(mockRichData);
+}
+
+window.testRealData = function() {
+    console.log('📊 Testing Real Data (resetting to actual API)');
+    initSmartPrizeHub();
+}
 
 // ===================================================================
 // SMART PRIZE HUB - LAUNCH VS SOPHISTICATED VIEW
@@ -299,10 +391,88 @@ function initLeaderboardInteractivity() {
 
     // Sophisticated view renderer for rich data
     function renderSophisticatedView(data) {
-        // Use the original prize hub logic with full data
-        renderCurrentPrizeSection(data.current);
-        renderFuturePrizesSection(data.upcoming);
-        renderHistoricImpactSection(data.history, data.stats);
+        const prizeHub = document.getElementById('prize-hub');
+        prizeHub.innerHTML = `
+            <div class="container">
+                <h1 class="section-title">🏆 Prize Championships</h1>
+                
+                <!-- Current Live Competition -->
+                <div class="sophisticated-current">
+                    <div class="current-prize-card">
+                        <div class="prize-header">
+                            <h2>${data.current.title}</h2>
+                            <div class="prize-badges">
+                                <span class="prize-badge live">🔴 LIVE</span>
+                                <span class="prize-badge monthly">MONTHLY</span>
+                            </div>
+                        </div>
+                        <div class="prize-pool">
+                            <div class="pool-amount">$${data.current.prize_pool_usd.toLocaleString()}</div>
+                            <div class="pool-label">Total Prize Pool</div>
+                        </div>
+                        <div class="prize-countdown-container">
+                            <div class="countdown-label">Competition Ends In:</div>
+                            <div class="countdown-timer">12d 14h 23m</div>
+                        </div>
+                        <div class="prize-actions">
+                            <a href="${data.current.cta_link || '#'}" class="btn btn-primary btn-large">
+                                ${data.current.cta_text || 'JOIN COMPETITION'}
+                            </a>
+                            <div class="eligibility-note">Min 50 trades • $10K volume</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Competitions -->
+                ${data.upcoming ? `
+                <div class="sophisticated-upcoming">
+                    <h3 class="subsection-title">Next Championship</h3>
+                    <div class="upcoming-card">
+                        <h4>${data.upcoming.title}</h4>
+                        <div class="upcoming-pool">$${data.upcoming.prize_pool_usd.toLocaleString()}</div>
+                        <p>Registration opens soon</p>
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- Rich Historical Impact -->
+                <div class="sophisticated-history">
+                    <h3 class="subsection-title">Champion Hall of Fame</h3>
+                    <div class="history-stats">
+                        <div class="stat-card">
+                            <div class="stat-value">$${data.stats.total_distributed_usd.toLocaleString()}</div>
+                            <div class="stat-label">Total Distributed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${data.stats.total_winners}</div>
+                            <div class="stat-label">Champions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${data.stats.months_active}</div>
+                            <div class="stat-label">Months Active</div>
+                        </div>
+                    </div>
+                    
+                    <div class="winners-grid">
+                        ${data.history.slice(0, 6).map(winner => `
+                            <div class="winner-card">
+                                <div class="winner-rank">${getPlaceEmoji(winner.place)}</div>
+                                <div class="winner-name">@${winner.username}</div>
+                                <div class="winner-prize">$${winner.amount_usd.toLocaleString()}</div>
+                                <div class="winner-competition">${winner.competition_title}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function getPlaceEmoji(place) {
+        if (place === 1) return '🥇';
+        if (place === 2) return '🥈'; 
+        if (place === 3) return '🥉';
+        return `#${place}`;
     }
 
     function renderCompetitionSection(data) {
