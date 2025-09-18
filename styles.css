@@ -3292,6 +3292,7 @@ nav ul li a.active {
     display: flex;
     gap: 20px;
     justify-content: center;
+    margin-top: 30px;
     margin-bottom: 40px;
     flex-wrap: wrap;
 }
