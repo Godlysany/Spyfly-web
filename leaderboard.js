@@ -42,18 +42,22 @@ window.testZeroDataView = function() {
 
 window.testLaunchView = function() {
     console.log('🚀 Testing Launch View');
-    // Create a start date 7 days from now for countdown demo
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 7);
-    
-    const mockUpcomingData = {
-        upcoming: [{
-            title: 'October Mega Championship',
-            prize_pool_usd: 25000,
-            start_date: futureDate.toISOString()
-        }]
-    };
-    renderLaunchView(mockUpcomingData);
+    // Use real API data for launch view testing
+    fetch('/api/prizes')
+        .then(response => response.json())
+        .then(data => {
+            if (data.upcoming && data.upcoming.length > 0) {
+                renderLaunchView(data);
+            } else {
+                // Fallback if no real upcoming competitions
+                console.log('No real upcoming competitions, using fallback');
+                renderLaunchView(null);
+            }
+        })
+        .catch(error => {
+            console.log('API error, using fallback launch view');
+            renderLaunchView(null);
+        });
 }
 
 window.testTransitionView = function() {
@@ -353,27 +357,123 @@ function startCountdownTimer(targetDate) {
 }
 
 function renderTransitionView(data) {
-    // Mixed view - some data exists but not full sophisticated view yet
     const prizeHub = document.getElementById('prize-hub');
-    const hasCompetitions = data.current || data.upcoming;
-    const hasHistory = data.history && data.history.length > 0;
+    const currentComp = data.current && data.current.length > 0 ? data.current[0] : null;
+    const upcomingComps = data.upcoming || [];
     
-    let content = '<div class="container"><h1 class="section-title">🏆 Prize Championships</h1>';
-    
-    if (hasCompetitions) {
-        content += renderCompetitionSection(data);
-    } else {
-        content += renderUpcomingPromise();
-    }
-    
-    if (hasHistory) {
-        content += renderHistorySection(data);
-    } else {
-        content += renderHistoryPreview();
-    }
-    
-    content += '</div>';
-    prizeHub.innerHTML = content;
+    prizeHub.innerHTML = `
+        <div class="container">
+            <h1 class="section-title">🏆 Prize Championships</h1>
+            
+            <!-- Live Competition Ticker Bar -->
+            <div class="live-ticker-section">
+                <div class="ticker-container">
+                    <div class="live-competition-card">
+                        <div class="live-indicator">
+                            <span class="live-dot"></span>
+                            <span class="live-text">LIVE COMPETITION</span>
+                        </div>
+                        <div class="competition-details">
+                            <h3>${currentComp ? currentComp.title : 'September Championship'}</h3>
+                            <div class="competition-stats">
+                                <div class="stat-pill">
+                                    <span class="stat-value">$${currentComp ? (currentComp.prize_pool_usd/1000).toFixed(0) : '15'}K</span>
+                                    <span class="stat-label">Prize Pool</span>
+                                </div>
+                                <div class="stat-pill">
+                                    <span class="stat-value">${currentComp ? currentComp.competition_type || 'P&L' : 'P&L'}</span>
+                                    <span class="stat-label">Category</span>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-live">
+                            🚀 JOIN NOW
+                        </a>
+                    </div>
+                    
+                    ${upcomingComps.length > 0 ? `
+                    <div class="upcoming-ticker">
+                        <div class="ticker-header">
+                            <span class="upcoming-label">🔥 COMING UP</span>
+                        </div>
+                        <div class="ticker-scroll">
+                            ${upcomingComps.map(comp => `
+                                <div class="upcoming-comp-item">
+                                    <span class="comp-name">${comp.title}</span>
+                                    <span class="comp-prize">$${(comp.prize_pool_usd/1000).toFixed(0)}K</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+            
+            <!-- Prize Breakdown & Incentives -->
+            <div class="prize-breakdown-section">
+                <h3 class="subsection-title">💰 What's At Stake</h3>
+                <div class="prize-incentive-grid">
+                    <div class="prize-breakdown-card main-prize">
+                        <div class="prize-rank">🥇</div>
+                        <div class="prize-details">
+                            <div class="prize-amount">$${currentComp ? Math.floor(currentComp.prize_pool_usd * 0.5) : '7,500'}</div>
+                            <div class="prize-desc">Winner Takes All</div>
+                            <div class="prize-percentage">50% of Total Pool</div>
+                        </div>
+                    </div>
+                    
+                    <div class="prize-breakdown-card">
+                        <div class="prize-rank">🥈</div>
+                        <div class="prize-details">
+                            <div class="prize-amount">$${currentComp ? Math.floor(currentComp.prize_pool_usd * 0.3) : '4,500'}</div>
+                            <div class="prize-desc">Runner-up Reward</div>
+                            <div class="prize-percentage">30% of Pool</div>
+                        </div>
+                    </div>
+                    
+                    <div class="prize-breakdown-card">
+                        <div class="prize-rank">🥉</div>
+                        <div class="prize-details">
+                            <div class="prize-amount">$${currentComp ? Math.floor(currentComp.prize_pool_usd * 0.2) : '3,000'}</div>
+                            <div class="prize-desc">Third Place</div>
+                            <div class="prize-percentage">20% of Pool</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Competition Progress Teaser -->
+                <div class="competition-progress-teaser">
+                    <div class="progress-header">
+                        <h4>🔥 Competition Heating Up!</h4>
+                        <p>Join now to climb the leaderboard and claim your share</p>
+                    </div>
+                    <div class="leader-preview">
+                        <div class="leader-item leader-first">
+                            <span class="leader-rank">🥇</span>
+                            <span class="leader-name">@current_leader</span>
+                            <span class="leader-performance">+$47.2K</span>
+                        </div>
+                        <div class="leader-item">
+                            <span class="leader-rank">🥈</span>
+                            <span class="leader-name">@runner_up</span>
+                            <span class="leader-performance">+$38.9K</span>
+                        </div>
+                        <div class="leader-item">
+                            <span class="leader-rank">🥉</span>
+                            <span class="leader-name">@third_place</span>
+                            <span class="leader-performance">+$31.5K</span>
+                        </div>
+                    </div>
+                    <div class="join-urgency">
+                        <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-secondary btn-large">
+                            ⚡ JOIN THE BATTLE
+                        </a>
+                        <span class="urgency-text">Still time to make your move!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 // Sophisticated view renderer for rich data

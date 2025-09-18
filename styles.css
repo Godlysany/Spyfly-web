@@ -2286,6 +2286,346 @@ nav ul li a.active {
     }
 }
 
+/* ===================================================================
+   TRANSITION VIEW - LIVE COMPETITION TICKER & PRIZE BREAKDOWN
+   =================================================================== */
+
+.live-ticker-section {
+    margin: 40px 0;
+    background: rgba(45, 212, 127, 0.05);
+    border: 2px solid var(--primary-color);
+    border-radius: 20px;
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.live-ticker-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--primary-color) 0%, transparent 50%, var(--primary-color) 100%);
+    opacity: 0.05;
+}
+
+.ticker-container {
+    display: grid;
+    gap: 30px;
+    position: relative;
+    z-index: 1;
+}
+
+.live-competition-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    background: rgba(45, 212, 127, 0.1);
+    border: 1px solid var(--primary-color);
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 150px;
+}
+
+.live-dot {
+    width: 12px;
+    height: 12px;
+    background: #ff4444;
+    border-radius: 50%;
+    animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+    0%, 100% { 
+        opacity: 1;
+        box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+    }
+    50% { 
+        opacity: 0.6;
+        box-shadow: 0 0 20px rgba(255, 68, 68, 0.8);
+    }
+}
+
+.live-text {
+    color: #ff4444;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.competition-details {
+    flex: 1;
+}
+
+.competition-details h3 {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    margin: 0 0 15px 0;
+    font-family: 'Orbitron', monospace;
+}
+
+.competition-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.stat-pill {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(45, 212, 127, 0.3);
+    border-radius: 25px;
+    padding: 8px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.stat-value {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.btn-live {
+    animation: glow-pulse 2s infinite;
+    min-width: 120px;
+}
+
+@keyframes glow-pulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(45, 212, 127, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(45, 212, 127, 0.8);
+    }
+}
+
+.upcoming-ticker {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.ticker-header {
+    margin-bottom: 15px;
+}
+
+.upcoming-label {
+    color: #ff9500;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.ticker-scroll {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
+.upcoming-comp-item {
+    background: rgba(255, 149, 0, 0.1);
+    border: 1px solid #ff9500;
+    border-radius: 10px;
+    padding: 12px 18px;
+    min-width: 200px;
+    text-align: center;
+}
+
+.comp-name {
+    display: block;
+    color: #ff9500;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.comp-prize {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* Prize Breakdown Section */
+.prize-breakdown-section {
+    margin: 50px 0;
+}
+
+.prize-incentive-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin: 30px 0;
+}
+
+.prize-breakdown-card {
+    background: linear-gradient(135deg, rgba(45, 212, 127, 0.1), rgba(45, 212, 127, 0.05));
+    border: 2px solid var(--primary-color);
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.prize-breakdown-card.main-prize {
+    transform: scale(1.05);
+    border-color: #ffd700;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+}
+
+.prize-rank {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.prize-amount {
+    font-family: 'Orbitron', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.main-prize .prize-amount {
+    color: #ffd700;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.prize-desc {
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.prize-percentage {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+/* Competition Progress Teaser */
+.competition-progress-teaser {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    margin-top: 40px;
+}
+
+.progress-header h4 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.progress-header p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 30px;
+}
+
+.leader-preview {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.leader-item {
+    background: rgba(45, 212, 127, 0.1);
+    border: 1px solid rgba(45, 212, 127, 0.3);
+    border-radius: 12px;
+    padding: 20px 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 140px;
+}
+
+.leader-first {
+    border-color: #ffd700;
+    background: rgba(255, 215, 0, 0.1);
+}
+
+.leader-rank {
+    font-size: 1.8rem;
+}
+
+.leader-name {
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.leader-performance {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.join-urgency {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.urgency-text {
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .live-competition-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .prize-incentive-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .prize-breakdown-card.main-prize {
+        transform: none;
+        order: -1;
+    }
+    
+    .leader-preview {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .competition-stats {
+        justify-content: center;
+    }
+    
+    .ticker-scroll {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
 .prize-section {
     margin-bottom: 50px;
 }
