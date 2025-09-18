@@ -1012,16 +1012,257 @@ function renderSophisticatedStatus1(data, prizeHub) {
 
 // Status 2: No active but upcoming + history
 function renderSophisticatedStatus2(data, prizeHub) {
-    // Similar to Status 1 but without active competition section
+    const upcomingComp = data.upcoming && data.upcoming.length > 0 ? data.upcoming[0] : null;
+    const upcomingComps = data.upcoming || [];
+    const historyData = data.history || [];
+    const stats = data.stats || {};
+    
+    // Calculate total jackpot across all competitions (upcoming + historical)
+    const upcomingPrizes = upcomingComps.reduce((sum, comp) => sum + comp.prize_pool_usd, 0);
+    const historicalPrizes = stats.total_distributed_usd || 0;
+    const totalJackpot = upcomingPrizes + historicalPrizes;
+    
+    // Format dates for display
+    const formatDate = (dateStr) => {
+        return new Date(dateStr).toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric', 
+            year: 'numeric' 
+        });
+    };
+    
     prizeHub.innerHTML = `
         <div class="container">
+            <!-- Total Jackpot Highlight Banner (EXACT from Status 1) -->
+            <div class="total-jackpot-banner">
+                <div class="jackpot-content">
+                    <div class="jackpot-label">🎯 TOTAL CHAMPIONSHIP JACKPOT</div>
+                    <div class="jackpot-amount">$${(totalJackpot/1000).toFixed(0)}K</div>
+                    <div class="jackpot-description">Available across all upcoming competitions</div>
+                </div>
+            </div>
+            
             <h1 class="section-title">🏆 Prize Championships</h1>
-            <div class="status-message">
-                <h2>🔜 Status 2: Upcoming Competitions + History</h2>
-                <p>No active competition but upcoming competitions available with tournament history</p>
+            
+            <!-- Upcoming Competition Hero Card (Modified from Live Competition) -->
+            <div class="transition-hero-card">
+                <div class="transition-hero-content">
+                    <div class="upcoming-badge">🔜 COMING SOON</div>
+                    <h2 class="transition-title">${upcomingComp ? upcomingComp.title : 'Next Trading Championship'}</h2>
+                    <p class="transition-subtitle">Get ready for the next elite trading championship. Registration opens soon.</p>
+                    
+                    <div class="transition-stats">
+                        <div class="transition-stat">
+                            <i class="fas fa-trophy"></i>
+                            <div>
+                                <strong>Prize Pool</strong>
+                                <span>$${upcomingComp ? (upcomingComp.prize_pool_usd/1000).toFixed(0) : '18'}K awaiting winners</span>
+                            </div>
+                        </div>
+                        <div class="transition-stat">
+                            <i class="fas fa-chart-line"></i>
+                            <div>
+                                <strong>Competition Type</strong>
+                                <span>${upcomingComp ? getCompetitionTypeDisplay(upcomingComp.competition_type) : 'Multi-Category'}</span>
+                            </div>
+                        </div>
+                        <div class="transition-stat">
+                            <i class="fas fa-calendar-alt"></i>
+                            <div>
+                                <strong>Starts</strong>
+                                <span>${upcomingComp ? formatDate(upcomingComp.start_date) : 'TBA'}</span>
+                            </div>
+                        </div>
+                        <div class="transition-stat">
+                            <i class="fas fa-users"></i>
+                            <div>
+                                <strong>Min Requirements</strong>
+                                <span>${upcomingComp ? upcomingComp.min_trades : 50} trades, $${upcomingComp ? (upcomingComp.min_volume_usd/1000).toFixed(0) : '10'}K volume</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Countdown Timer for Start Date -->
+                    <div class="countdown-container">
+                        <h3>⏰ Competition Starts In</h3>
+                        <div class="countdown-timer" id="sophisticated-countdown">
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="countdown-days">--</span>
+                                <span class="countdown-label">Days</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="countdown-hours">--</span>
+                                <span class="countdown-label">Hours</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="countdown-minutes">--</span>
+                                <span class="countdown-label">Minutes</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="countdown-seconds">--</span>
+                                <span class="countdown-label">Seconds</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="transition-actions">
+                        <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-large">
+                            📢 Get Notified
+                        </a>
+                        <a href="#main-leaderboard" class="btn btn-secondary btn-large btn-view-leaderboard">
+                            📊 View Past Results
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Prize Distribution (EXACT from Status 1) -->
+            <div class="prize-distribution-section">
+                <h3 class="subsection-title">💰 Prize Breakdown</h3>
+                <div class="prize-breakdown-visual">
+                    ${upcomingComp && upcomingComp.prize_breakdown && upcomingComp.prize_breakdown.length > 0 ? `
+                        ${upcomingComp.prize_breakdown.map((prize, index) => `
+                            <div class="prize-tier ${index === 0 ? 'champion' : index === 1 ? 'runner-up' : 'third-place'}">
+                                <div class="prize-position">
+                                    <span class="position-icon">${['🥇', '🥈', '🥉'][index] || '🏆'}</span>
+                                    <span class="position-text">${['Champion', 'Runner-up', 'Third Place'][index] || `${prize.place} Place`}</span>
+                                </div>
+                                <div class="prize-amount">$${prize.amount_usd.toLocaleString()}</div>
+                                <div class="prize-percentage">${prize.percent}% of pool</div>
+                            </div>
+                        `).join('')}
+                    ` : `
+                        <div class="prize-tier champion">
+                            <div class="prize-position">
+                                <span class="position-icon">🥇</span>
+                                <span class="position-text">Champion</span>
+                            </div>
+                            <div class="prize-amount">$${upcomingComp ? Math.round(upcomingComp.prize_pool_usd * 0.5).toLocaleString() : '9,000'}</div>
+                            <div class="prize-percentage">50% of pool</div>
+                        </div>
+                        <div class="prize-tier runner-up">
+                            <div class="prize-position">
+                                <span class="position-icon">🥈</span>
+                                <span class="position-text">Runner-up</span>
+                            </div>
+                            <div class="prize-amount">$${upcomingComp ? Math.round(upcomingComp.prize_pool_usd * 0.3).toLocaleString() : '5,400'}</div>
+                            <div class="prize-percentage">30% of pool</div>
+                        </div>
+                        <div class="prize-tier third-place">
+                            <div class="prize-position">
+                                <span class="position-icon">🥉</span>
+                                <span class="position-text">Third Place</span>
+                            </div>
+                            <div class="prize-amount">$${upcomingComp ? Math.round(upcomingComp.prize_pool_usd * 0.2).toLocaleString() : '3,600'}</div>
+                            <div class="prize-percentage">20% of pool</div>
+                        </div>
+                    `}
+                </div>
+            </div>
+            
+            <!-- Next Championships (EXACT from Status 1) -->
+            ${upcomingComps.length > 1 ? `
+            <div class="next-championships-section">
+                <h3 class="subsection-title">🔥 Next Championships</h3>
+                <div class="next-championships-grid">
+                    ${upcomingComps.slice(1, 3).map(comp => `
+                        <div class="next-championship-card ${comp.competition_type}">
+                            <div class="next-championship-header">
+                                <div class="next-championship-info">
+                                    <span class="championship-type">${getCompetitionTypeDisplay(comp.competition_type)}</span>
+                                    <span class="championship-status">📅 ${new Date(comp.start_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+                                </div>
+                                <div class="championship-prize">$${(comp.prize_pool_usd/1000).toFixed(0)}K</div>
+                            </div>
+                            <h4 class="championship-title">${comp.title}</h4>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
+            
+            <!-- ==== ADDITIONAL SOPHISTICATED SECTIONS BELOW ==== -->
+            
+            <!-- Championship Stats Section -->
+            <div class="sophisticated-historical-section" style="margin-top: 80px; margin-bottom: 60px;">
+                <h1 class="section-title">🏆 Championship Stats</h1>
+                
+                <!-- Core Historical KPIs -->
+                <div class="historical-kpis" style="margin-bottom: 50px;">
+                    <div class="historical-kpi-grid">
+                        <div class="kpi-card highlight">
+                            <div class="kpi-icon">💰</div>
+                            <div class="kpi-value">$${(stats.total_distributed_usd || 45000).toLocaleString()}</div>
+                            <div class="kpi-label">Total Distributed</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">🏆</div>
+                            <div class="kpi-value">${stats.total_competitions || historyData.length || 3}</div>
+                            <div class="kpi-label">Championships Finished</div>
+                        </div>
+                        <div class="kpi-card highlight">
+                            <div class="kpi-icon">📊</div>
+                            <div class="kpi-value">$${stats.total_volume ? (stats.total_volume/1000000).toFixed(1) + 'M' : '18.3M'}</div>
+                            <div class="kpi-label">Total Volume</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">📈</div>
+                            <div class="kpi-value">${stats.total_trades ? (stats.total_trades/1000).toFixed(1) + 'K' : '45.2K'}</div>
+                            <div class="kpi-label">Total Trades</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hall of Fame Section -->
+                <div class="hall-of-fame-section" style="margin-bottom: 50px;">
+                    <div class="hall-header">
+                        <h4>🏅 Hall of Fame</h4>
+                        <div class="hall-navigation">
+                            <button class="carousel-btn" onclick="previousCompetition()">&lt;</button>
+                            <span class="competition-indicator" id="competition-indicator">
+                                ${historyData.length > 0 ? historyData[0].title : 'August P&L Championship'}
+                            </span>
+                            <button class="carousel-btn" onclick="nextCompetition()">&gt;</button>
+                        </div>
+                    </div>
+                    
+                    <div class="hall-of-fame-display" id="hall-of-fame-display">
+                        ${generateHallOfFameDisplay(historyData)}
+                    </div>
+                </div>
+                
+                <!-- Championship History Table -->
+                <div class="championship-history-section">
+                    <h4>📋 Championship History</h4>
+                    <div class="championship-history-table">
+                        <div class="history-table-header">
+                            <div class="table-col">Competition</div>
+                            <div class="table-col">Type</div>
+                            <div class="table-col">Prize Pool</div>
+                            <div class="table-col">Total Participants</div>
+                            <div class="table-col">Total Trades</div>
+                            <div class="table-col">Action</div>
+                        </div>
+                        <div class="history-table-body">
+                            ${generateChampionshipHistoryTable(historyData)}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     `;
+    
+    // Store all prize data globally for modal access
+    window.currentPrizeData = data;
+    
+    // Store history data globally for navigation
+    currentHistoryData = historyData;
+    currentCompetitionIndex = 0;
+    
+    // Start countdown timer to START date if we have an upcoming competition
+    if (upcomingComp && upcomingComp.start_date) {
+        startSophisticatedCountdownTimer(new Date(upcomingComp.start_date));
+    }
 }
 
 // Status 3: No active, no upcoming, only history
