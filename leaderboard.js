@@ -63,11 +63,29 @@ window.testLaunchView = function() {
 window.testTransitionView = function() {
     console.log('🔄 Testing Transition View');
     const mockTransitionData = {
-        current: {
-            title: 'September Championship',
-            prize_pool_usd: 15000
-        },
-        upcoming: null,
+        current: [{
+            title: 'September Trading Championship',
+            prize_pool_usd: 15000,
+            start_date: '2025-09-15T00:00:00+00:00',
+            end_date: '2025-09-30T23:59:59+00:00',
+            competition_type: 'pnl'
+        }],
+        upcoming: [
+            {
+                title: 'October Volume Championship',
+                prize_pool_usd: 18000,
+                start_date: '2025-10-01T00:00:00+00:00',
+                end_date: '2025-10-31T23:59:59+00:00',
+                competition_type: 'volume'
+            },
+            {
+                title: 'November Win Rate Championship',
+                prize_pool_usd: 22000,
+                start_date: '2025-11-01T00:00:00+00:00',
+                end_date: '2025-11-30T23:59:59+00:00',
+                competition_type: 'winrate'
+            }
+        ],
         history: [],
         stats: { total_winners: 0, total_distributed_usd: 0 }
     };
@@ -77,7 +95,7 @@ window.testTransitionView = function() {
 window.testSophisticatedView = function() {
     console.log('💎 Testing Sophisticated View');
     const mockRichData = {
-        current: {
+        current: [{
             id: '1',
             title: 'September Championship',
             prize_pool_usd: 15000,
@@ -85,26 +103,36 @@ window.testSophisticatedView = function() {
             end_date: '2025-09-30T23:59:59Z',
             highlight_copy: '🔥 $15K Prize Pool - Ends This Month!',
             cta_text: 'JOIN COMPETITION',
-            cta_link: '#'
-        },
-        upcoming: {
-            title: 'October Mega Championship',
-            prize_pool_usd: 25000
-        },
+            cta_link: '#',
+            competition_type: 'pnl'
+        }],
+        upcoming: [
+            {
+                title: 'October Mega Championship',
+                prize_pool_usd: 25000,
+                start_date: '2025-10-01T00:00:00Z',
+                end_date: '2025-10-31T23:59:59Z',
+                competition_type: 'volume'
+            }
+        ],
         history: [
             {
-                username: 'cryptowizard',
-                place: 1,
-                amount_usd: 7500,
-                competition_title: 'August Championship',
-                paid_at: '2025-08-31'
-            },
-            {
-                username: 'alphahunter',
-                place: 2, 
-                amount_usd: 4500,
-                competition_title: 'August Championship',
-                paid_at: '2025-08-31'
+                winners: [
+                    {
+                        username: 'cryptowizard',
+                        place: 1,
+                        amount_usd: 7500,
+                        competition_title: 'August Championship',
+                        paid_at: '2025-08-31'
+                    },
+                    {
+                        username: 'alphahunter',
+                        place: 2, 
+                        amount_usd: 4500,
+                        competition_title: 'August Championship',
+                        paid_at: '2025-08-31'
+                    }
+                ]
             }
         ],
         stats: {
