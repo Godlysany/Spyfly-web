@@ -1337,6 +1337,10 @@ body.loading .loader-overlay {
 #fly-swatter.picked-up {
     pointer-events: none !important;
     z-index: 5201;
+    transition: none !important; /* Disable transitions when picked up for smooth following */
+    opacity: 1 !important; /* Ensure visibility */
+    visibility: visible !important; /* Force visibility */
+    display: flex !important; /* Ensure display */
 }
 
 #fly-swatter.returning {

@@ -412,6 +412,10 @@ function initFlySwatter() {
         swatter.style.position = 'fixed';
         swatter.style.right = 'auto';
         swatter.style.bottom = 'auto';
+        swatter.style.opacity = '1';
+        swatter.style.visibility = 'visible';
+        swatter.style.display = 'flex';
+        swatter.style.zIndex = '5201';
         
         console.log('Spatula picked up! Click to smack, right-click to put back!');
     }
@@ -422,16 +426,21 @@ function initFlySwatter() {
         const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
         const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
         
-        // Use transform for better performance and smoother movement
+        // Calculate centered position
         const centerX = clientX - (swatter.offsetWidth / 2);
         const centerY = clientY - (swatter.offsetHeight / 2);
         
-        // Clear any previous positioning and use transform for smooth following
-        swatter.style.left = '';
-        swatter.style.top = '';
-        swatter.style.right = '';
-        swatter.style.bottom = '';
-        swatter.style.transform = `translate(${centerX}px, ${centerY}px)`;
+        // Ensure swatter is visible and positioned correctly
+        swatter.style.position = 'fixed';
+        swatter.style.left = centerX + 'px';
+        swatter.style.top = centerY + 'px';
+        swatter.style.right = 'auto';
+        swatter.style.bottom = 'auto';
+        swatter.style.transform = 'none'; // Clear any conflicting transforms
+        swatter.style.opacity = '1';
+        swatter.style.visibility = 'visible';
+        swatter.style.display = 'flex';
+        swatter.style.zIndex = '5201';
         
         if (e.type === 'touchmove') {
             e.preventDefault();
