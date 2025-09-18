@@ -61,10 +61,27 @@
     </style>
 </head>
 <body class="admin-page" style="background: var(--dark-bg); color: #ffffff; min-height: 100vh;">
-    <div class="admin-container">
+    <!-- Authentication Check Overlay -->
+    <div id="auth-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 18, 19, 0.95); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+        <div style="text-align: center; color: #2DD47F;">
+            <div class="loading" style="width: 40px; height: 40px; margin: 0 auto 20px;"></div>
+            <h2>🔐 Verifying Access</h2>
+            <p>Please wait while we authenticate your session...</p>
+        </div>
+    </div>
+    
+    <div class="admin-container" id="admin-content" style="display: none;">
         <div class="admin-header">
-            <h1>🏆 SpyFly Prize Management</h1>
-            <p>Manage competitions, prizes, and winners</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div>
+                    <h1>🏆 SpyFly Prize Management</h1>
+                    <p>Manage competitions, prizes, and winners</p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="margin: 0; color: #2DD47F; font-size: 14px;">Welcome, <span id="admin-username">admin</span></p>
+                    <button onclick="logout()" style="background: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-top: 5px;">Logout</button>
+                </div>
+            </div>
             <div id="connection-status" class="loading">Connecting to database...</div>
         </div>
 
@@ -175,15 +192,100 @@
         const API_BASE = '/api';
         let competitions = [];
 
-        // Initialize admin panel
-        document.addEventListener('DOMContentLoaded', function() {
-            testConnection();
-            loadCompetitions();
-            loadSystemStats();
+        // Authentication variables
+        let authToken = null;
+        let currentAdmin = null;
+
+        // Authentication functions
+        async function checkAuthentication() {
+            const token = localStorage.getItem('spyfly_admin_token');
             
-            // Setup form handlers
-            document.getElementById('competition-form').addEventListener('submit', createCompetition);
-            document.getElementById('winner-form').addEventListener('submit', addWinner);
+            if (!token) {
+                redirectToLogin();
+                return false;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = token;
+                    currentAdmin = data.admin;
+                    
+                    // Update UI with admin info
+                    document.getElementById('admin-username').textContent = currentAdmin.username;
+                    document.getElementById('auth-overlay').style.display = 'none';
+                    document.getElementById('admin-content').style.display = 'block';
+                    
+                    return true;
+                } else {
+                    localStorage.removeItem('spyfly_admin_token');
+                    localStorage.removeItem('spyfly_admin_user');
+                    redirectToLogin();
+                    return false;
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                redirectToLogin();
+                return false;
+            }
+        }
+        
+        function redirectToLogin() {
+            window.location.href = 'login.html';
+        }
+        
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('spyfly_admin_token');
+                localStorage.removeItem('spyfly_admin_user');
+                redirectToLogin();
+            }
+        }
+
+        // Modified fetch function to include auth headers
+        async function authenticatedFetch(url, options = {}) {
+            if (!authToken) {
+                redirectToLogin();
+                return;
+            }
+            
+            options.headers = {
+                ...options.headers,
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            };
+            
+            const response = await fetch(url, options);
+            
+            if (response.status === 401) {
+                localStorage.removeItem('spyfly_admin_token');
+                localStorage.removeItem('spyfly_admin_user');
+                redirectToLogin();
+                return;
+            }
+            
+            return response;
+        }
+
+        // Initialize admin panel
+        document.addEventListener('DOMContentLoaded', async function() {
+            // First check authentication
+            const isAuthenticated = await checkAuthentication();
+            if (isAuthenticated) {
+                testConnection();
+                loadCompetitions();
+                loadSystemStats();
+                
+                // Setup form handlers
+                document.getElementById('competition-form').addEventListener('submit', createCompetition);
+                document.getElementById('winner-form').addEventListener('submit', addWinner);
+            }
         });
 
         async function testConnection() {
@@ -276,9 +378,8 @@
             };
             
             try {
-                const response = await fetch('/api/competitions', {
+                const response = await authenticatedFetch('/api/competitions', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(competition)
                 });
                 
@@ -306,9 +407,8 @@
             };
             
             try {
-                const response = await fetch('/api/winners', {
+                const response = await authenticatedFetch('/api/winners', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(winner)
                 });
                 
@@ -355,9 +455,8 @@
         async function updateCacheVersion() {
             const version = document.getElementById('cache-version').value;
             try {
-                const response = await fetch('/api/settings', {
+                const response = await authenticatedFetch('/api/settings', {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ key: 'cache_version', value: version })
                 });
                 
