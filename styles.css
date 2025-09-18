@@ -2176,6 +2176,7 @@ nav ul li a.active {
 #prize-hub {
     background: var(--dark-bg); /* Consistent with page background */
     padding: 60px 0;
+    margin-bottom: 80px; /* Add significant spacing after prize section for better visual separation */
     opacity: 1 !important; /* Force visibility - override any hiding rules */
 }
 
