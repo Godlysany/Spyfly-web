@@ -929,11 +929,11 @@ function renderSophisticatedStatus1(data, prizeHub) {
             <!-- ==== ADDITIONAL SOPHISTICATED SECTIONS BELOW ==== -->
             
             <!-- Championship Stats Section -->
-            <div class="sophisticated-historical-section" style="margin-top: 60px;">
-                <h1 class="section-title">📊 Championship Stats</h1>
+            <div class="sophisticated-historical-section" style="margin-top: 80px; margin-bottom: 60px;">
+                <h1 class="section-title">🏆 Championship Stats</h1>
                 
                 <!-- Core Historical KPIs -->
-                <div class="historical-kpis">
+                <div class="historical-kpis" style="margin-bottom: 50px;">
                     <div class="historical-kpi-grid">
                         <div class="kpi-card highlight">
                             <div class="kpi-icon">💰</div>
@@ -959,7 +959,7 @@ function renderSophisticatedStatus1(data, prizeHub) {
                 </div>
                 
                 <!-- Hall of Fame Section -->
-                <div class="hall-of-fame-section">
+                <div class="hall-of-fame-section" style="margin-bottom: 50px;">
                     <div class="hall-header">
                         <h4>🏅 Hall of Fame</h4>
                         <div class="hall-navigation">
@@ -996,6 +996,9 @@ function renderSophisticatedStatus1(data, prizeHub) {
             </div>
         </div>
     `;
+    
+    // Store all prize data globally for modal access
+    window.currentPrizeData = data;
     
     // Store history data globally for navigation
     currentHistoryData = historyData;
@@ -1269,13 +1272,23 @@ function updateHallOfFameDisplay() {
 }
 
 window.openChampionshipModal = function(championshipIndex) {
+    console.log('Opening championship modal for index:', championshipIndex);
+    console.log('Current prize data:', window.currentPrizeData);
+    
     // Get competition data from current history data
     if (!window.currentPrizeData || !window.currentPrizeData.history || championshipIndex >= window.currentPrizeData.history.length) {
+        console.error('Competition data not available', {
+            currentPrizeData: !!window.currentPrizeData,
+            hasHistory: !!(window.currentPrizeData && window.currentPrizeData.history),
+            historyLength: window.currentPrizeData && window.currentPrizeData.history ? window.currentPrizeData.history.length : 0,
+            requestedIndex: championshipIndex
+        });
         alert('Competition data not available');
         return;
     }
     
     const competition = window.currentPrizeData.history[championshipIndex];
+    console.log('Opening modal for competition:', competition);
     openCompetitionModal(competition.id);
 }
 
