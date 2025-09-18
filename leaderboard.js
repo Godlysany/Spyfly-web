@@ -538,7 +538,9 @@ function renderSophisticatedView(data) {
     const prizeHub = document.getElementById('prize-hub');
     const currentComp = data.current && data.current.length > 0 ? data.current[0] : null;
     const upcomingComps = data.upcoming || [];
-    const recentWinners = data.history && data.history.length > 0 ? data.history[0].winners : [];
+    const recentWinners = data.history && data.history.length > 0 && data.history[0].winners 
+        ? data.history[0].winners 
+        : [];
     
     prizeHub.innerHTML = `
         <div class="container">
