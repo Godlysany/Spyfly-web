@@ -144,6 +144,107 @@ window.testSophisticatedView = function() {
     renderSophisticatedView(mockRichData);
 }
 
+// Test functions for the 3 sophisticated statuses
+window.testSophisticatedStatus1 = function() {
+    console.log('💎 Testing Sophisticated Status 1: Active + History');
+    const mockData = {
+        current: [{
+            title: 'September Trading Championship',
+            prize_pool_usd: 15000,
+            start_date: '2025-09-15T00:00:00+00:00',
+            end_date: '2025-09-30T23:59:59+00:00',
+            competition_type: 'pnl'
+        }],
+        upcoming: [
+            {
+                title: 'October Volume Championship',
+                prize_pool_usd: 18000,
+                start_date: '2025-10-01T00:00:00+00:00',
+                end_date: '2025-10-31T23:59:59+00:00',
+                competition_type: 'volume'
+            }
+        ],
+        history: [
+            {
+                title: 'August P&L Championship',
+                prize_pool_usd: 12000,
+                end_date: '2025-08-31T23:59:59+00:00',
+                competition_type: 'pnl',
+                winners: [
+                    { username: 'cryptowizard', place: 1, amount_usd: 6000 },
+                    { username: 'alphahunter', place: 2, amount_usd: 3600 },
+                    { username: 'trademaster', place: 3, amount_usd: 2400 }
+                ]
+            }
+        ],
+        stats: {
+            total_distributed_usd: 45000,
+            total_competitions: 3,
+            total_participants: 1247,
+            total_volume: 18300000
+        }
+    };
+    renderSophisticatedView(mockData);
+}
+
+window.testSophisticatedStatus2 = function() {
+    console.log('🔜 Testing Sophisticated Status 2: Upcoming + History');
+    const mockData = {
+        current: [], // No active competition
+        upcoming: [
+            {
+                title: 'October Volume Championship',
+                prize_pool_usd: 18000,
+                start_date: '2025-10-01T00:00:00+00:00',
+                end_date: '2025-10-31T23:59:59+00:00',
+                competition_type: 'volume'
+            }
+        ],
+        history: [
+            {
+                title: 'August P&L Championship',
+                prize_pool_usd: 12000,
+                end_date: '2025-08-31T23:59:59+00:00',
+                competition_type: 'pnl',
+                winners: [
+                    { username: 'cryptowizard', place: 1, amount_usd: 6000 }
+                ]
+            }
+        ],
+        stats: {
+            total_distributed_usd: 12000,
+            total_competitions: 1,
+            total_participants: 856
+        }
+    };
+    renderSophisticatedView(mockData);
+}
+
+window.testSophisticatedStatus3 = function() {
+    console.log('📜 Testing Sophisticated Status 3: History Only');
+    const mockData = {
+        current: [], // No active competition
+        upcoming: [], // No upcoming competitions
+        history: [
+            {
+                title: 'August P&L Championship',
+                prize_pool_usd: 12000,
+                end_date: '2025-08-31T23:59:59+00:00',
+                competition_type: 'pnl',
+                winners: [
+                    { username: 'cryptowizard', place: 1, amount_usd: 6000 }
+                ]
+            }
+        ],
+        stats: {
+            total_distributed_usd: 12000,
+            total_competitions: 1,
+            total_participants: 856
+        }
+    };
+    renderSophisticatedView(mockData);
+}
+
 window.testRealData = function() {
     console.log('📊 Testing Real Data (resetting to actual API)');
     initSmartPrizeHub();
@@ -627,9 +728,386 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Sophisticated view renderer for rich data
+// Sophisticated view renderer with 3 different statuses
 function renderSophisticatedView(data) {
     const prizeHub = document.getElementById('prize-hub');
+    const currentComp = data.current && data.current.length > 0 ? data.current[0] : null;
+    const upcomingComps = data.upcoming || [];
+    const hasHistory = data.history && data.history.length > 0;
+    
+    // Determine sophisticated view status
+    if (currentComp && hasHistory) {
+        // Status 1: Active competition + history (full sophisticated view)
+        renderSophisticatedStatus1(data, prizeHub);
+    } else if (!currentComp && upcomingComps.length > 0 && hasHistory) {
+        // Status 2: No active but upcoming + history
+        renderSophisticatedStatus2(data, prizeHub);
+    } else if (!currentComp && upcomingComps.length === 0 && hasHistory) {
+        // Status 3: No active, no upcoming, only history
+        renderSophisticatedStatus3(data, prizeHub);
+    } else {
+        // Fallback to current implementation for edge cases
+        renderSophisticatedViewOriginal(data, prizeHub);
+    }
+}
+
+// Status 1: Active competition + history (full featured)
+function renderSophisticatedStatus1(data, prizeHub) {
+    const currentComp = data.current[0];
+    const upcomingComps = data.upcoming || [];
+    const historyData = data.history || [];
+    const stats = data.stats || {};
+    
+    // Calculate total jackpot across all competitions (current + upcoming + historical)
+    const currentPrize = currentComp ? currentComp.prize_pool_usd : 0;
+    const upcomingPrizes = upcomingComps.reduce((sum, comp) => sum + comp.prize_pool_usd, 0);
+    const historicalPrizes = stats.total_distributed_usd || 0;
+    const totalJackpot = currentPrize + upcomingPrizes + historicalPrizes;
+    
+    // Format dates for display
+    const formatDate = (dateStr) => {
+        return new Date(dateStr).toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric', 
+            year: 'numeric' 
+        });
+    };
+    
+    prizeHub.innerHTML = `
+        <div class="container">
+            <!-- Total Ecosystem Jackpot Banner -->
+            <div class="total-jackpot-banner ecosystem">
+                <div class="jackpot-content">
+                    <div class="jackpot-label">🎯 TOTAL ECOSYSTEM VALUE</div>
+                    <div class="jackpot-amount">$${(totalJackpot/1000).toFixed(0)}K</div>
+                    <div class="jackpot-description">Distributed + active + upcoming competitions</div>
+                </div>
+            </div>
+            
+            <h1 class="section-title">🏆 Prize Championships</h1>
+            
+            <!-- High Level KPIs -->
+            <div class="sophisticated-kpis">
+                <div class="kpi-row">
+                    <div class="kpi-card highlight">
+                        <div class="kpi-icon">💰</div>
+                        <div class="kpi-value">$${(stats.total_distributed_usd || 0).toLocaleString()}</div>
+                        <div class="kpi-label">Total Distributed</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">🏆</div>
+                        <div class="kpi-value">${stats.total_competitions || historyData.length}</div>
+                        <div class="kpi-label">Competitions Finished</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">👥</div>
+                        <div class="kpi-value">${stats.total_participants || '1,247'}</div>
+                        <div class="kpi-label">Total Participants</div>
+                    </div>
+                    <div class="kpi-card highlight">
+                        <div class="kpi-icon">📊</div>
+                        <div class="kpi-value">$${stats.total_volume ? (stats.total_volume/1000000).toFixed(1) + 'M' : '18.3M'}</div>
+                        <div class="kpi-label">Total Volume</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Active Competition Hero (Reuse from Transition) -->
+            <div class="transition-hero-card">
+                <div class="transition-hero-content">
+                    <div class="live-badge">🔴 LIVE NOW</div>
+                    <h2 class="transition-title">${currentComp.title}</h2>
+                    <p class="transition-subtitle">Elite traders are competing live. Join the championship and prove your alpha.</p>
+                    
+                    <div class="transition-stats">
+                        <div class="transition-stat">
+                            <i class="fas fa-trophy"></i>
+                            <div>
+                                <strong>Prize Pool</strong>
+                                <span>$${(currentComp.prize_pool_usd/1000).toFixed(0)}K ready to win</span>
+                            </div>
+                        </div>
+                        <div class="transition-stat">
+                            <i class="fas fa-chart-line"></i>
+                            <div>
+                                <strong>Competition Type</strong>
+                                <span>${getCompetitionTypeDisplay(currentComp.competition_type)}</span>
+                            </div>
+                        </div>
+                        <div class="transition-stat">
+                            <i class="fas fa-calendar-alt"></i>
+                            <div>
+                                <strong>Competition Period</strong>
+                                <span>${formatDate(currentComp.start_date)} - ${formatDate(currentComp.end_date)}</span>
+                            </div>
+                        </div>
+                        <div class="transition-stat countdown-stat">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <strong>Time Remaining</strong>
+                                <div id="sophisticated-countdown-timer" class="countdown-inline">
+                                    <span id="sophisticated-countdown-days">00</span>d 
+                                    <span id="sophisticated-countdown-hours">00</span>h 
+                                    <span id="sophisticated-countdown-minutes">00</span>m 
+                                    <span id="sophisticated-countdown-seconds">00</span>s
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="transition-cta">
+                        <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary btn-large">
+                            🚀 Join Competition
+                        </a>
+                        <a href="#main-leaderboard" class="btn btn-secondary">
+                            📊 View Live Rankings
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="transition-visual">
+                    <!-- Big Prize Display -->
+                    <div class="big-prize-display">
+                        <div class="prize-spotlight">
+                            <div class="prize-icon">💰</div>
+                            <div class="prize-value">$${(currentComp.prize_pool_usd/1000).toFixed(0)}K</div>
+                            <div class="prize-label">LIVE PRIZE POOL</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Leaderboard Preview -->
+                    <div class="current-standings-preview">
+                        <div class="standings-title">Live Leaderboard Preview</div>
+                        <div class="standings-list">
+                            <div class="standing-row leader">
+                                <span class="position">🥇</span>
+                                <span class="trader">@current_leader</span>
+                                <span class="performance">+$47.2K</span>
+                            </div>
+                            <div class="standing-row">
+                                <span class="position">🥈</span>
+                                <span class="trader">@runner_up</span>
+                                <span class="performance">+$38.9K</span>
+                            </div>
+                            <div class="standing-row">
+                                <span class="position">🥉</span>
+                                <span class="trader">@third_place</span>
+                                <span class="performance">+$31.5K</span>
+                            </div>
+                        </div>
+                        <div class="standings-footer">Rankings update every 15 minutes</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- History Section -->
+            <div class="history-section">
+                <h3 class="subsection-title">🏅 Hall of Fame & Tournament History</h3>
+                
+                <!-- Hall of Fame Carousel -->
+                <div class="hall-of-fame">
+                    <div class="hall-header">
+                        <h4>🌟 Recent Champions</h4>
+                        <div class="carousel-controls">
+                            <button class="carousel-btn prev" onclick="previousWinners()">&lt;</button>
+                            <button class="carousel-btn next" onclick="nextWinners()">&gt;</button>
+                        </div>
+                    </div>
+                    
+                    <div class="winners-carousel-container">
+                        <div class="winners-carousel" id="winners-carousel">
+                            ${generateWinnersCarousel(historyData)}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Past Tournaments List -->
+                <div class="past-tournaments">
+                    <h4>📊 Tournament History</h4>
+                    <div class="tournaments-list">
+                        ${generateTournamentsList(historyData)}
+                    </div>
+                </div>
+            </div>
+            
+            ${upcomingComps.length > 0 ? `
+            <!-- Next Competitions Preview -->
+            <div class="next-competitions-section">
+                <h3 class="subsection-title">🔥 Next Championships</h3>
+                <div class="next-competitions-grid">
+                    ${upcomingComps.slice(0, 3).map(comp => `
+                        <div class="next-comp-card ${comp.competition_type}">
+                            <div class="next-comp-header">
+                                <span class="next-comp-type">${getCompetitionTypeDisplay(comp.competition_type)}</span>
+                                <span class="next-comp-prize">$${(comp.prize_pool_usd/1000).toFixed(0)}K</span>
+                            </div>
+                            <h4 class="next-comp-title">${comp.title}</h4>
+                            <div class="next-comp-date">
+                                ${new Date(comp.start_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
+        </div>
+    `;
+    
+    // Start countdown timer if we have an end date
+    if (currentComp && currentComp.end_date) {
+        startSophisticatedCountdownTimer(new Date(currentComp.end_date));
+    }
+}
+
+// Status 2: No active but upcoming + history
+function renderSophisticatedStatus2(data, prizeHub) {
+    // Similar to Status 1 but without active competition section
+    prizeHub.innerHTML = `
+        <div class="container">
+            <h1 class="section-title">🏆 Prize Championships</h1>
+            <div class="status-message">
+                <h2>🔜 Status 2: Upcoming Competitions + History</h2>
+                <p>No active competition but upcoming competitions available with tournament history</p>
+            </div>
+        </div>
+    `;
+}
+
+// Status 3: No active, no upcoming, only history
+function renderSophisticatedStatus3(data, prizeHub) {
+    // History-focused view
+    prizeHub.innerHTML = `
+        <div class="container">
+            <h1 class="section-title">🏆 Prize Championships</h1>
+            <div class="status-message">
+                <h2>📜 Status 3: Historical Championships Only</h2>
+                <p>No active or upcoming competitions, showing tournament history and hall of fame</p>
+            </div>
+        </div>
+    `;
+}
+
+// Helper functions for sophisticated view
+function generateWinnersCarousel(historyData) {
+    if (!historyData || historyData.length === 0) {
+        return '<div class="no-winners">🏆 First winners will be displayed here after competitions conclude</div>';
+    }
+    
+    const allWinners = [];
+    historyData.forEach(competition => {
+        if (competition.winners && competition.winners.length > 0) {
+            competition.winners.forEach(winner => {
+                allWinners.push({
+                    ...winner,
+                    competition_title: competition.title,
+                    competition_type: competition.competition_type
+                });
+            });
+        }
+    });
+    
+    return allWinners.slice(0, 9).map(winner => `
+        <div class="winner-card">
+            <div class="winner-rank">${['🥇', '🥈', '🥉'][winner.place - 1] || '🏆'}</div>
+            <div class="winner-info">
+                <div class="winner-name">@${winner.username}</div>
+                <div class="winner-prize">$${winner.amount_usd.toLocaleString()}</div>
+                <div class="winner-competition">${winner.competition_title}</div>
+                <div class="winner-type">${getCompetitionTypeDisplay(winner.competition_type)}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function generateTournamentsList(historyData) {
+    if (!historyData || historyData.length === 0) {
+        return '<div class="no-tournaments">📊 Tournament history will appear here after competitions conclude</div>';
+    }
+    
+    return historyData.map((tournament, index) => `
+        <div class="tournament-item">
+            <div class="tournament-summary">
+                <div class="tournament-header">
+                    <h5>${tournament.title}</h5>
+                    <span class="tournament-type">${getCompetitionTypeDisplay(tournament.competition_type)}</span>
+                </div>
+                <div class="tournament-stats">
+                    <span class="stat">💰 $${(tournament.prize_pool_usd/1000).toFixed(0)}K Pool</span>
+                    <span class="stat">🏆 ${tournament.winners ? tournament.winners.length : 0} Winners</span>
+                    <span class="stat">📅 ${new Date(tournament.end_date).toLocaleDateString()}</span>
+                </div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="openTournamentModal(${index})">
+                📊 View Details
+            </button>
+        </div>
+    `).join('');
+}
+
+// Countdown Timer for Sophisticated View (competition end)
+function startSophisticatedCountdownTimer(endDate) {
+    const countdownInterval = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = endDate.getTime() - now;
+
+        if (distance < 0) {
+            clearInterval(countdownInterval);
+            const timerEl = document.getElementById('sophisticated-countdown-timer');
+            if (timerEl) {
+                timerEl.innerHTML = '<span class="countdown-expired">🎉 Competition Ended!</span>';
+            }
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        const daysEl = document.getElementById('sophisticated-countdown-days');
+        const hoursEl = document.getElementById('sophisticated-countdown-hours');
+        const minutesEl = document.getElementById('sophisticated-countdown-minutes');
+        const secondsEl = document.getElementById('sophisticated-countdown-seconds');
+
+        if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+        if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+        if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+        if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+    }, 1000);
+}
+
+// Hall of Fame Carousel Controls
+let currentWinnerIndex = 0;
+window.previousWinners = function() {
+    const carousel = document.getElementById('winners-carousel');
+    if (carousel) {
+        const cards = carousel.children;
+        const cardWidth = cards[0].offsetWidth + 20; // Include margin
+        currentWinnerIndex = Math.max(0, currentWinnerIndex - 1);
+        carousel.style.transform = `translateX(-${currentWinnerIndex * cardWidth}px)`;
+    }
+}
+
+window.nextWinners = function() {
+    const carousel = document.getElementById('winners-carousel');
+    if (carousel) {
+        const cards = carousel.children;
+        const cardWidth = cards[0].offsetWidth + 20; // Include margin
+        const maxIndex = Math.max(0, cards.length - 3); // Show 3 cards at a time
+        currentWinnerIndex = Math.min(maxIndex, currentWinnerIndex + 1);
+        carousel.style.transform = `translateX(-${currentWinnerIndex * cardWidth}px)`;
+    }
+}
+
+// Tournament Modal
+window.openTournamentModal = function(tournamentIndex) {
+    // TODO: Implement tournament modal with detailed leaderboard
+    console.log('Opening tournament modal for index:', tournamentIndex);
+    alert('Tournament details modal coming soon! This will show the complete leaderboard and statistics for this competition.');
+}
+
+// Backup: Original sophisticated view implementation
+function renderSophisticatedViewOriginal(data, prizeHub) {
     const currentComp = data.current && data.current.length > 0 ? data.current[0] : null;
     const upcomingComps = data.upcoming || [];
     const recentWinners = data.history && data.history.length > 0 && data.history[0].winners 

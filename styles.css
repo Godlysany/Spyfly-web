@@ -2333,6 +2333,310 @@ nav ul li a.active {
     gap: 30px;
 }
 
+/* Sophisticated View Styles */
+.sophisticated-kpis {
+    margin: 40px 0;
+}
+
+.kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.kpi-card {
+    background: rgba(45, 212, 127, 0.05);
+    border: 1px solid rgba(45, 212, 127, 0.2);
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.kpi-card.highlight {
+    border-color: rgba(255, 215, 0, 0.4);
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(45, 212, 127, 0.15);
+}
+
+.kpi-icon {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.kpi-value {
+    color: var(--primary-color);
+    font-family: 'Orbitron', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.kpi-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Ecosystem Total Jackpot Banner */
+.total-jackpot-banner.ecosystem {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(45, 212, 127, 0.15));
+    border: 2px solid rgba(255, 215, 0, 0.5);
+}
+
+.total-jackpot-banner.ecosystem .jackpot-label {
+    color: #ffd700;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+}
+
+/* History Section */
+.history-section {
+    margin: 60px 0;
+    padding: 40px 0;
+    border-top: 1px solid rgba(45, 212, 127, 0.2);
+}
+
+/* Hall of Fame */
+.hall-of-fame {
+    margin-bottom: 50px;
+}
+
+.hall-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.hall-header h4 {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.carousel-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.carousel-btn {
+    background: rgba(45, 212, 127, 0.1);
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 700;
+}
+
+.carousel-btn:hover {
+    background: var(--primary-color);
+    color: var(--dark-bg);
+    transform: scale(1.1);
+}
+
+.winners-carousel-container {
+    overflow: hidden;
+    position: relative;
+}
+
+.winners-carousel {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.3s ease;
+}
+
+.winner-card {
+    background: rgba(45, 212, 127, 0.05);
+    border: 1px solid rgba(45, 212, 127, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 250px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.winner-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(45, 212, 127, 0.2);
+}
+
+.winner-rank {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.winner-name {
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.winner-prize {
+    color: var(--primary-color);
+    font-family: 'Orbitron', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.winner-competition {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.winner-type {
+    background: rgba(45, 212, 127, 0.2);
+    color: var(--primary-color);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.no-winners {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 40px;
+    font-style: italic;
+}
+
+/* Past Tournaments List */
+.past-tournaments h4 {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.tournaments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.tournament-item {
+    background: rgba(45, 212, 127, 0.05);
+    border: 1px solid rgba(45, 212, 127, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tournament-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(45, 212, 127, 0.15);
+}
+
+.tournament-summary {
+    flex: 1;
+}
+
+.tournament-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.tournament-header h5 {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.tournament-type {
+    background: rgba(45, 212, 127, 0.2);
+    color: var(--primary-color);
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.tournament-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.tournament-stats .stat {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.no-tournaments {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 40px;
+    font-style: italic;
+}
+
+/* Status Messages for Testing */
+.status-message {
+    background: rgba(45, 212, 127, 0.1);
+    border: 1px solid var(--primary-color);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    margin: 40px 0;
+}
+
+.status-message h2 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.status-message p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+}
+
+/* Button Styles for Sophisticated View */
+.btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(45, 212, 127, 0.3);
+    color: var(--primary-color);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-ghost:hover {
+    background: rgba(45, 212, 127, 0.1);
+    border-color: var(--primary-color);
+}
+
+.btn-ghost.active {
+    background: var(--primary-color);
+    color: var(--dark-bg);
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+}
+
 /* Responsive Design Updates */
 @media (max-width: 768px) {
     .jackpot-amount {
@@ -2345,6 +2649,38 @@ nav ul li a.active {
     
     .total-jackpot-banner {
         padding: 20px;
+    }
+    
+    .kpi-row {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    
+    .kpi-card {
+        padding: 20px 15px;
+    }
+    
+    .kpi-value {
+        font-size: 1.5rem;
+    }
+    
+    .winner-card {
+        min-width: 200px;
+    }
+    
+    .tournament-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .tournament-stats {
+        gap: 15px;
+    }
+    
+    .hall-header {
+        flex-direction: column;
+        gap: 15px;
     }
 }
 
