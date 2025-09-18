@@ -1,0 +1,112 @@
+name: SpyFly Auto Deploy & DB Sync
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🏗 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci --only=production
+
+      - name: 🗄 Database Migration Check
+        run: |
+          echo "🔍 Checking for database changes..."
+          if [ -f "migrations.sql" ]; then
+            echo "✅ Migration file found - will sync database"
+            echo "DB_CHANGES=true" >> $GITHUB_ENV
+          else
+            echo "ℹ️ No migration file - skipping database sync"
+            echo "DB_CHANGES=false" >> $GITHUB_ENV
+          fi
+
+      - name: 🗄 Sync Database Schema (if needed)
+        if: env.DB_CHANGES == 'true'
+        run: |
+          echo "🚀 Syncing database schema to production..."
+          # Install PostgreSQL client
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          
+          # Apply migrations
+          if [ -f "migrations.sql" ]; then
+            echo "Applying database migrations..."
+            PGPASSWORD='${{ secrets.DB_PASSWORD }}' psql -h '${{ secrets.DB_HOST }}' -U '${{ secrets.DB_USER }}' -d '${{ secrets.DB_NAME }}' -f migrations.sql
+            
+            # Archive the migration file
+            mv migrations.sql "applied-migrations/migration-$(date +%Y%m%d_%H%M%S).sql"
+            git config --global user.name 'SpyFly Deploy Bot'
+            git config --global user.email 'deploy@spyfly.com'
+            git add applied-migrations/
+            git commit -m "📦 Archive applied migration $(date +%Y-%m-%d)"
+            git push origin main
+          fi
+
+      - name: 🚀 Deploy to Railway
+        uses: bltavares/actions-railway@v1
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: ${{ secrets.RAILWAY_SERVICE_NAME }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+      - name: 🔄 Health Check
+        run: |
+          echo "⏳ Waiting for deployment to be ready..."
+          sleep 30
+          
+          echo "🩺 Performing health check..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://spyfly.railway.app/api/test)
+          
+          if [ $response -eq 200 ]; then
+            echo "✅ Deployment successful! SpyFly is live at https://spyfly.railway.app"
+          else
+            echo "❌ Health check failed with status: $response"
+            exit 1
+          fi
+
+      - name: 📊 Deployment Summary
+        run: |
+          echo "## 🎉 SpyFly Deployment Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**🌐 Live URL:** https://spyfly.railway.app" >> $GITHUB_STEP_SUMMARY
+          echo "**🏆 Admin Panel:** https://spyfly.railway.app/admin.html" >> $GITHUB_STEP_SUMMARY
+          echo "**🔐 Login:** https://spyfly.railway.app/login.html" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Database Changes:** ${{ env.DB_CHANGES }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+
+  notify:
+    name: Notify Success
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: success()
+    
+    steps:
+      - name: ✅ Success Notification
+        run: |
+          echo "🚀 SpyFly successfully deployed!"
+          echo "   🌐 Frontend: https://spyfly.railway.app"
+          echo "   🏆 Admin: https://spyfly.railway.app/admin.html"
+          echo "   📊 Database: Synced and operational"
