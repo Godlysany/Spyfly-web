@@ -611,8 +611,7 @@ async function initPrizeSystem() {
         // Update hero banner
         updateHeroPrizeBanner(prizeData);
         
-        // Update leaderboard prize pill
-        updateLeaderboardPrizePill(prizeData);
+        // Prize pill removed from leaderboard section
         
         // Start countdown timers
         startPrizeCountdowns(prizeData);
