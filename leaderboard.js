@@ -28,6 +28,7 @@ function addViewTesterInterface() {
             <button onclick="testTransitionView()" style="background: #9945ff; color: white; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">🔄 Transition</button>
             <button onclick="testSophisticatedView()" style="background: #FFD700; color: black; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">💎 Sophisticated</button>
             <button onclick="testRealData()" style="background: #ffffff; color: black; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">📊 Real Data</button>
+            <button onclick="testSimple()" style="background: #ff0000; color: white; border: none; padding: 8px 12px; margin: 5px; border-radius: 5px; cursor: pointer;">🔧 Simple Test</button>
         </div>
     `;
     document.body.appendChild(tester);
@@ -36,11 +37,21 @@ function addViewTesterInterface() {
 // Test Functions
 window.testLaunchView = function() {
     console.log('🚀 Testing Launch View');
-    renderLaunchView();
+    const prizeHub = document.getElementById('prize-hub');
+    console.log('Found prize-hub element:', !!prizeHub);
+    if (prizeHub) {
+        console.log('Current innerHTML length:', prizeHub.innerHTML.length);
+        console.log('About to call renderLaunchView...');
+        renderLaunchView();
+        console.log('After renderLaunchView, innerHTML length:', prizeHub.innerHTML.length);
+        console.log('Contains launch-hero-card:', prizeHub.innerHTML.includes('launch-hero-card'));
+    }
 }
 
 window.testTransitionView = function() {
     console.log('🔄 Testing Transition View');
+    const prizeHub = document.getElementById('prize-hub');
+    console.log('Found prize-hub element:', !!prizeHub);
     const mockTransitionData = {
         current: {
             title: 'September Championship',
@@ -55,6 +66,8 @@ window.testTransitionView = function() {
 
 window.testSophisticatedView = function() {
     console.log('💎 Testing Sophisticated View');
+    const prizeHub = document.getElementById('prize-hub');
+    console.log('Found prize-hub element:', !!prizeHub);
     const mockRichData = {
         current: {
             id: '1',
@@ -98,6 +111,18 @@ window.testSophisticatedView = function() {
 window.testRealData = function() {
     console.log('📊 Testing Real Data (resetting to actual API)');
     initSmartPrizeHub();
+}
+
+window.testSimple = function() {
+    console.log('🔧 Simple Test - Direct DOM Manipulation');
+    const prizeHub = document.getElementById('prize-hub');
+    if (prizeHub) {
+        console.log('Element found, setting simple test content...');
+        prizeHub.innerHTML = '<div style="background: red; color: white; padding: 20px; text-align: center;"><h1>🔧 SIMPLE TEST WORKS!</h1><p>This proves DOM manipulation is working</p></div>';
+        console.log('Simple test content set!');
+    } else {
+        console.log('ERROR: Could not find prize-hub element!');
+    }
 }
 
 // ===================================================================
