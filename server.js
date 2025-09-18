@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const JWT_SECRET = process.env.JWT_SECRET || 'spyfly-jwt-secret-change-in-production-2025';
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
     console.error('❌ Missing Supabase environment variables');
