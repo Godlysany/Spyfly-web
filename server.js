@@ -517,6 +517,84 @@ async function handleApiRequest(req, res, pathname, method) {
             return;
         }
 
+        // Update competition (PROTECTED)
+        if (pathname.startsWith('/api/competitions/') && method === 'PUT') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const competitionId = pathname.split('/')[3];
+            const body = await getRequestBody(req);
+            const updateData = JSON.parse(body);
+            
+            // Update timestamp
+            updateData.updated_at = new Date().toISOString();
+            
+            const { data, error } = await supabase
+                .from('competitions')
+                .update(updateData)
+                .eq('id', competitionId)
+                .select();
+                
+            if (error) throw error;
+            
+            if (data.length === 0) {
+                res.writeHead(404);
+                res.end(JSON.stringify({ error: 'Competition not found' }));
+                return;
+            }
+            
+            res.writeHead(200);
+            res.end(JSON.stringify({ success: true, competition: data[0] }));
+            return;
+        }
+
+        // Delete competition (PROTECTED)
+        if (pathname.startsWith('/api/competitions/') && method === 'DELETE') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const competitionId = pathname.split('/')[3];
+            
+            // Delete prize breakdown first (foreign key constraint)
+            await supabase
+                .from('prize_breakdown')
+                .delete()
+                .eq('competition_id', competitionId);
+            
+            // Delete winners
+            await supabase
+                .from('winners')
+                .delete()
+                .eq('competition_id', competitionId);
+            
+            // Delete the competition
+            const { data, error } = await supabase
+                .from('competitions')
+                .delete()
+                .eq('id', competitionId)
+                .select();
+                
+            if (error) throw error;
+            
+            if (data.length === 0) {
+                res.writeHead(404);
+                res.end(JSON.stringify({ error: 'Competition not found' }));
+                return;
+            }
+            
+            res.writeHead(200);
+            res.end(JSON.stringify({ success: true, message: 'Competition deleted successfully' }));
+            return;
+        }
+
         // ===== SOPHISTICATED ADMIN FEATURES =====
         
         // Bulk winner import endpoint
