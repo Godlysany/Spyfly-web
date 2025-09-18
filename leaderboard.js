@@ -1215,9 +1215,14 @@ window.nextWinners = function() {
 
 // Tournament Modal
 window.openTournamentModal = function(tournamentIndex) {
-    // TODO: Implement tournament modal with detailed leaderboard
-    console.log('Opening tournament modal for index:', tournamentIndex);
-    alert('Tournament details modal coming soon! This will show the complete leaderboard and statistics for this competition.');
+    // Get competition data from current data
+    if (!window.currentPrizeData || !window.currentPrizeData.upcoming || tournamentIndex >= window.currentPrizeData.upcoming.length) {
+        alert('Competition data not available');
+        return;
+    }
+    
+    const competition = window.currentPrizeData.upcoming[tournamentIndex];
+    openCompetitionModal(competition.id);
 }
 
 // Championship navigation and modal handlers
@@ -1252,10 +1257,231 @@ function updateHallOfFameDisplay() {
 }
 
 window.openChampionshipModal = function(championshipIndex) {
-    // TODO: Implement championship details modal with full leaderboard
-    console.log('Opening championship modal for index:', championshipIndex);
-    alert('Championship details modal coming soon! This will show the complete ranked leaderboard and detailed statistics for this specific championship.');
+    // Get competition data from current history data
+    if (!window.currentPrizeData || !window.currentPrizeData.history || championshipIndex >= window.currentPrizeData.history.length) {
+        alert('Competition data not available');
+        return;
+    }
+    
+    const competition = window.currentPrizeData.history[championshipIndex];
+    openCompetitionModal(competition.id);
 }
+
+// Competition Modal Functions
+async function openCompetitionModal(competitionId) {
+    const modal = document.getElementById('competition-modal');
+    const titleEl = document.getElementById('modal-competition-title');
+    const infoEl = document.getElementById('modal-competition-info');
+    const leaderboardEl = document.getElementById('modal-leaderboard');
+    
+    // Show loading
+    titleEl.textContent = 'Loading Competition Details...';
+    infoEl.innerHTML = '<div style="text-align: center; color: #ffffff; padding: 20px;">Loading...</div>';
+    leaderboardEl.innerHTML = '';
+    modal.style.display = 'block';
+    
+    try {
+        const response = await fetch(`/api/competitions/${competitionId}/participants`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch competition details');
+        }
+        
+        const data = await response.json();
+        const competition = data.competition;
+        const participants = data.participants;
+        
+        // Update modal title
+        titleEl.textContent = competition.title;
+        
+        // Generate competition info
+        const competitionType = getCompetitionTypeDisplay(competition.competition_type);
+        const startDate = new Date(competition.start_date).toLocaleDateString();
+        const endDate = new Date(competition.end_date).toLocaleDateString();
+        const totalPrize = competition.prize_pool_usd;
+        
+        infoEl.innerHTML = `
+            <div class="competition-info-grid">
+                <div class="info-item">
+                    <span class="info-label">Prize Pool</span>
+                    <span class="info-value prize">$${totalPrize.toLocaleString()}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Competition Type</span>
+                    <span class="competition-type-badge">${competitionType}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Start Date</span>
+                    <span class="info-value">${startDate}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">End Date</span>
+                    <span class="info-value">${endDate}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Participants</span>
+                    <span class="info-value">${participants.length}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Period</span>
+                    <span class="info-value">${competition.period}</span>
+                </div>
+            </div>
+        `;
+        
+        // Generate leaderboard
+        leaderboardEl.innerHTML = generateModalLeaderboard(participants, competition.competition_type);
+        
+    } catch (error) {
+        console.error('Error loading competition details:', error);
+        titleEl.textContent = 'Error Loading Competition';
+        infoEl.innerHTML = '<div style="text-align: center; color: #f44336; padding: 20px;">Failed to load competition details. Please try again.</div>';
+        leaderboardEl.innerHTML = '';
+    }
+}
+
+function generateModalLeaderboard(participants, competitionType) {
+    if (!participants || participants.length === 0) {
+        return '<div style="text-align: center; color: #ffffff; padding: 20px;">No participants data available</div>';
+    }
+    
+    // Define columns based on competition type
+    let columns = '';
+    let headers = '';
+    
+    if (competitionType === 'pnl') {
+        headers = `
+            <th>Rank</th>
+            <th>Trader</th>
+            <th>P&L</th>
+            <th>Volume</th>
+            <th>Trades</th>
+            <th>Win Rate</th>
+            <th>ROI %</th>
+        `;
+    } else if (competitionType === 'volume') {
+        headers = `
+            <th>Rank</th>
+            <th>Trader</th>
+            <th>Volume</th>
+            <th>P&L</th>
+            <th>Trades</th>
+            <th>Win Rate</th>
+            <th>ROI %</th>
+        `;
+    } else if (competitionType === 'winrate') {
+        headers = `
+            <th>Rank</th>
+            <th>Trader</th>
+            <th>Win Rate</th>
+            <th>P&L</th>
+            <th>Volume</th>
+            <th>Trades</th>
+            <th>ROI %</th>
+        `;
+    } else {
+        // Default headers
+        headers = `
+            <th>Rank</th>
+            <th>Trader</th>
+            <th>Score</th>
+            <th>P&L</th>
+            <th>Volume</th>
+            <th>Trades</th>
+            <th>Win Rate</th>
+        `;
+    }
+    
+    const rows = participants.map(participant => {
+        const pnlClass = participant.pnl_usd >= 0 ? 'positive' : 'negative';
+        const winnerBadge = participant.is_winner ? '<span class="winner-badge">WINNER</span>' : '';
+        
+        let rowData = '';
+        
+        if (competitionType === 'pnl') {
+            rowData = `
+                <td class="rank">${participant.rank}</td>
+                <td class="username">${participant.username}${winnerBadge}</td>
+                <td class="pnl ${pnlClass}">$${participant.pnl_usd.toLocaleString()}</td>
+                <td class="volume">$${(participant.volume_usd / 1000).toFixed(0)}K</td>
+                <td>${participant.trades_count}</td>
+                <td>${participant.win_rate.toFixed(1)}%</td>
+                <td>${participant.roi_percent.toFixed(1)}%</td>
+            `;
+        } else if (competitionType === 'volume') {
+            rowData = `
+                <td class="rank">${participant.rank}</td>
+                <td class="username">${participant.username}${winnerBadge}</td>
+                <td class="volume">$${(participant.volume_usd / 1000).toFixed(0)}K</td>
+                <td class="pnl ${pnlClass}">$${participant.pnl_usd.toLocaleString()}</td>
+                <td>${participant.trades_count}</td>
+                <td>${participant.win_rate.toFixed(1)}%</td>
+                <td>${participant.roi_percent.toFixed(1)}%</td>
+            `;
+        } else if (competitionType === 'winrate') {
+            rowData = `
+                <td class="rank">${participant.rank}</td>
+                <td class="username">${participant.username}${winnerBadge}</td>
+                <td>${participant.win_rate.toFixed(1)}%</td>
+                <td class="pnl ${pnlClass}">$${participant.pnl_usd.toLocaleString()}</td>
+                <td class="volume">$${(participant.volume_usd / 1000).toFixed(0)}K</td>
+                <td>${participant.trades_count}</td>
+                <td>${participant.roi_percent.toFixed(1)}%</td>
+            `;
+        } else {
+            rowData = `
+                <td class="rank">${participant.rank}</td>
+                <td class="username">${participant.username}${winnerBadge}</td>
+                <td>${participant.score.toFixed(2)}</td>
+                <td class="pnl ${pnlClass}">$${participant.pnl_usd.toLocaleString()}</td>
+                <td class="volume">$${(participant.volume_usd / 1000).toFixed(0)}K</td>
+                <td>${participant.trades_count}</td>
+                <td>${participant.win_rate.toFixed(1)}%</td>
+            `;
+        }
+        
+        return `<tr>${rowData}</tr>`;
+    }).join('');
+    
+    return `
+        <h3>📊 Final Leaderboard</h3>
+        <table>
+            <thead>
+                <tr>${headers}</tr>
+            </thead>
+            <tbody>
+                ${rows}
+            </tbody>
+        </table>
+    `;
+}
+
+// Modal close functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('competition-modal');
+    const closeBtn = document.querySelector('.modal-close');
+    
+    // Close modal when X is clicked
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+    }
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+    
+    // Close modal on escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modal.style.display === 'block') {
+            modal.style.display = 'none';
+        }
+    });
+});
 
 // Backup: Original sophisticated view implementation
 function renderSophisticatedViewOriginal(data, prizeHub) {
