@@ -6,11 +6,9 @@
     <title>SpyFly Admin - Prize Management</title>
     <link rel="stylesheet" href="styles.css?v=202509">
     <style>
-        .admin-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .admin-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
         .admin-header { background: var(--darker-bg); padding: 30px; border-radius: 12px; margin-bottom: 30px; text-align: center; }
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .admin-card { background: var(--darker-bg); border-radius: 12px; padding: 25px; border: 1px solid rgba(45, 212, 127, 0.3); }
-        .admin-card h3 { color: var(--primary-color); margin-bottom: 20px; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; color: #ffffff; margin-bottom: 8px; font-weight: 600; }
         .form-group input, .form-group textarea, .form-group select { 
@@ -26,73 +24,28 @@
             border-color: var(--primary-color);
             outline: none;
         }
-        .btn-admin { background: var(--primary-color); color: #ffffff; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-right: 10px; }
+        .btn-admin { background: var(--primary-color); color: #ffffff; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-right: 10px; transition: all 0.3s; }
         .btn-admin:hover { background: #22c55e; }
         .btn-danger { background: #dc2626; }
         .btn-danger:hover { background: #b91c1c; }
-        .competition-list { max-height: 400px; overflow-y: auto; }
-        .competition-item { 
-            background: rgba(45, 212, 127, 0.1); 
-            border: 1px solid rgba(45, 212, 127, 0.3); 
-            border-radius: 8px; 
-            padding: 15px; 
-            margin-bottom: 15px; 
-        }
-        .competition-status { 
-            padding: 4px 8px; 
-            border-radius: 12px; 
-            font-size: 12px; 
-            font-weight: 600;
-        }
-        .status-active { background: #dc2626; color: white; }
-        .status-upcoming { background: var(--purple-color); color: white; }
-        .status-ended { background: #6b7280; color: white; }
-        .stats-row { display: flex; justify-content: space-between; margin-top: 10px; }
-        .stat-item { text-align: center; }
-        .stat-value { font-size: 1.2rem; font-weight: 700; color: var(--primary-color); }
-        .stat-label { font-size: 0.9rem; color: #ffffff; opacity: 0.8; }
+        .btn-warning { background: #f59e0b; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-secondary { background: #6b7280; }
+        .btn-secondary:hover { background: #4b5563; }
         .loading { text-align: center; padding: 40px; color: var(--primary-color); }
         .error { background: #dc2626; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
         .success { background: #22c55e; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
         
-        /* Enhanced Admin Interface Styles */
-        .admin-control-center { margin-bottom: 30px; }
-        .control-tabs { display: flex; gap: 5px; background: rgba(45, 212, 127, 0.1); padding: 5px; border-radius: 10px; }
+        /* Tab System */
+        .control-tabs { display: flex; gap: 5px; background: rgba(45, 212, 127, 0.1); padding: 5px; border-radius: 10px; margin-bottom: 30px; }
         .tab-btn { background: transparent; border: none; color: rgba(255, 255, 255, 0.7); padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
         .tab-btn.active, .tab-btn:hover { background: var(--primary-color); color: white; }
         .tab-content { display: none; }
-        .span-full { grid-column: span 2; }
-        
-        /* Mapping Engine Styles */
-        .mapping-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .mapping-section { background: rgba(45, 212, 127, 0.05); padding: 20px; border-radius: 10px; }
-        .mapping-section h4 { color: var(--primary-color); margin-bottom: 15px; }
-        .mapping-section small { color: rgba(255, 255, 255, 0.6); font-size: 0.8rem; }
-        
-        /* Winner Controls */
-        .winner-controls { margin-bottom: 20px; }
-        .validation-rules { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-        .validation-rules label { display: flex; align-items: center; gap: 8px; font-weight: normal; }
-        
-        /* Monitoring Dashboard */
-        .monitoring-dashboard { }
-        .monitor-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-        .monitor-card { background: rgba(45, 212, 127, 0.1); border: 1px solid rgba(45, 212, 127, 0.3); border-radius: 10px; padding: 20px; text-align: center; }
-        .monitor-card h4 { color: var(--primary-color); font-size: 0.9rem; margin-bottom: 10px; }
-        .monitor-value { font-size: 2rem; font-weight: 700; color: white; }
-        .live-feed { background: var(--darker-bg); border-radius: 10px; padding: 20px; }
-        .feed-container { max-height: 300px; overflow-y: auto; }
-        .feed-item { padding: 10px; border-bottom: 1px solid rgba(45, 212, 127, 0.2); }
-        
-        /* Override System */
-        .override-controls { margin-bottom: 20px; }
-        .dynamic-fields { margin: 20px 0; }
-        .override-log { max-height: 300px; overflow-y: auto; }
-        .override-entry { background: rgba(255, 68, 68, 0.1); border: 1px solid rgba(255, 68, 68, 0.3); border-radius: 8px; padding: 15px; margin-bottom: 10px; }
         
         /* Modal Styles */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .modal-content { background: var(--darker-bg); border: 1px solid rgba(45, 212, 127, 0.3); border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--darker-bg); border: 1px solid rgba(45, 212, 127, 0.3); border-radius: 12px; width: 90%; max-width: 900px; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid rgba(45, 212, 127, 0.2); }
         .modal-header h3 { margin: 0; color: var(--primary-color); }
         .modal-close { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 5px; }
@@ -100,29 +53,52 @@
         .modal-body { padding: 20px; }
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
         
-        /* Competition List Styles */
-        .competition-item { background: rgba(45, 212, 127, 0.1); border: 1px solid rgba(45, 212, 127, 0.3); border-radius: 8px; padding: 15px; margin-bottom: 10px; }
-        .competition-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .competition-title { color: var(--primary-color); font-weight: 600; margin: 0; }
-        .competition-actions { display: flex; gap: 5px; }
-        .btn-small { padding: 5px 10px; font-size: 0.8rem; }
-        .competition-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; font-size: 0.9rem; }
-        .detail-item { color: rgba(255, 255, 255, 0.8); }
-        .detail-label { font-weight: 600; color: var(--primary-color); }
-        .status-badge { padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+        /* Table Styles */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .data-table th, .data-table td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(45, 212, 127, 0.2); }
+        .data-table th { color: var(--primary-color); font-weight: 600; background: rgba(45, 212, 127, 0.05); }
+        .data-table tr:hover { background: rgba(45, 212, 127, 0.05); }
+        .data-table .btn-small { padding: 6px 12px; font-size: 0.85rem; }
+        
+        /* Status Badges */
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: inline-block; }
         .status-active { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
         .status-upcoming { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
         .status-ended { background: rgba(156, 163, 175, 0.2); color: #9ca3af; }
+        .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .status-approved { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .status-disqualified { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        
+        /* KPI Cards */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .kpi-card { background: rgba(45, 212, 127, 0.1); border: 1px solid rgba(45, 212, 127, 0.3); border-radius: 10px; padding: 20px; text-align: center; }
+        .kpi-card h4 { color: var(--primary-color); font-size: 0.9rem; margin-bottom: 10px; font-weight: 600; }
+        .kpi-value { font-size: 2rem; font-weight: 700; color: white; }
+        
+        /* Winner Approval Section */
+        .winner-list { max-height: 400px; overflow-y: auto; }
+        .winner-item { background: rgba(45, 212, 127, 0.05); border: 1px solid rgba(45, 212, 127, 0.2); border-radius: 8px; padding: 15px; margin-bottom: 10px; }
+        .winner-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .winner-info { display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.9rem; }
+        .winner-actions { display: flex; gap: 10px; margin-top: 10px; }
+        
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .stat-card { background: rgba(45, 212, 127, 0.05); border: 1px solid rgba(45, 212, 127, 0.2); border-radius: 10px; padding: 20px; }
+        .stat-card h4 { color: var(--primary-color); margin-bottom: 15px; }
+        .stat-item { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .stat-label { color: rgba(255, 255, 255, 0.7); }
+        .stat-value { color: white; font-weight: 600; }
+        
+        /* User Filter */
+        .filter-section { background: rgba(45, 212, 127, 0.05); padding: 20px; border-radius: 10px; margin-bottom: 25px; }
         
         @media (max-width: 768px) { 
-            .admin-grid { grid-template-columns: 1fr; }
             .admin-container { padding: 15px; }
             .control-tabs { flex-wrap: wrap; }
-            .mapping-controls { grid-template-columns: 1fr; }
-            .monitor-cards { grid-template-columns: repeat(2, 1fr); }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .data-table { font-size: 0.85rem; }
             .modal-content { width: 95%; }
-            .competition-header { flex-direction: column; gap: 10px; }
-            .competition-details { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -138,24 +114,23 @@
     
     <div class="admin-container" id="admin-content" style="display: none;">
         <div class="admin-header">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <h1>🏆 SpyFly Prize Management</h1>
-                    <p>Manage competitions, prizes, and winners</p>
+                    <p style="margin: 5px 0 0 0;">Manage competitions, prizes, and winners</p>
                 </div>
                 <div style="text-align: right;">
                     <p style="margin: 0; color: #2DD47F; font-size: 14px;">Welcome, <span id="admin-username">admin</span></p>
                     <button onclick="logout()" style="background: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-top: 5px;">Logout</button>
                 </div>
             </div>
-            <div id="connection-status" class="loading">Connecting to database...</div>
         </div>
 
         <div id="message-area"></div>
 
         <!-- MAIN LEADERBOARD TOGGLE - Prominent Position -->
         <div class="admin-card" style="background: linear-gradient(135deg, rgba(45, 212, 127, 0.1), rgba(45, 212, 127, 0.05)); border: 2px solid rgba(45, 212, 127, 0.4); margin-bottom: 30px;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
                 <div>
                     <h3 style="margin: 0; color: var(--primary-color); display: flex; align-items: center; gap: 10px;">
                         🎯 <span>Production Leaderboard Control</span>
@@ -169,7 +144,7 @@
                         <option value="true">🟢 ON - Full leaderboard features enabled</option>
                         <option value="false">🔴 OFF - Hide all leaderboard elements</option>
                     </select>
-                    <button class="btn-admin" onclick="updateLeaderboardToggle()" style="background: var(--primary-color); padding: 12px 20px; font-weight: 600;">
+                    <button class="btn-admin" onclick="updateLeaderboardToggle()">
                         Update Control
                     </button>
                 </div>
@@ -182,26 +157,108 @@
             </div>
         </div>
 
-        <!-- Admin Control Center - New Section -->
-        <div class="admin-control-center">
-            <div class="control-tabs">
-                <button class="tab-btn active" onclick="switchTab('competitions')">🏆 Competitions</button>
-                <button class="tab-btn" onclick="switchTab('mapping')">⚙️ Data Mapping</button>
-                <button class="tab-btn" onclick="switchTab('winners')">👑 Winners</button>
-                <button class="tab-btn" onclick="switchTab('monitoring')">📊 Live Monitor</button>
-                <button class="tab-btn" onclick="switchTab('overrides')">🔧 Overrides</button>
+        <!-- Tab Navigation -->
+        <div class="control-tabs">
+            <button class="tab-btn active" onclick="switchTab('competitions')">🏆 Competitions</button>
+            <button class="tab-btn" onclick="switchTab('statistics')">📊 System Statistics</button>
+        </div>
+
+        <!-- COMPETITIONS TAB -->
+        <div class="tab-content" id="tab-competitions" style="display: block;">
+            <div class="admin-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0;">🏆 Competition Management</h3>
+                    <button class="btn-admin" onclick="openCreateCompetitionModal()">
+                        ➕ Create New Competition
+                    </button>
+                </div>
+                
+                <div id="competitions-loading" class="loading">Loading competitions...</div>
+                <div id="competitions-table-container" style="display: none;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Competition</th>
+                                <th>Period</th>
+                                <th>Status</th>
+                                <th>Type</th>
+                                <th>Prize Pool</th>
+                                <th>Participants</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="competitions-list">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- Competitions Tab -->
-        <div class="admin-grid" id="tab-competitions">
-            <!-- Create New Competition -->
+        <!-- SYSTEM STATISTICS TAB -->
+        <div class="tab-content" id="tab-statistics" style="display: none;">
             <div class="admin-card">
+                <h3>📊 System Statistics</h3>
+                
+                <!-- Overall KPIs -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <h4>Total Competitions</h4>
+                        <div id="stat-total-comps" class="kpi-value">-</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h4>Total Prize Pool Deployed</h4>
+                        <div id="stat-total-prizes" class="kpi-value">-</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h4>Total Winners Approved</h4>
+                        <div id="stat-total-winners" class="kpi-value">-</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h4>Unique Participants</h4>
+                        <div id="stat-unique-users" class="kpi-value">-</div>
+                    </div>
+                </div>
+
+                <!-- User Participation Filter -->
+                <div class="filter-section">
+                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">🔍 User Participation Lookup</h4>
+                    <div style="display: flex; gap: 15px; align-items: flex-end;">
+                        <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                            <label>Search by Username or Wallet</label>
+                            <input type="text" id="user-search" placeholder="Enter username or wallet address">
+                        </div>
+                        <button class="btn-admin" onclick="searchUserStats()">Search</button>
+                    </div>
+                </div>
+
+                <!-- User Stats Results -->
+                <div id="user-stats-container" style="display: none; margin-top: 25px;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">User Statistics</h4>
+                    <div class="stats-grid" id="user-stats-grid"></div>
+                </div>
+
+                <!-- Competition Breakdown -->
+                <div style="margin-top: 30px;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">📈 Competition Type Breakdown</h4>
+                    <div class="stats-grid" id="comp-type-stats"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREATE COMPETITION MODAL -->
+    <div id="create-competition-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
                 <h3>🎯 Create New Competition</h3>
-                <form id="competition-form">
+                <button class="modal-close" onclick="closeModal('create-competition-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="competition-form" onsubmit="createCompetition(event)">
                     <div class="form-group">
                         <label>Competition Name (ID)</label>
                         <input type="text" id="comp-name" placeholder="e.g., oct2025" required>
+                        <small style="color: rgba(255,255,255,0.6);">Unique identifier (lowercase, no spaces)</small>
                     </div>
                     <div class="form-group">
                         <label>Display Title</label>
@@ -210,6 +267,15 @@
                     <div class="form-group">
                         <label>Period Display</label>
                         <input type="text" id="comp-period" placeholder="e.g., October 2025" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Competition Type</label>
+                        <select id="comp-type" required>
+                            <option value="">Select Type</option>
+                            <option value="pnl">💰 P&L Competition</option>
+                            <option value="volume">📊 Volume Competition</option>
+                            <option value="winrate">🎯 Win Rate Competition</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Start Date</label>
@@ -224,1465 +290,679 @@
                         <input type="number" id="comp-pool" placeholder="15000" required>
                     </div>
                     <div class="form-group">
-                        <label>Hero Banner Text</label>
-                        <input type="text" id="comp-highlight" placeholder="🔥 $15K Prize Pool - Ends This Month!">
+                        <label>Prize Structure (JSON)</label>
+                        <textarea id="comp-prizes" rows="6" required>{"1": 7500, "2": 4500, "3": 2250, "4": 750}</textarea>
+                        <small style="color: rgba(255,255,255,0.6);">Format: {"position": amount}</small>
                     </div>
-                    <div class="form-group">
-                        <label>CTA Button Text</label>
-                        <input type="text" id="comp-cta-text" placeholder="JOIN COMPETITION">
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal('create-competition-modal')">Cancel</button>
+                        <button type="submit" class="btn-admin">Create Competition</button>
                     </div>
-                    <div class="form-group">
-                        <label>CTA Link</label>
-                        <input type="url" id="comp-cta-link" placeholder="leaderboard.html#prize-hub">
-                    </div>
-                    
-                    <!-- Prize Breakdown Section -->
-                    <div class="form-group">
-                        <label style="display: block; margin-bottom: 10px;">🏆 Prize Breakdown</label>
-                        <div id="prize-breakdown-container">
-                            <div class="prize-breakdown-item" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
-                                <input type="text" placeholder="1st" style="width: 80px;" class="breakdown-place" value="1st">
-                                <input type="number" placeholder="7500" style="width: 100px;" class="breakdown-amount" value="">
-                                <span style="color: #888;">USD</span>
-                                <input type="number" placeholder="50" style="width: 80px;" class="breakdown-percent" value="50" min="1" max="100">
-                                <span style="color: #888;">%</span>
-                                <button type="button" onclick="removePrizeItem(this)" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">✕</button>
-                            </div>
-                            <div class="prize-breakdown-item" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
-                                <input type="text" placeholder="2nd" style="width: 80px;" class="breakdown-place" value="2nd">
-                                <input type="number" placeholder="4500" style="width: 100px;" class="breakdown-amount" value="">
-                                <span style="color: #888;">USD</span>
-                                <input type="number" placeholder="30" style="width: 80px;" class="breakdown-percent" value="30" min="1" max="100">
-                                <span style="color: #888;">%</span>
-                                <button type="button" onclick="removePrizeItem(this)" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">✕</button>
-                            </div>
-                            <div class="prize-breakdown-item" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
-                                <input type="text" placeholder="3rd" style="width: 80px;" class="breakdown-place" value="3rd">
-                                <input type="number" placeholder="3000" style="width: 100px;" class="breakdown-amount" value="">
-                                <span style="color: #888;">USD</span>
-                                <input type="number" placeholder="20" style="width: 80px;" class="breakdown-percent" value="20" min="1" max="100">
-                                <span style="color: #888;">%</span>
-                                <button type="button" onclick="removePrizeItem(this)" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">✕</button>
-                            </div>
-                        </div>
-                        <button type="button" onclick="addPrizeItem()" class="btn-admin" style="background: #2DD47F; margin-top: 10px;">+ Add Prize Place</button>
-                        <button type="button" onclick="autoCalculatePrizes()" class="btn-admin" style="background: #9945ff; margin-top: 10px;">⚡ Auto-Calculate from Pool</button>
-                    </div>
-                    
-                    <button type="submit" class="btn-admin">Create Competition</button>
                 </form>
-            </div>
-
-            <!-- Existing Competitions -->
-            <div class="admin-card">
-                <h3>📋 Existing Competitions</h3>
-                <div id="competitions-list" class="competition-list">
-                    <div class="loading">Loading competitions...</div>
-                </div>
-                <button class="btn-admin" onclick="loadCompetitions()">Refresh List</button>
-            </div>
-
-            <!-- Competition Detail Modal -->
-            <div id="competition-detail-modal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 id="detail-modal-title">Competition Details</h3>
-                        <button class="modal-close" onclick="closeDetailModal()">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="competition-detail-content">
-                            <!-- Content will be populated by JavaScript -->
-                        </div>
-                        <div class="modal-actions">
-                            <button class="btn-admin" onclick="editCompetition()">✏️ Edit</button>
-                            <button class="btn-danger" onclick="confirmDeleteCompetition()">🗑️ Delete</button>
-                            <button class="btn btn-secondary" onclick="closeDetailModal()">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Competition Edit Modal -->
-            <div id="competition-edit-modal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Edit Competition</h3>
-                        <button class="modal-close" onclick="closeEditModal()">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="edit-competition-form">
-                            <div class="form-group">
-                                <label>Competition Name (ID)</label>
-                                <input type="text" id="edit-comp-name" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Title</label>
-                                <input type="text" id="edit-comp-title" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Period</label>
-                                <input type="text" id="edit-comp-period" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Competition Type</label>
-                                <select id="edit-comp-type" required>
-                                    <option value="pnl">P&L Performance</option>
-                                    <option value="volume">Trading Volume</option>
-                                    <option value="winrate">Win Rate</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Start Date</label>
-                                <input type="datetime-local" id="edit-comp-start" required>
-                            </div>
-                            <div class="form-group">
-                                <label>End Date</label>
-                                <input type="datetime-local" id="edit-comp-end" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Prize Pool (USD)</label>
-                                <input type="number" id="edit-comp-prize" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Highlight Copy</label>
-                                <textarea id="edit-comp-highlight" rows="2" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>CTA Button Text</label>
-                                <input type="text" id="edit-comp-cta-text">
-                            </div>
-                            <div class="form-group">
-                                <label>CTA Link</label>
-                                <input type="url" id="edit-comp-cta-link">
-                            </div>
-                            <div class="form-group">
-                                <label>Min Trades Required</label>
-                                <input type="number" id="edit-comp-min-trades">
-                            </div>
-                            <div class="form-group">
-                                <label>Min Volume (USD)</label>
-                                <input type="number" id="edit-comp-min-volume">
-                            </div>
-                            <div class="modal-actions">
-                                <button type="submit" class="btn-admin">💾 Save Changes</button>
-                                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Add Winners -->
-            <div class="admin-card">
-                <h3>🏆 Add Competition Winners</h3>
-                <form id="winner-form">
-                    <div class="form-group">
-                        <label>Competition</label>
-                        <select id="winner-competition" required>
-                            <option value="">Select Competition</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Position</label>
-                        <input type="number" id="winner-place" min="1" placeholder="1" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Username</label>
-                        <input type="text" id="winner-username" placeholder="@crypto_wizard" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Amount Won (USD)</label>
-                        <input type="number" id="winner-amount" placeholder="7500" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Transaction URL (Optional)</label>
-                        <input type="url" id="winner-tx" placeholder="https://solscan.io/tx/...">
-                    </div>
-                    <button type="submit" class="btn-admin">Add Winner</button>
-                </form>
-            </div>
-
-            <!-- Winners Management -->
-            <div class="admin-card">
-                <h3>🏆 Manage Winners</h3>
-                <div id="winners-list" style="max-height: 400px; overflow-y: auto;">
-                    <div class="loading">Loading winners...</div>
-                </div>
-                <button class="btn-admin" onclick="loadWinners()" style="margin-top: 15px;">Refresh Winners</button>
-            </div>
-
-            <!-- System Stats -->
-            <div class="admin-card">
-                <h3>📊 System Statistics</h3>
-                <div id="system-stats">
-                    <div class="loading">Loading stats...</div>
-                </div>
-                <div class="form-group" style="margin-top: 20px;">
-                    <label>Cache Version (bump to refresh frontend)</label>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="cache-version" placeholder="202509">
-                        <button class="btn-admin" onclick="updateCacheVersion()">Update</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Data Mapping Tab -->
-        <div class="admin-grid tab-content" id="tab-mapping" style="display: none;">
-            <div class="admin-card span-full">
-                <h3>⚙️ Sophisticated Data Mapping Engine</h3>
-                <div class="mapping-controls">
-                    <div class="mapping-section">
-                        <h4>🔄 Automatic Competition Detection</h4>
-                        <div class="form-group">
-                            <label>Competition Name Pattern</label>
-                            <input type="text" id="comp-pattern" placeholder="[month][year]-[type]" value="[month][year]-[type]">
-                            <small>Use [month], [year], [type] as placeholders</small>
-                        </div>
-                        <div class="form-group">
-                            <label>Auto-Create Upcoming Competitions</label>
-                            <select id="auto-create">
-                                <option value="manual">Manual Only</option>
-                                <option value="monthly">Monthly Auto-Generation</option>
-                                <option value="quarterly">Quarterly Schedule</option>
-                            </select>
-                        </div>
-                        <button class="btn-admin" onclick="testAutoMapping()">🧪 Test Pattern</button>
-                    </div>
-                    
-                    <div class="mapping-section">
-                        <h4>📈 Trading Data Integration</h4>
-                        <div class="form-group">
-                            <label>Data Source Priority</label>
-                            <select id="data-priority">
-                                <option value="manual">Manual Entry Only</option>
-                                <option value="api-manual">API First, Manual Override</option>
-                                <option value="auto">Fully Automatic</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Trader ID Mapping</label>
-                            <textarea id="trader-mapping" placeholder="discord_id:wallet_address&#10;@username:0x...&#10;telegram_id:solana_wallet" rows="4"></textarea>
-                        </div>
-                        <button class="btn-admin" onclick="validateMappings()">✅ Validate Mappings</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Winners Management Tab -->
-        <div class="admin-grid tab-content" id="tab-winners" style="display: none;">
-            <div class="admin-card">
-                <h3>👑 Advanced Winner Management</h3>
-                <div class="winner-controls">
-                    <div class="form-group">
-                        <label>Bulk Winner Import</label>
-                        <textarea id="bulk-winners" placeholder="Format: username,position,amount,tx_hash&#10;@crypto_king,1,7500,0x123...&#10;@volume_master,2,4500,0x456..." rows="6"></textarea>
-                        <button class="btn-admin" onclick="importBulkWinners()">📥 Import Winners</button>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Winner Validation Rules</label>
-                        <div class="validation-rules">
-                            <label><input type="checkbox" id="validate-wallet" checked> Verify Wallet Address</label>
-                            <label><input type="checkbox" id="validate-trades" checked> Minimum Trade Count</label>
-                            <label><input type="checkbox" id="validate-volume" checked> Minimum Volume</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="admin-card">
-                <h3>🚫 Disqualification System</h3>
-                <form id="disqualify-form">
-                    <div class="form-group">
-                        <label>Competition</label>
-                        <select id="disqualify-competition" required></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Trader to Disqualify</label>
-                        <input type="text" id="disqualify-trader" placeholder="@username or wallet" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Reason</label>
-                        <select id="disqualify-reason" required>
-                            <option value="">Select Reason</option>
-                            <option value="manipulation">Market Manipulation</option>
-                            <option value="wash_trading">Wash Trading</option>
-                            <option value="bot_usage">Automated Bot Usage</option>
-                            <option value="violation">Rules Violation</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Evidence/Notes</label>
-                        <textarea id="disqualify-notes" placeholder="Evidence links, transaction analysis, etc."></textarea>
-                    </div>
-                    <button type="submit" class="btn-danger">⚠️ Disqualify Trader</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Live Monitoring Tab -->
-        <div class="admin-grid tab-content" id="tab-monitoring" style="display: none;">
-            <div class="admin-card span-full">
-                <h3>📊 Real-Time Competition Monitor</h3>
-                <div class="monitoring-dashboard">
-                    <div class="monitor-cards">
-                        <div class="monitor-card">
-                            <h4>Active Competitions</h4>
-                            <div id="active-count" class="monitor-value">-</div>
-                        </div>
-                        <div class="monitor-card">
-                            <h4>Total Participants</h4>
-                            <div id="participant-count" class="monitor-value">-</div>
-                        </div>
-                        <div class="monitor-card">
-                            <h4>Prize Pool Deployed</h4>
-                            <div id="deployed-prizes" class="monitor-value">-</div>
-                        </div>
-                        <div class="monitor-card">
-                            <h4>API Calls/Hour</h4>
-                            <div id="api-calls" class="monitor-value">-</div>
-                        </div>
-                    </div>
-                    
-                    <div class="live-feed">
-                        <h4>🔴 Live Activity Feed</h4>
-                        <div id="activity-feed" class="feed-container">
-                            <div class="loading">Loading real-time data...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Override System Tab -->
-        <div class="admin-grid tab-content" id="tab-overrides" style="display: none;">
-            <div class="admin-card">
-                <h3>🔧 Manual Data Overrides</h3>
-                <div class="override-controls">
-                    <div class="form-group">
-                        <label>Override Type</label>
-                        <select id="override-type" onchange="updateOverrideFields()">
-                            <option value="">Select Override</option>
-                            <option value="competition-status">Competition Status</option>
-                            <option value="winner-position">Winner Position</option>
-                            <option value="prize-amount">Prize Amount</option>
-                            <option value="data-correction">Data Correction</option>
-                        </select>
-                    </div>
-                    
-                    <div id="override-fields" class="dynamic-fields"></div>
-                    
-                    <div class="form-group">
-                        <label>Override Reason</label>
-                        <textarea id="override-reason" placeholder="Explain why this manual override is necessary" required></textarea>
-                    </div>
-                    
-                    <button class="btn-admin" onclick="applyOverride()">🔧 Apply Override</button>
-                </div>
-            </div>
-            
-            <div class="admin-card">
-                <h3>📜 Override History</h3>
-                <div id="override-history" class="override-log">
-                    <div class="loading">Loading override history...</div>
-                </div>
             </div>
         </div>
     </div>
+
+    <!-- COMPETITION DETAIL MODAL -->
+    <div id="competition-detail-modal" class="modal">
+        <div class="modal-content" style="max-width: 1200px;">
+            <div class="modal-header">
+                <h3 id="detail-modal-title">Competition Details</h3>
+                <button class="modal-close" onclick="closeModal('competition-detail-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Competition Info -->
+                <div style="background: rgba(45, 212, 127, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div id="competition-info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    </div>
+                </div>
+
+                <!-- Tabs within modal -->
+                <div style="border-bottom: 2px solid rgba(45, 212, 127, 0.2); margin-bottom: 20px;">
+                    <button class="tab-btn active" onclick="switchDetailTab('participants')" id="tab-btn-participants">👥 Participants</button>
+                    <button class="tab-btn" onclick="switchDetailTab('prizes')" id="tab-btn-prizes">💰 Prizes</button>
+                    <button class="tab-btn" onclick="switchDetailTab('winners')" id="tab-btn-winners">👑 Winners</button>
+                </div>
+
+                <!-- Participants Tab -->
+                <div id="detail-tab-participants" class="detail-subtab" style="display: block;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">Leaderboard Participants</h4>
+                    <div id="participants-loading" class="loading">Loading participants...</div>
+                    <table class="data-table" id="participants-table" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Username</th>
+                                <th>Wallet</th>
+                                <th>Score</th>
+                                <th>Prize Position</th>
+                            </tr>
+                        </thead>
+                        <tbody id="participants-list"></tbody>
+                    </table>
+                </div>
+
+                <!-- Prizes Tab -->
+                <div id="detail-tab-prizes" class="detail-subtab" style="display: none;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">Prize Distribution</h4>
+                    <table class="data-table" id="prizes-table">
+                        <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Prize Amount</th>
+                                <th>Status</th>
+                                <th>Winner</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prizes-list"></tbody>
+                    </table>
+                </div>
+
+                <!-- Winners Tab -->
+                <div id="detail-tab-winners" class="detail-subtab" style="display: none;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">Winner Selection & Approval</h4>
+                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">
+                        Winners are determined from API leaderboard data. Review and approve each winner before finalizing prize positions.
+                    </p>
+                    
+                    <div id="winners-loading" class="loading">Loading winner selection...</div>
+                    <div id="winners-list" class="winner-list" style="display: none;"></div>
+                </div>
+
+                <div class="modal-actions" style="margin-top: 25px;">
+                    <button class="btn-danger" onclick="confirmDeleteCompetition()">Delete Competition</button>
+                    <button class="btn-secondary" onclick="closeModal('competition-detail-modal')">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        const API_BASE = '/api';
+        const API_URL = '/api';
         let competitions = [];
+        let currentCompetitionId = null;
+        let currentDetailTab = 'participants';
 
-        // Authentication variables
-        let authToken = null;
-        let currentAdmin = null;
-
-        // Authentication functions
-        async function checkAuthentication() {
-            const token = localStorage.getItem('spyfly_admin_token');
-            
-            if (!token) {
-                redirectToLogin();
-                return false;
-            }
-            
+        // Authentication Check
+        async function checkAuth() {
             try {
-                const response = await fetch('/api/admin/verify', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                const response = await fetch(`${API_URL}/auth/check`, {
+                    credentials: 'include'
                 });
-                
                 if (response.ok) {
                     const data = await response.json();
-                    authToken = token;
-                    currentAdmin = data.admin;
-                    
-                    // Update UI with admin info
-                    document.getElementById('admin-username').textContent = currentAdmin.username;
+                    document.getElementById('admin-username').textContent = data.username || 'admin';
                     document.getElementById('auth-overlay').style.display = 'none';
                     document.getElementById('admin-content').style.display = 'block';
                     
-                    return true;
+                    loadInitialData();
                 } else {
-                    localStorage.removeItem('spyfly_admin_token');
-                    localStorage.removeItem('spyfly_admin_user');
-                    redirectToLogin();
-                    return false;
+                    window.location.href = '/login.html';
                 }
             } catch (error) {
                 console.error('Auth check failed:', error);
-                redirectToLogin();
-                return false;
-            }
-        }
-        
-        function redirectToLogin() {
-            window.location.href = 'login.html';
-        }
-        
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('spyfly_admin_token');
-                localStorage.removeItem('spyfly_admin_user');
-                redirectToLogin();
+                window.location.href = '/login.html';
             }
         }
 
-        // Modified fetch function to include auth headers
-        async function authenticatedFetch(url, options = {}) {
-            if (!authToken) {
-                redirectToLogin();
-                return;
-            }
-            
-            options.headers = {
-                ...options.headers,
-                'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json'
-            };
-            
-            const response = await fetch(url, options);
-            
-            if (response.status === 401) {
-                localStorage.removeItem('spyfly_admin_token');
-                localStorage.removeItem('spyfly_admin_user');
-                redirectToLogin();
-                return;
-            }
-            
-            return response;
-        }
-
-        // Initialize admin panel
-        document.addEventListener('DOMContentLoaded', async function() {
-            // First check authentication
-            const isAuthenticated = await checkAuthentication();
-            if (isAuthenticated) {
-                testConnection();
-                loadCompetitions();
-                loadSystemStats();
-                loadWinners();
-                
-                // Setup form handlers
-                document.getElementById('competition-form').addEventListener('submit', createCompetition);
-                document.getElementById('winner-form').addEventListener('submit', addWinner);
-            }
-        });
-
-        async function testConnection() {
-            const statusEl = document.getElementById('connection-status');
+        async function logout() {
             try {
-                const response = await fetch('/api/test');
+                await fetch(`${API_URL}/auth/logout`, { 
+                    method: 'POST',
+                    credentials: 'include' 
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            window.location.href = '/login.html';
+        }
+
+        // Load Initial Data
+        async function loadInitialData() {
+            await loadLeaderboardToggle();
+            await loadCompetitions();
+            await loadSystemStatistics();
+        }
+
+        // Leaderboard Toggle
+        async function loadLeaderboardToggle() {
+            try {
+                const response = await fetch(`${API_URL}/leaderboard-toggle`);
+                const data = await response.json();
+                document.getElementById('leaderboard-toggle').value = data.enabled.toString();
+            } catch (error) {
+                console.error('Error loading toggle:', error);
+            }
+        }
+
+        async function updateLeaderboardToggle() {
+            const enabled = document.getElementById('leaderboard-toggle').value === 'true';
+            try {
+                const response = await fetch(`${API_URL}/leaderboard-toggle`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ enabled })
+                });
+                
                 if (response.ok) {
-                    statusEl.innerHTML = '✅ Database Connected';
-                    statusEl.className = 'success';
+                    showMessage('Leaderboard control updated successfully!', 'success');
                 } else {
-                    throw new Error('Connection failed');
+                    showMessage('Failed to update leaderboard control', 'error');
                 }
             } catch (error) {
-                statusEl.innerHTML = '❌ Database Connection Failed';
-                statusEl.className = 'error';
+                console.error('Error updating toggle:', error);
+                showMessage('Error updating leaderboard control', 'error');
             }
         }
 
-        async function loadCompetitions() {
-            const listEl = document.getElementById('competitions-list');
-            const selectEl = document.getElementById('winner-competition');
+        // Tab Switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
             
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).style.display = 'block';
+            
+            if (tabName === 'statistics') {
+                loadSystemStatistics();
+            }
+        }
+
+        function switchDetailTab(tabName) {
+            document.querySelectorAll('#competition-detail-modal .tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.detail-subtab').forEach(content => content.style.display = 'none');
+            
+            document.getElementById(`tab-btn-${tabName}`).classList.add('active');
+            document.getElementById(`detail-tab-${tabName}`).style.display = 'block';
+            currentDetailTab = tabName;
+            
+            if (tabName === 'participants') {
+                loadParticipants();
+            } else if (tabName === 'prizes') {
+                loadPrizes();
+            } else if (tabName === 'winners') {
+                loadWinners();
+            }
+        }
+
+        // Modal Management
+        function openCreateCompetitionModal() {
+            document.getElementById('create-competition-modal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function openCompetitionDetail(competitionId) {
+            currentCompetitionId = competitionId;
+            const comp = competitions.find(c => c.id === competitionId);
+            if (!comp) return;
+            
+            document.getElementById('detail-modal-title').textContent = comp.title;
+            
+            const infoGrid = document.getElementById('competition-info-grid');
+            infoGrid.innerHTML = `
+                <div><strong style="color: var(--primary-color);">Period:</strong> ${comp.period}</div>
+                <div><strong style="color: var(--primary-color);">Type:</strong> ${getTypeLabel(comp.type)}</div>
+                <div><strong style="color: var(--primary-color);">Status:</strong> ${getStatusBadge(comp)}</div>
+                <div><strong style="color: var(--primary-color);">Prize Pool:</strong> $${comp.prize_pool.toLocaleString()}</div>
+                <div><strong style="color: var(--primary-color);">Start:</strong> ${new Date(comp.start_date).toLocaleDateString()}</div>
+                <div><strong style="color: var(--primary-color);">End:</strong> ${new Date(comp.end_date).toLocaleDateString()}</div>
+            `;
+            
+            document.getElementById('competition-detail-modal').classList.add('active');
+            currentDetailTab = 'participants';
+            switchDetailTab('participants');
+        }
+
+        // Competitions Management
+        async function loadCompetitions() {
             try {
-                const response = await fetch('/api/competitions');
+                const response = await fetch(`${API_URL}/competitions`);
                 competitions = await response.json();
                 
-                // Update competitions list
-                listEl.innerHTML = competitions.map(comp => {
-                    const status = getCompetitionStatus(comp);
-                    return `
-                        <div class="competition-item">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <h4 style="margin: 0; color: var(--primary-color);">${comp.title}</h4>
-                                    <p style="margin: 5px 0; opacity: 0.8;">${comp.period}</p>
-                                </div>
-                                <span class="competition-status status-${status.toLowerCase()}">${status}</span>
-                            </div>
-                            <div class="stats-row">
-                                <div class="stat-item">
-                                    <div class="stat-value">$${comp.prize_pool_usd.toLocaleString()}</div>
-                                    <div class="stat-label">Prize Pool</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-value">${new Date(comp.start_date).toLocaleDateString()}</div>
-                                    <div class="stat-label">Start Date</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-value">${new Date(comp.end_date).toLocaleDateString()}</div>
-                                    <div class="stat-label">End Date</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                document.getElementById('competitions-loading').style.display = 'none';
+                document.getElementById('competitions-table-container').style.display = 'block';
                 
-                // Update winner form select
-                selectEl.innerHTML = '<option value="">Select Competition</option>' + 
-                    competitions.map(comp => `<option value="${comp.id}">${comp.title}</option>`).join('');
-                
-            } catch (error) {
-                listEl.innerHTML = '<div class="error">Failed to load competitions</div>';
-            }
-        }
-
-        function getCompetitionStatus(comp) {
-            const now = new Date();
-            const start = new Date(comp.start_date);
-            const end = new Date(comp.end_date);
-            
-            if (now >= start && now <= end) return 'ACTIVE';
-            if (now < start) return 'UPCOMING';
-            return 'ENDED';
-        }
-
-        // Prize Breakdown Management Functions
-        function addPrizeItem() {
-            const container = document.getElementById('prize-breakdown-container');
-            const newItem = document.createElement('div');
-            newItem.className = 'prize-breakdown-item';
-            newItem.style = 'display: flex; gap: 10px; margin-bottom: 8px; align-items: center;';
-            newItem.innerHTML = `
-                <input type="text" placeholder="4th" style="width: 80px;" class="breakdown-place" value="">
-                <input type="number" placeholder="1000" style="width: 100px;" class="breakdown-amount" value="">
-                <span style="color: #888;">USD</span>
-                <input type="number" placeholder="10" style="width: 80px;" class="breakdown-percent" value="" min="1" max="100">
-                <span style="color: #888;">%</span>
-                <button type="button" onclick="removePrizeItem(this)" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">✕</button>
-            `;
-            container.appendChild(newItem);
-        }
-
-        function removePrizeItem(button) {
-            const container = document.getElementById('prize-breakdown-container');
-            if (container.children.length > 1) {
-                button.parentElement.remove();
-            } else {
-                showMessage('Must have at least one prize place', 'error');
-            }
-        }
-
-        function autoCalculatePrizes() {
-            const prizePool = parseInt(document.getElementById('comp-pool').value);
-            if (!prizePool || prizePool <= 0) {
-                showMessage('Please enter a valid prize pool first', 'error');
-                return;
-            }
-
-            const items = document.querySelectorAll('.prize-breakdown-item');
-            const percentages = [50, 30, 20, 15, 10, 8, 5, 3, 2, 1]; // Default distribution
-
-            items.forEach((item, index) => {
-                const amountInput = item.querySelector('.breakdown-amount');
-                const percentInput = item.querySelector('.breakdown-percent');
-                const percent = index < percentages.length ? percentages[index] : 1;
-                const amount = Math.floor((prizePool * percent) / 100);
-                
-                amountInput.value = amount;
-                percentInput.value = percent;
-            });
-
-            showMessage('Prize breakdown calculated automatically!', 'success');
-        }
-
-        async function createCompetition(e) {
-            e.preventDefault();
-            
-            // Collect prize breakdown data
-            const prizeBreakdown = [];
-            const breakdownItems = document.querySelectorAll('.prize-breakdown-item');
-            
-            breakdownItems.forEach(item => {
-                const place = item.querySelector('.breakdown-place').value;
-                const amount = parseInt(item.querySelector('.breakdown-amount').value);
-                const percent = parseInt(item.querySelector('.breakdown-percent').value);
-                
-                if (place && amount && percent) {
-                    prizeBreakdown.push({
-                        place: place,
-                        amount_usd: amount,
-                        percent: percent,
-                        is_split: false
-                    });
-                }
-            });
-
-            const competition = {
-                name: document.getElementById('comp-name').value,
-                title: document.getElementById('comp-title').value,
-                period: document.getElementById('comp-period').value,
-                start_date: new Date(document.getElementById('comp-start').value).toISOString(),
-                end_date: new Date(document.getElementById('comp-end').value).toISOString(),
-                prize_pool_usd: parseInt(document.getElementById('comp-pool').value),
-                highlight_copy: document.getElementById('comp-highlight').value,
-                cta_text: document.getElementById('comp-cta-text').value,
-                cta_link: document.getElementById('comp-cta-link').value,
-                prize_breakdown: prizeBreakdown
-            };
-            
-            try {
-                const response = await authenticatedFetch('/api/competitions', {
-                    method: 'POST',
-                    body: JSON.stringify(competition)
-                });
-                
-                if (response.ok) {
-                    showMessage('Competition and prize breakdown created successfully!', 'success');
-                    e.target.reset();
-                    
-                    // Reset prize breakdown to defaults
-                    const container = document.getElementById('prize-breakdown-container');
-                    container.innerHTML = `
-                        <div class="prize-breakdown-item" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
-                            <input type="text" placeholder="1st" style="width: 80px;" class="breakdown-place" value="1st">
-                            <input type="number" placeholder="7500" style="width: 100px;" class="breakdown-amount" value="">
-                            <span style="color: #888;">USD</span>
-                            <input type="number" placeholder="50" style="width: 80px;" class="breakdown-percent" value="50" min="1" max="100">
-                            <span style="color: #888;">%</span>
-                            <button type="button" onclick="removePrizeItem(this)" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">✕</button>
-                        </div>
-                        <div class="prize-breakdown-item" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
-                            <input type="text" placeholder="2nd" style="width: 80px;" class="breakdown-place" value="2nd">
-                            <input type="number" placeholder="4500" style="width: 100px;" class="breakdown-amount" value="">
-                            <span style="color: #888;">USD</span>
-                            <input type="number" placeholder="30" style="width: 80px;" class="breakdown-percent" value="30" min="1" max="100">
-                            <span style="color: #888;">%</span>
-                            <button type="button" onclick="removePrizeItem(this)" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">✕</button>
-                        </div>
-                        <div class="prize-breakdown-item" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
-                            <input type="text" placeholder="3rd" style="width: 80px;" class="breakdown-place" value="3rd">
-                            <input type="number" placeholder="3000" style="width: 100px;" class="breakdown-amount" value="">
-                            <span style="color: #888;">USD</span>
-                            <input type="number" placeholder="20" style="width: 80px;" class="breakdown-percent" value="20" min="1" max="100">
-                            <span style="color: #888;">%</span>
-                            <button type="button" onclick="removePrizeItem(this)" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">✕</button>
-                        </div>
-                    `;
-                    
-                    loadCompetitions();
-                } else {
-                    throw new Error('Failed to create competition');
-                }
-            } catch (error) {
-                showMessage('Error creating competition: ' + error.message, 'error');
-            }
-        }
-
-        async function addWinner(e) {
-            e.preventDefault();
-            
-            const winner = {
-                competition_id: document.getElementById('winner-competition').value,
-                place: parseInt(document.getElementById('winner-place').value),
-                username: document.getElementById('winner-username').value,
-                amount_usd: parseInt(document.getElementById('winner-amount').value),
-                tx_url: document.getElementById('winner-tx').value
-            };
-            
-            try {
-                const response = await authenticatedFetch('/api/winners', {
-                    method: 'POST',
-                    body: JSON.stringify(winner)
-                });
-                
-                if (response.ok) {
-                    showMessage('Winner added successfully!', 'success');
-                    e.target.reset();
-                } else {
-                    throw new Error('Failed to add winner');
-                }
-            } catch (error) {
-                showMessage('Error adding winner: ' + error.message, 'error');
-            }
-        }
-
-        // Tab switching functionality
-        function switchTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content, .admin-grid:not(.tab-content)').forEach(tab => {
-                tab.style.display = 'none';
-            });
-            
-            // Remove active class from all tab buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Show selected tab
-            const selectedTab = document.getElementById(`tab-${tabName}`);
-            if (selectedTab) {
-                selectedTab.style.display = 'grid';
-            } else if (tabName === 'competitions') {
-                // Show the main competitions grid (not hidden by default)
-                document.querySelector('.admin-grid:not(.tab-content)').style.display = 'grid';
-            }
-            
-            // Add active class to clicked button
-            event.target.classList.add('active');
-            
-            // Load tab-specific data
-            loadTabData(tabName);
-        }
-        
-        function loadTabData(tabName) {
-            switch(tabName) {
-                case 'mapping':
-                    loadMappingData();
-                    break;
-                case 'monitoring':
-                    loadMonitoringData();
-                    startLiveMonitoring();
-                    break;
-                case 'overrides':
-                    loadOverrideHistory();
-                    break;
-                case 'winners':
-                    loadCompetitionsForSelect();
-                    break;
-            }
-        }
-        
-        // Mapping Engine Functions
-        function testAutoMapping() {
-            const pattern = document.getElementById('comp-pattern').value;
-            const currentDate = new Date();
-            const month = currentDate.toLocaleDateString('en-US', { month: 'short' }).toLowerCase();
-            const year = currentDate.getFullYear();
-            
-            const testResult = pattern
-                .replace('[month]', month)
-                .replace('[year]', year)
-                .replace('[type]', 'pnl');
-                
-            showMessage(`Test Result: "${testResult}"`, 'success');
-        }
-        
-        function validateMappings() {
-            const mappingText = document.getElementById('trader-mapping').value;
-            const lines = mappingText.split('\n').filter(line => line.trim());
-            
-            let validMappings = 0;
-            let errors = [];
-            
-            lines.forEach((line, index) => {
-                if (line.includes(':')) {
-                    const [id, wallet] = line.split(':').map(s => s.trim());
-                    if (id && wallet) {
-                        validMappings++;
-                    } else {
-                        errors.push(`Line ${index + 1}: Invalid format`);
-                    }
-                } else {
-                    errors.push(`Line ${index + 1}: Missing ':'`);
-                }
-            });
-            
-            if (errors.length > 0) {
-                showMessage(`Found ${errors.length} errors: ${errors.join(', ')}`, 'error');
-            } else {
-                showMessage(`✅ ${validMappings} valid mappings found`, 'success');
-            }
-        }
-        
-        // Bulk Winner Import
-        async function importBulkWinners() {
-            const bulkText = document.getElementById('bulk-winners').value;
-            const lines = bulkText.split('\n').filter(line => line.trim());
-            
-            if (lines.length === 0) {
-                showMessage('Please enter winner data', 'error');
-                return;
-            }
-            
-            const winners = [];
-            for (const line of lines) {
-                const [username, position, amount, tx_hash] = line.split(',').map(s => s.trim());
-                if (username && position && amount) {
-                    winners.push({
-                        username,
-                        position: parseInt(position),
-                        amount_usd: parseFloat(amount),
-                        transaction_hash: tx_hash || null
-                    });
-                }
-            }
-            
-            if (winners.length === 0) {
-                showMessage('No valid winner data found', 'error');
-                return;
-            }
-            
-            showMessage(`Processing ${winners.length} winners...`, 'info');
-            
-            // Here you would send to API
-            // For now, just show success
-            setTimeout(() => {
-                showMessage(`✅ Successfully imported ${winners.length} winners`, 'success');
-                document.getElementById('bulk-winners').value = '';
-            }, 1500);
-        }
-        
-        // Disqualification System
-        async function loadCompetitionsForSelect() {
-            const select = document.getElementById('disqualify-competition');
-            if (competitions.length > 0) {
-                select.innerHTML = '<option value="">Select Competition</option>' + 
-                    competitions.map(comp => `<option value="${comp.id}">${comp.title}</option>`).join('');
-            }
-        }
-        
-        document.getElementById('disqualify-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const competitionId = document.getElementById('disqualify-competition').value;
-            const trader = document.getElementById('disqualify-trader').value;
-            const reason = document.getElementById('disqualify-reason').value;
-            const notes = document.getElementById('disqualify-notes').value;
-            
-            if (confirm(`Are you sure you want to disqualify ${trader}? This action cannot be undone.`)) {
-                showMessage(`Processing disqualification for ${trader}...`, 'info');
-                
-                // Here you would send to API
-                setTimeout(() => {
-                    showMessage(`⚠️ ${trader} has been disqualified from the competition`, 'success');
-                    this.reset();
-                }, 1500);
-            }
-        });
-        
-        // Live Monitoring Functions
-        function loadMonitoringData() {
-            // Simulate loading monitoring data
-            setTimeout(() => {
-                document.getElementById('active-count').textContent = competitions.filter(c => getCompetitionStatus(c) === 'ACTIVE').length;
-                document.getElementById('participant-count').textContent = '1,247';
-                document.getElementById('deployed-prizes').textContent = '$45,000';
-                document.getElementById('api-calls').textContent = '342';
-            }, 500);
-        }
-        
-        function startLiveMonitoring() {
-            const feedContainer = document.getElementById('activity-feed');
-            
-            // Simulate live feed
-            const activities = [
-                '🎯 New participant joined November Volume Championship',
-                '💰 Prize breakdown updated for December Competition',
-                '📊 API call spike detected - monitoring',
-                '🏆 Winner verification completed for @crypto_master',
-                '⚡ Real-time leaderboard update processed'
-            ];
-            
-            let activityIndex = 0;
-            feedContainer.innerHTML = '';
-            
-            const addActivity = () => {
-                const activity = activities[activityIndex % activities.length];
-                const timestamp = new Date().toLocaleTimeString();
-                
-                const item = document.createElement('div');
-                item.className = 'feed-item';
-                item.innerHTML = `<strong>${timestamp}</strong> - ${activity}`;
-                feedContainer.insertBefore(item, feedContainer.firstChild);
-                
-                // Keep only last 10 items
-                while (feedContainer.children.length > 10) {
-                    feedContainer.removeChild(feedContainer.lastChild);
-                }
-                
-                activityIndex++;
-            };
-            
-            addActivity();
-            setInterval(addActivity, 3000);
-        }
-        
-        // Override System Functions
-        function updateOverrideFields() {
-            const overrideType = document.getElementById('override-type').value;
-            const fieldsContainer = document.getElementById('override-fields');
-            
-            let fieldsHtml = '';
-            
-            switch(overrideType) {
-                case 'competition-status':
-                    fieldsHtml = `
-                        <div class="form-group">
-                            <label>Competition</label>
-                            <select id="override-competition" required>
-                                <option value="">Select Competition</option>
-                                ${competitions.map(comp => `<option value="${comp.id}">${comp.title}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>New Status</label>
-                            <select id="override-status" required>
-                                <option value="active">Active</option>
-                                <option value="upcoming">Upcoming</option>
-                                <option value="ended">Ended</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'winner-position':
-                    fieldsHtml = `
-                        <div class="form-group">
-                            <label>Winner Username</label>
-                            <input type="text" id="override-winner" placeholder="@username" required>
-                        </div>
-                        <div class="form-group">
-                            <label>New Position</label>
-                            <input type="number" id="override-position" min="1" required>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'prize-amount':
-                    fieldsHtml = `
-                        <div class="form-group">
-                            <label>Winner ID</label>
-                            <input type="text" id="override-winner-id" placeholder="Winner ID or username" required>
-                        </div>
-                        <div class="form-group">
-                            <label>New Prize Amount (USD)</label>
-                            <input type="number" id="override-amount" placeholder="7500" required>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'data-correction':
-                    fieldsHtml = `
-                        <div class="form-group">
-                            <label>Table</label>
-                            <select id="override-table" required>
-                                <option value="competitions">Competitions</option>
-                                <option value="winners">Winners</option>
-                                <option value="prize_breakdown">Prize Breakdown</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Record ID</label>
-                            <input type="text" id="override-record-id" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Field to Update</label>
-                            <input type="text" id="override-field" required>
-                        </div>
-                        <div class="form-group">
-                            <label>New Value</label>
-                            <input type="text" id="override-value" required>
-                        </div>
-                    `;
-                    break;
-            }
-            
-            fieldsContainer.innerHTML = fieldsHtml;
-        }
-        
-        function applyOverride() {
-            const overrideType = document.getElementById('override-type').value;
-            const reason = document.getElementById('override-reason').value;
-            
-            if (!overrideType || !reason) {
-                showMessage('Please select override type and provide reason', 'error');
-                return;
-            }
-            
-            if (confirm('Are you sure you want to apply this manual override? This action is logged for audit purposes.')) {
-                showMessage('Processing override...', 'info');
-                
-                // Here you would send to API
-                setTimeout(() => {
-                    showMessage('✅ Override applied successfully', 'success');
-                    logOverride(overrideType, reason);
-                    document.getElementById('override-reason').value = '';
-                    updateOverrideFields();
-                }, 1500);
-            }
-        }
-        
-        function logOverride(type, reason) {
-            const timestamp = new Date().toLocaleString();
-            const admin = currentAdmin?.username || 'admin';
-            
-            const overrideEntry = {
-                timestamp,
-                admin,
-                type,
-                reason,
-                id: Date.now()
-            };
-            
-            // Add to override history display
-            const historyContainer = document.getElementById('override-history');
-            const entry = document.createElement('div');
-            entry.className = 'override-entry';
-            entry.innerHTML = `
-                <strong>${timestamp}</strong> - ${admin}<br>
-                <em>Type:</em> ${type}<br>
-                <em>Reason:</em> ${reason}
-            `;
-            historyContainer.insertBefore(entry, historyContainer.firstChild);
-        }
-        
-        function loadOverrideHistory() {
-            const historyContainer = document.getElementById('override-history');
-            historyContainer.innerHTML = '<div class="loading">Loading override history...</div>';
-            
-            // Simulate loading
-            setTimeout(() => {
-                historyContainer.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">No overrides recorded yet</div>';
-            }, 1000);
-        }
-
-        // Enhanced Competition Management Functions
-        let currentEditingCompetition = null;
-        
-        async function loadCompetitions() {
-            const container = document.getElementById('competitions-list');
-            container.innerHTML = '<div class="loading">Loading competitions...</div>';
-            
-            try {
-                const response = await fetch('/api/competitions');
-                const competitions = await response.json();
-                
-                if (competitions.length === 0) {
-                    container.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.6); padding: 20px;">No competitions found</div>';
-                    return;
-                }
-                
-                container.innerHTML = competitions.map(comp => {
-                    const status = getCompetitionStatus(comp);
-                    const statusClass = status === 'ACTIVE' ? 'status-active' : 
-                                       status === 'UPCOMING' ? 'status-upcoming' : 'status-ended';
-                    
-                    return `
-                        <div class="competition-item">
-                            <div class="competition-header">
-                                <div>
-                                    <h4 class="competition-title">${comp.title}</h4>
-                                    <span class="status-badge ${statusClass}">${status}</span>
-                                </div>
-                                <div class="competition-actions">
-                                    <button class="btn-admin btn-small" onclick="viewCompetitionDetails('${comp.id}')">👁️ View</button>
-                                    <button class="btn-admin btn-small" onclick="openEditModal('${comp.id}')">✏️ Edit</button>
-                                    <button class="btn-danger btn-small" onclick="deleteCompetition('${comp.id}')">🗑️ Delete</button>
-                                </div>
-                            </div>
-                            <div class="competition-details">
-                                <div class="detail-item">
-                                    <span class="detail-label">Type:</span> ${getCompetitionTypeDisplay(comp.competition_type)}
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Prize Pool:</span> $${comp.prize_pool_usd.toLocaleString()}
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Period:</span> ${comp.period}
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Start:</span> ${new Date(comp.start_date).toLocaleDateString()}
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">End:</span> ${new Date(comp.end_date).toLocaleDateString()}
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Min Trades:</span> ${comp.min_trades || 'N/A'}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                // Store competitions globally for other functions
-                window.loadedCompetitions = competitions;
-                
+                const tbody = document.getElementById('competitions-list');
+                tbody.innerHTML = competitions.map(comp => `
+                    <tr>
+                        <td><strong style="color: var(--primary-color);">${comp.title}</strong></td>
+                        <td>${comp.period}</td>
+                        <td>${getStatusBadge(comp)}</td>
+                        <td>${getTypeLabel(comp.type)}</td>
+                        <td>$${comp.prize_pool.toLocaleString()}</td>
+                        <td>${comp.participant_count || 0}</td>
+                        <td>
+                            <button class="btn-admin btn-small" onclick="openCompetitionDetail('${comp.id}')">
+                                View Details
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
             } catch (error) {
                 console.error('Error loading competitions:', error);
-                container.innerHTML = '<div class="error">Failed to load competitions</div>';
+                showMessage('Failed to load competitions', 'error');
             }
         }
-        
-        function getCompetitionStatus(comp) {
-            const now = new Date();
-            const start = new Date(comp.start_date);
-            const end = new Date(comp.end_date);
+
+        async function createCompetition(event) {
+            event.preventDefault();
             
-            if (now >= start && now <= end) return 'ACTIVE';
-            if (now < start) return 'UPCOMING';
-            return 'ENDED';
-        }
-        
-        function getCompetitionTypeDisplay(type) {
-            const types = {
-                'pnl': 'P&L Performance',
-                'volume': 'Trading Volume', 
-                'winrate': 'Win Rate'
+            const competitionData = {
+                id: document.getElementById('comp-name').value,
+                title: document.getElementById('comp-title').value,
+                period: document.getElementById('comp-period').value,
+                type: document.getElementById('comp-type').value,
+                start_date: document.getElementById('comp-start').value,
+                end_date: document.getElementById('comp-end').value,
+                prize_pool: parseInt(document.getElementById('comp-pool').value),
+                prize_structure: JSON.parse(document.getElementById('comp-prizes').value)
             };
-            return types[type] || type;
-        }
-        
-        // Competition Detail View
-        function viewCompetitionDetails(competitionId) {
-            const competition = window.loadedCompetitions?.find(c => c.id === competitionId);
-            if (!competition) {
-                showMessage('Competition not found', 'error');
-                return;
-            }
-            
-            const modal = document.getElementById('competition-detail-modal');
-            const content = document.getElementById('competition-detail-content');
-            const title = document.getElementById('detail-modal-title');
-            
-            title.textContent = competition.title;
-            content.innerHTML = `
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                    <div class="detail-section">
-                        <h4 style="color: var(--primary-color); margin-bottom: 15px;">📋 Basic Information</h4>
-                        <div class="detail-item"><strong>ID:</strong> ${competition.name}</div>
-                        <div class="detail-item"><strong>Title:</strong> ${competition.title}</div>
-                        <div class="detail-item"><strong>Period:</strong> ${competition.period}</div>
-                        <div class="detail-item"><strong>Type:</strong> ${getCompetitionTypeDisplay(competition.competition_type)}</div>
-                        <div class="detail-item"><strong>Status:</strong> <span class="status-badge ${getCompetitionStatus(competition) === 'ACTIVE' ? 'status-active' : getCompetitionStatus(competition) === 'UPCOMING' ? 'status-upcoming' : 'status-ended'}">${getCompetitionStatus(competition)}</span></div>
-                    </div>
-                    
-                    <div class="detail-section">
-                        <h4 style="color: var(--primary-color); margin-bottom: 15px;">💰 Prize Information</h4>
-                        <div class="detail-item"><strong>Prize Pool:</strong> $${competition.prize_pool_usd.toLocaleString()}</div>
-                        <div class="detail-item"><strong>Breakdown Count:</strong> ${competition.prize_breakdown?.length || 0} places</div>
-                        <div class="detail-item"><strong>Highlight Copy:</strong> ${competition.highlight_copy}</div>
-                        <div class="detail-item"><strong>CTA Text:</strong> ${competition.cta_text || 'N/A'}</div>
-                        <div class="detail-item"><strong>CTA Link:</strong> ${competition.cta_link || 'N/A'}</div>
-                    </div>
-                    
-                    <div class="detail-section">
-                        <h4 style="color: var(--primary-color); margin-bottom: 15px;">📅 Schedule & Requirements</h4>
-                        <div class="detail-item"><strong>Start Date:</strong> ${new Date(competition.start_date).toLocaleString()}</div>
-                        <div class="detail-item"><strong>End Date:</strong> ${new Date(competition.end_date).toLocaleString()}</div>
-                        <div class="detail-item"><strong>Duration:</strong> ${Math.ceil((new Date(competition.end_date) - new Date(competition.start_date)) / (1000 * 60 * 60 * 24))} days</div>
-                        <div class="detail-item"><strong>Min Trades:</strong> ${competition.min_trades || 'Not set'}</div>
-                        <div class="detail-item"><strong>Min Volume:</strong> $${(competition.min_volume_usd || 0).toLocaleString()}</div>
-                    </div>
-                    
-                    <div class="detail-section">
-                        <h4 style="color: var(--primary-color); margin-bottom: 15px;">🏆 Prize Breakdown</h4>
-                        ${competition.prize_breakdown && competition.prize_breakdown.length > 0 ? 
-                            competition.prize_breakdown.map(prize => `
-                                <div class="detail-item">
-                                    <strong>${prize.place}:</strong> $${prize.amount_usd.toLocaleString()} (${prize.percentage}%)
-                                </div>
-                            `).join('') : 
-                            '<div class="detail-item" style="color: rgba(255,255,255,0.6);">No prize breakdown configured</div>'
-                        }
-                    </div>
-                </div>
-                
-                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(45, 212, 127, 0.2);">
-                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">🔧 System Information</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 0.9rem;">
-                        <div class="detail-item"><strong>Created:</strong> ${new Date(competition.created_at).toLocaleString()}</div>
-                        <div class="detail-item"><strong>Updated:</strong> ${new Date(competition.updated_at).toLocaleString()}</div>
-                        <div class="detail-item"><strong>Competition ID:</strong> ${competition.id}</div>
-                    </div>
-                </div>
-            `;
-            
-            // Store current competition for edit/delete actions
-            currentEditingCompetition = competition;
-            modal.style.display = 'flex';
-        }
-        
-        function closeDetailModal() {
-            document.getElementById('competition-detail-modal').style.display = 'none';
-            currentEditingCompetition = null;
-        }
-        
-        // Competition Edit Functions
-        function editCompetition() {
-            if (!currentEditingCompetition) {
-                showMessage('No competition selected', 'error');
-                return;
-            }
-            closeDetailModal();
-            openEditModal(currentEditingCompetition.id);
-        }
-        
-        function openEditModal(competitionId) {
-            const competition = window.loadedCompetitions?.find(c => c.id === competitionId);
-            if (!competition) {
-                showMessage('Competition not found', 'error');
-                return;
-            }
-            
-            // Pre-populate form fields
-            document.getElementById('edit-comp-name').value = competition.name;
-            document.getElementById('edit-comp-title').value = competition.title;
-            document.getElementById('edit-comp-period').value = competition.period;
-            document.getElementById('edit-comp-type').value = competition.competition_type;
-            document.getElementById('edit-comp-start').value = competition.start_date.slice(0, 16); // Format for datetime-local
-            document.getElementById('edit-comp-end').value = competition.end_date.slice(0, 16);
-            document.getElementById('edit-comp-prize').value = competition.prize_pool_usd;
-            document.getElementById('edit-comp-highlight').value = competition.highlight_copy;
-            document.getElementById('edit-comp-cta-text').value = competition.cta_text || '';
-            document.getElementById('edit-comp-cta-link').value = competition.cta_link || '';
-            document.getElementById('edit-comp-min-trades').value = competition.min_trades || '';
-            document.getElementById('edit-comp-min-volume').value = competition.min_volume_usd || '';
-            
-            currentEditingCompetition = competition;
-            document.getElementById('competition-edit-modal').style.display = 'flex';
-        }
-        
-        function closeEditModal() {
-            document.getElementById('competition-edit-modal').style.display = 'none';
-            currentEditingCompetition = null;
-        }
-        
-        // Handle edit form submission
-        document.getElementById('edit-competition-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            if (!currentEditingCompetition) {
-                showMessage('No competition selected for editing', 'error');
-                return;
-            }
-            
-            const formData = {
-                name: document.getElementById('edit-comp-name').value,
-                title: document.getElementById('edit-comp-title').value,
-                period: document.getElementById('edit-comp-period').value,
-                competition_type: document.getElementById('edit-comp-type').value,
-                start_date: new Date(document.getElementById('edit-comp-start').value).toISOString(),
-                end_date: new Date(document.getElementById('edit-comp-end').value).toISOString(),
-                prize_pool_usd: parseInt(document.getElementById('edit-comp-prize').value),
-                highlight_copy: document.getElementById('edit-comp-highlight').value,
-                cta_text: document.getElementById('edit-comp-cta-text').value,
-                cta_link: document.getElementById('edit-comp-cta-link').value,
-                min_trades: parseInt(document.getElementById('edit-comp-min-trades').value) || null,
-                min_volume_usd: parseInt(document.getElementById('edit-comp-min-volume').value) || null
-            };
-            
+
             try {
-                showMessage('Updating competition...', 'info');
-                
-                const response = await fetch(`/api/competitions/${currentEditingCompetition.id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                    },
-                    body: JSON.stringify(formData)
+                const response = await fetch(`${API_URL}/competitions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(competitionData)
                 });
-                
+
                 if (response.ok) {
-                    showMessage('Competition updated successfully!', 'success');
-                    closeEditModal();
-                    loadCompetitions(); // Refresh the list
+                    showMessage('Competition created successfully!', 'success');
+                    closeModal('create-competition-modal');
+                    document.getElementById('competition-form').reset();
+                    await loadCompetitions();
                 } else {
                     const error = await response.json();
-                    showMessage('Failed to update competition: ' + error.error, 'error');
+                    showMessage(error.error || 'Failed to create competition', 'error');
                 }
             } catch (error) {
-                console.error('Error updating competition:', error);
-                showMessage('Error updating competition', 'error');
+                console.error('Error creating competition:', error);
+                showMessage('Error creating competition', 'error');
             }
-        });
-        
-        // Competition Delete Function
-        async function deleteCompetition(competitionId) {
-            const competition = window.loadedCompetitions?.find(c => c.id === competitionId);
-            if (!competition) {
-                showMessage('Competition not found', 'error');
-                return;
-            }
-            
-            const confirmMessage = `Are you sure you want to delete "${competition.title}"?\n\nThis will also delete:\n- All associated prize breakdowns\n- All winners for this competition\n- This action CANNOT be undone!\n\nType "DELETE" to confirm:`;
-            
-            const confirmation = prompt(confirmMessage);
-            if (confirmation !== 'DELETE') {
-                showMessage('Deletion cancelled', 'info');
-                return;
-            }
+        }
+
+        async function confirmDeleteCompetition() {
+            if (!confirm('Are you sure you want to delete this competition? This action cannot be undone.')) return;
             
             try {
-                showMessage('Deleting competition...', 'info');
-                
-                const response = await fetch(`/api/competitions/${competitionId}`, {
+                const response = await fetch(`${API_URL}/competitions/${currentCompetitionId}`, {
                     method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                    }
+                    credentials: 'include'
                 });
-                
+
                 if (response.ok) {
-                    showMessage('Competition deleted successfully!', 'success');
-                    loadCompetitions(); // Refresh the list
-                    // Close any open modals
-                    closeDetailModal();
-                    closeEditModal();
+                    showMessage('Competition deleted successfully', 'success');
+                    closeModal('competition-detail-modal');
+                    await loadCompetitions();
                 } else {
-                    const error = await response.json();
-                    showMessage('Failed to delete competition: ' + error.error, 'error');
+                    showMessage('Failed to delete competition', 'error');
                 }
             } catch (error) {
                 console.error('Error deleting competition:', error);
                 showMessage('Error deleting competition', 'error');
             }
         }
-        
-        function confirmDeleteCompetition() {
-            if (currentEditingCompetition) {
-                deleteCompetition(currentEditingCompetition.id);
-            }
-        }
 
-        async function loadSystemStats() {
-            const statsEl = document.getElementById('system-stats');
+        // Participants Management
+        async function loadParticipants() {
+            document.getElementById('participants-loading').style.display = 'block';
+            document.getElementById('participants-table').style.display = 'none';
+            
             try {
-                const response = await fetch('/api/stats');
-                const stats = await response.json();
+                const response = await fetch(`${API_URL}/leaderboard/${currentCompetitionId}`);
+                const participants = await response.json();
                 
-                statsEl.innerHTML = `
-                    <div class="stats-row">
-                        <div class="stat-item">
-                            <div class="stat-value">$${stats.total_distributed.toLocaleString()}</div>
-                            <div class="stat-label">Total Distributed</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">${stats.total_winners}</div>
-                            <div class="stat-label">Winners Paid</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">${stats.months_active}</div>
-                            <div class="stat-label">Months Active</div>
-                        </div>
-                    </div>
-                `;
+                document.getElementById('participants-loading').style.display = 'none';
+                document.getElementById('participants-table').style.display = 'table';
                 
-                document.getElementById('cache-version').value = stats.cache_version;
-                document.getElementById('leaderboard-toggle').value = stats.leaderboard_enabled !== undefined ? stats.leaderboard_enabled : 'true';
+                const tbody = document.getElementById('participants-list');
+                tbody.innerHTML = participants.map(p => `
+                    <tr>
+                        <td><strong>${p.rank}</strong></td>
+                        <td>${p.username}</td>
+                        <td><code style="font-size: 0.85rem;">${p.wallet_address.substring(0, 8)}...${p.wallet_address.substring(p.wallet_address.length - 6)}</code></td>
+                        <td><strong style="color: var(--primary-color);">${formatScore(p.score, p.competition_type)}</strong></td>
+                        <td>${p.prize_position ? `Position #${p.prize_position}` : '-'}</td>
+                    </tr>
+                `).join('');
             } catch (error) {
-                statsEl.innerHTML = '<div class="error">Failed to load stats</div>';
+                console.error('Error loading participants:', error);
+                showMessage('Failed to load participants', 'error');
             }
         }
 
-        async function updateCacheVersion() {
-            const version = document.getElementById('cache-version').value;
+        // Prizes Management
+        async function loadPrizes() {
+            const comp = competitions.find(c => c.id === currentCompetitionId);
+            if (!comp) return;
+            
+            const tbody = document.getElementById('prizes-list');
+            const prizeEntries = Object.entries(comp.prize_structure).sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+            
+            tbody.innerHTML = prizeEntries.map(([position, amount]) => `
+                <tr>
+                    <td><strong>#${position}</strong></td>
+                    <td><strong style="color: var(--primary-color);">$${amount.toLocaleString()}</strong></td>
+                    <td><span class="status-badge status-pending">Awaiting Approval</span></td>
+                    <td>-</td>
+                </tr>
+            `).join('');
+        }
+
+        // Winners Management
+        async function loadWinners() {
+            document.getElementById('winners-loading').style.display = 'block';
+            document.getElementById('winners-list').style.display = 'none';
+            
             try {
-                const response = await authenticatedFetch('/api/settings', {
-                    method: 'PUT',
-                    body: JSON.stringify({ key: 'cache_version', value: version })
+                const response = await fetch(`${API_URL}/leaderboard/${currentCompetitionId}`);
+                const leaderboardData = await response.json();
+                
+                const comp = competitions.find(c => c.id === currentCompetitionId);
+                const prizePositions = Object.keys(comp.prize_structure).map(Number).sort((a, b) => a - b);
+                
+                const winnersResponse = await fetch(`${API_URL}/winners?competition_id=${currentCompetitionId}`);
+                const existingWinners = await winnersResponse.json();
+                
+                document.getElementById('winners-loading').style.display = 'none';
+                document.getElementById('winners-list').style.display = 'block';
+                
+                const winnersList = document.getElementById('winners-list');
+                winnersList.innerHTML = prizePositions.map(position => {
+                    const participant = leaderboardData.find(p => p.rank === position);
+                    const existingWinner = existingWinners.find(w => w.prize_position === position);
+                    
+                    if (!participant) {
+                        return `
+                            <div class="winner-item">
+                                <div class="winner-header">
+                                    <h4 style="color: var(--primary-color); margin: 0;">Position #${position} - $${comp.prize_structure[position].toLocaleString()}</h4>
+                                    <span class="status-badge status-pending">No Participant</span>
+                                </div>
+                                <p style="color: rgba(255,255,255,0.6); margin: 10px 0 0 0;">No participant at this rank</p>
+                            </div>
+                        `;
+                    }
+                    
+                    const status = existingWinner?.status || 'pending';
+                    const isDisqualified = existingWinner?.status === 'disqualified';
+                    
+                    return `
+                        <div class="winner-item">
+                            <div class="winner-header">
+                                <h4 style="color: var(--primary-color); margin: 0;">Position #${position} - $${comp.prize_structure[position].toLocaleString()}</h4>
+                                <span class="status-badge status-${status}">${status.toUpperCase()}</span>
+                            </div>
+                            <div class="winner-info">
+                                <div><strong>Username:</strong> ${participant.username}</div>
+                                <div><strong>Wallet:</strong> <code>${participant.wallet_address.substring(0, 12)}...${participant.wallet_address.substring(participant.wallet_address.length - 8)}</code></div>
+                                <div><strong>Score:</strong> ${formatScore(participant.score, comp.type)}</div>
+                                <div><strong>Rank:</strong> #${participant.rank}</div>
+                            </div>
+                            <div class="winner-actions">
+                                ${status === 'pending' ? `
+                                    <button class="btn-admin" onclick="approveWinner('${participant.wallet_address}', ${position})">
+                                        ✓ Approve Winner
+                                    </button>
+                                    <button class="btn-danger" onclick="disqualifyWinner('${participant.wallet_address}', ${position})">
+                                        ✗ Disqualify
+                                    </button>
+                                ` : status === 'approved' ? `
+                                    <button class="btn-warning" onclick="revokeApproval('${participant.wallet_address}', ${position})">
+                                        Revoke Approval
+                                    </button>
+                                ` : `
+                                    <button class="btn-admin" onclick="reinstateWinner('${participant.wallet_address}', ${position})">
+                                        Reinstate
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading winners:', error);
+                showMessage('Failed to load winner selection', 'error');
+            }
+        }
+
+        async function approveWinner(walletAddress, position) {
+            try {
+                const response = await fetch(`${API_URL}/winners/approve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        competition_id: currentCompetitionId,
+                        wallet_address: walletAddress,
+                        prize_position: position
+                    })
+                });
+
+                if (response.ok) {
+                    showMessage('Winner approved successfully!', 'success');
+                    await loadWinners();
+                } else {
+                    const error = await response.json();
+                    showMessage(error.error || 'Failed to approve winner', 'error');
+                }
+            } catch (error) {
+                console.error('Error approving winner:', error);
+                showMessage('Error approving winner', 'error');
+            }
+        }
+
+        async function disqualifyWinner(walletAddress, position) {
+            if (!confirm('Are you sure you want to disqualify this participant? The next runner-up will automatically be pre-qualified.')) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/winners/disqualify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        competition_id: currentCompetitionId,
+                        wallet_address: walletAddress,
+                        prize_position: position
+                    })
+                });
+
+                if (response.ok) {
+                    showMessage('Participant disqualified. Next runner-up pre-qualified for approval.', 'success');
+                    await loadWinners();
+                } else {
+                    const error = await response.json();
+                    showMessage(error.error || 'Failed to disqualify participant', 'error');
+                }
+            } catch (error) {
+                console.error('Error disqualifying:', error);
+                showMessage('Error processing disqualification', 'error');
+            }
+        }
+
+        async function revokeApproval(walletAddress, position) {
+            if (!confirm('Revoke approval for this winner?')) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/winners/revoke`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        competition_id: currentCompetitionId,
+                        wallet_address: walletAddress,
+                        prize_position: position
+                    })
+                });
+
+                if (response.ok) {
+                    showMessage('Approval revoked', 'success');
+                    await loadWinners();
+                } else {
+                    showMessage('Failed to revoke approval', 'error');
+                }
+            } catch (error) {
+                console.error('Error revoking approval:', error);
+                showMessage('Error revoking approval', 'error');
+            }
+        }
+
+        async function reinstateWinner(walletAddress, position) {
+            try {
+                const response = await fetch(`${API_URL}/winners/reinstate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        competition_id: currentCompetitionId,
+                        wallet_address: walletAddress,
+                        prize_position: position
+                    })
+                });
+
+                if (response.ok) {
+                    showMessage('Participant reinstated', 'success');
+                    await loadWinners();
+                } else {
+                    showMessage('Failed to reinstate participant', 'error');
+                }
+            } catch (error) {
+                console.error('Error reinstating:', error);
+                showMessage('Error reinstating participant', 'error');
+            }
+        }
+
+        // System Statistics
+        async function loadSystemStatistics() {
+            try {
+                const [compsRes, winnersRes] = await Promise.all([
+                    fetch(`${API_URL}/competitions`),
+                    fetch(`${API_URL}/winners`)
+                ]);
+                
+                const allCompetitions = await compsRes.json();
+                const allWinners = await winnersRes.json();
+                
+                const totalPrizes = allCompetitions.reduce((sum, c) => sum + c.prize_pool, 0);
+                const approvedWinners = allWinners.filter(w => w.status === 'approved').length;
+                
+                document.getElementById('stat-total-comps').textContent = allCompetitions.length;
+                document.getElementById('stat-total-prizes').textContent = `$${totalPrizes.toLocaleString()}`;
+                document.getElementById('stat-total-winners').textContent = approvedWinners;
+                document.getElementById('stat-unique-users').textContent = '...';
+                
+                const typeBreakdown = {};
+                allCompetitions.forEach(comp => {
+                    typeBreakdown[comp.type] = (typeBreakdown[comp.type] || 0) + 1;
                 });
                 
-                if (response.ok) {
-                    showMessage('Cache version updated! Frontend will refresh.', 'success');
-                } else {
-                    throw new Error('Failed to update cache version');
-                }
-            } catch (error) {
-                showMessage('Error updating cache: ' + error.message, 'error');
-            }
-        }
-
-        // Load Winners function - was missing
-        async function loadWinners() {
-            const listEl = document.getElementById('winners-list');
-            try {
-                const response = await authenticatedFetch('/api/winners');
-                const winners = await response.json();
-                
-                if (winners.length === 0) {
-                    listEl.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.6); padding: 20px;">No winners found</div>';
-                    return;
-                }
-                
-                // Display winners list
-                listEl.innerHTML = winners.map(winner => `
-                    <div class="competition-item" style="margin-bottom: 10px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <h4 style="margin: 0; color: var(--primary-color);">${winner.username}</h4>
-                                <p style="margin: 5px 0; opacity: 0.8;">Position #${winner.place} - ${winner.competition_title || 'Unknown Competition'}</p>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary-color);">$${winner.amount_usd.toLocaleString()}</div>
-                                <div style="font-size: 0.8rem; opacity: 0.6;">${new Date(winner.created_at).toLocaleDateString()}</div>
-                            </div>
+                const typeStatsHTML = Object.entries(typeBreakdown).map(([type, count]) => `
+                    <div class="stat-card">
+                        <h4>${getTypeLabel(type)}</h4>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Competitions:</span>
+                            <span class="stat-value">${count}</span>
                         </div>
-                        ${winner.tx_url ? `<a href="${winner.tx_url}" target="_blank" style="color: #2DD47F; font-size: 0.9rem;">View Transaction</a>` : ''}
                     </div>
                 `).join('');
                 
+                document.getElementById('comp-type-stats').innerHTML = typeStatsHTML;
             } catch (error) {
-                listEl.innerHTML = '<div class="error">Failed to load winners</div>';
+                console.error('Error loading statistics:', error);
             }
         }
 
-        async function updateLeaderboardToggle() {
-            const toggleElement = document.getElementById('leaderboard-toggle');
-            const enabled = toggleElement.value;
-            const originalValue = toggleElement.value === 'true' ? 'false' : 'true'; // Store opposite of current
+        async function searchUserStats() {
+            const searchTerm = document.getElementById('user-search').value.trim();
+            if (!searchTerm) {
+                showMessage('Please enter a username or wallet address', 'error');
+                return;
+            }
+            
+            document.getElementById('user-stats-container').style.display = 'block';
+            document.getElementById('user-stats-grid').innerHTML = '<div class="loading">Searching...</div>';
             
             try {
-                const response = await authenticatedFetch('/api/settings', {
-                    method: 'PUT',
-                    body: JSON.stringify({ key: 'leaderboard_enabled', value: enabled })
-                });
+                const response = await fetch(`${API_URL}/user-stats?search=${encodeURIComponent(searchTerm)}`);
+                if (!response.ok) throw new Error('Search failed');
                 
-                if (response.ok) {
-                    const status = enabled === 'true' ? 'ON' : 'OFF';
-                    showMessage(`✅ Leaderboard control updated to ${status}! Website will reflect changes immediately.`, 'success');
-                } else {
-                    // Revert toggle to original state on failure
-                    toggleElement.value = originalValue;
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Failed to update leaderboard control');
-                }
+                const stats = await response.json();
+                
+                document.getElementById('user-stats-grid').innerHTML = `
+                    <div class="stat-card">
+                        <h4>Competitions Participated</h4>
+                        <div class="stat-item">
+                            <span class="stat-value">${stats.competitions_count || 0}</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Total Winnings</h4>
+                        <div class="stat-item">
+                            <span class="stat-value">$${(stats.total_winnings || 0).toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Best Rank</h4>
+                        <div class="stat-item">
+                            <span class="stat-value">#${stats.best_rank || '-'}</span>
+                        </div>
+                    </div>
+                `;
             } catch (error) {
-                // Revert toggle to original state on error
-                toggleElement.value = originalValue;
-                showMessage('❌ Error updating leaderboard control: ' + error.message, 'error');
-                console.error('Toggle update failed:', error);
+                console.error('Error searching user stats:', error);
+                document.getElementById('user-stats-grid').innerHTML = '<p style="color: rgba(255,255,255,0.6);">No data found for this user.</p>';
             }
+        }
+
+        // Utility Functions
+        function getStatusBadge(comp) {
+            const now = new Date();
+            const start = new Date(comp.start_date);
+            const end = new Date(comp.end_date);
+            
+            if (now < start) {
+                return '<span class="status-badge status-upcoming">UPCOMING</span>';
+            } else if (now >= start && now <= end) {
+                return '<span class="status-badge status-active">ACTIVE</span>';
+            } else {
+                return '<span class="status-badge status-ended">ENDED</span>';
+            }
+        }
+
+        function getTypeLabel(type) {
+            const labels = {
+                'pnl': '💰 P&L',
+                'volume': '📊 Volume',
+                'winrate': '🎯 Win Rate'
+            };
+            return labels[type] || type;
+        }
+
+        function formatScore(score, type) {
+            if (type === 'pnl') return `$${score.toLocaleString()}`;
+            if (type === 'volume') return `$${score.toLocaleString()}`;
+            if (type === 'winrate') return `${score}%`;
+            return score.toLocaleString();
         }
 
         function showMessage(text, type) {
             const messageArea = document.getElementById('message-area');
-            messageArea.innerHTML = `<div class="${type}">${text}</div>`;
-            setTimeout(() => messageArea.innerHTML = '', 5000);
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = text;
+            messageArea.innerHTML = '';
+            messageArea.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
         }
+
+        checkAuth();
     </script>
 </body>
 </html>
