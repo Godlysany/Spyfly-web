@@ -1,10 +1,34 @@
 -- ============================================
--- SPYFLY STAGING - ADMIN & SAMPLE DATA SETUP
--- Creates admin user and comprehensive test data
+-- SPYFLY STAGING - FIX SCHEMA & ADD DATA
+-- Fix app_settings column names and add test data
 -- ============================================
 
 -- ============================================
--- 1. ADMIN USER SETUP
+-- 1. FIX APP_SETTINGS TABLE SCHEMA
+-- ============================================
+
+-- Drop the incorrect app_settings table
+DROP TABLE IF EXISTS app_settings CASCADE;
+
+-- Recreate with correct column names (key and value, not setting_key and setting_value)
+CREATE TABLE app_settings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    key VARCHAR(255) UNIQUE NOT NULL,
+    value TEXT,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create index
+CREATE INDEX idx_app_settings_key ON app_settings(key);
+
+-- Insert default leaderboard setting
+INSERT INTO app_settings (key, value)
+VALUES ('leaderboard_enabled', 'false')
+ON CONFLICT (key) DO NOTHING;
+
+-- ============================================
+-- 2. ADMIN USER SETUP
 -- ============================================
 INSERT INTO admin_users (username, password_hash, is_active)
 VALUES ('admin', '$2b$10$z4ao/AGeP5U844fXAji0puNnwRorrrf.2wZacbCV6UYGsIvejT3He', true)
@@ -13,7 +37,7 @@ ON CONFLICT (username) DO UPDATE SET
     is_active = EXCLUDED.is_active;
 
 -- ============================================
--- 2. SAMPLE COMPETITIONS - ALL STAGES
+-- 3. SAMPLE COMPETITIONS - ALL STAGES
 -- ============================================
 
 -- DRAFT Competition (future)
@@ -187,7 +211,7 @@ VALUES
 ON CONFLICT DO NOTHING;
 
 -- ============================================
--- 3. SAMPLE PARTICIPANTS
+-- 4. SAMPLE PARTICIPANTS
 -- ============================================
 INSERT INTO participants (competition_id, wallet_address, username, entry_date)
 VALUES 
@@ -196,13 +220,6 @@ VALUES
     ('11111111-1111-1111-1111-111111111111', 'BxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'DiamondHands', NOW() - INTERVAL '3 days'),
     ('11111111-1111-1111-1111-111111111111', 'ExQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'NewTrader2025', NOW() - INTERVAL '1 day')
 ON CONFLICT DO NOTHING;
-
--- ============================================
--- 4. APP SETTINGS UPDATE
--- ============================================
-UPDATE app_settings 
-SET setting_value = 'false', updated_at = NOW()
-WHERE setting_key = 'leaderboard_enabled';
 
 -- ============================================
 -- MIGRATION COMPLETE - SUMMARY
@@ -235,6 +252,7 @@ BEGIN
     RAISE NOTICE '   ▶️  ACTIVE: October Trading Championship (live)';
     RAISE NOTICE '   ✅ COMPLETED: September Volume + August Win Rate';
     RAISE NOTICE '';
+    RAISE NOTICE '🔧 FIXED: app_settings table now uses key/value columns';
     RAISE NOTICE '🚀 Ready for CMS testing!';
     RAISE NOTICE '========================================';
 END $$;
