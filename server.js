@@ -103,6 +103,30 @@ async function handleApiRequest(req, res, pathname, method) {
     try {
         // ===== AUTHENTICATION ENDPOINTS =====
         
+        // Auth check endpoint
+        if (pathname === '/api/auth/check' && method === 'GET') {
+            const admin = await verifyAdminToken(req);
+            if (admin) {
+                res.writeHead(200);
+                res.end(JSON.stringify({ 
+                    authenticated: true, 
+                    username: admin.username 
+                }));
+            } else {
+                res.writeHead(401);
+                res.end(JSON.stringify({ authenticated: false }));
+            }
+            return;
+        }
+
+        // Logout endpoint
+        if (pathname === '/api/auth/logout' && method === 'POST') {
+            res.setHeader('Set-Cookie', 'admin_token=; HttpOnly; Path=/; Max-Age=0');
+            res.writeHead(200);
+            res.end(JSON.stringify({ success: true }));
+            return;
+        }
+
         // Admin login
         if (pathname === '/api/admin/login' && method === 'POST') {
             const body = await getRequestBody(req);
