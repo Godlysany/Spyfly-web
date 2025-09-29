@@ -626,7 +626,7 @@
                         <td>${p.username}</td>
                         <td><code style="font-size: 0.85rem;">${p.wallet_address.substring(0, 8)}...${p.wallet_address.substring(p.wallet_address.length - 6)}</code></td>
                         <td><strong style="color: var(--primary-color);">${formatScore(p.score, p.competition_type)}</strong></td>
-                        <td>${p.prize_position ? `Position #${p.prize_position}` : '-'}</td>
+                        <td>${p.place ? `Position #${p.place}` : '-'}</td>
                     </tr>
                 `).join('');
             } catch (error) {
@@ -674,7 +674,7 @@
                 const winnersList = document.getElementById('winners-list');
                 winnersList.innerHTML = prizePositions.map(position => {
                     const participant = leaderboardData.find(p => p.rank === position);
-                    const existingWinner = existingWinners.find(w => w.prize_position === position);
+                    const existingWinner = existingWinners.find(w => w.place === position);
                     
                     if (!participant) {
                         return `
@@ -688,8 +688,8 @@
                         `;
                     }
                     
-                    const status = existingWinner?.status || 'pending';
-                    const isDisqualified = existingWinner?.status === 'disqualified';
+                    const status = existingWinner?.payment_status || 'pending';
+                    const isDisqualified = existingWinner?.payment_status === 'disqualified';
                     
                     return `
                         <div class="winner-item">
@@ -739,7 +739,7 @@
                     body: JSON.stringify({
                         competition_id: currentCompetitionId,
                         wallet_address: walletAddress,
-                        prize_position: position
+                        place: position
                     })
                 });
 
@@ -767,7 +767,7 @@
                     body: JSON.stringify({
                         competition_id: currentCompetitionId,
                         wallet_address: walletAddress,
-                        prize_position: position
+                        place: position
                     })
                 });
 
@@ -795,7 +795,7 @@
                     body: JSON.stringify({
                         competition_id: currentCompetitionId,
                         wallet_address: walletAddress,
-                        prize_position: position
+                        place: position
                     })
                 });
 
@@ -820,7 +820,7 @@
                     body: JSON.stringify({
                         competition_id: currentCompetitionId,
                         wallet_address: walletAddress,
-                        prize_position: position
+                        place: position
                     })
                 });
 
