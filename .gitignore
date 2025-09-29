@@ -77,8 +77,8 @@ Thumbs.db
 *.backup
 *.bak
 
-# Applied migrations archive (keep this)
-applied-migrations/
+# Applied migrations archive (track these files)
+# applied-migrations/ is now tracked to preserve migration history
 
 # Never ignore replit configuration
 !replit.nix
