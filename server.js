@@ -318,10 +318,19 @@ async function handleApiRequest(req, res, pathname, method) {
                 return;
             }
             
-            const { data: winners, error } = await supabase
+            const url = new URL(req.url, `http://${req.headers.host}`);
+            const competitionId = url.searchParams.get('competition_id');
+            
+            let query = supabase
                 .from('winners')
                 .select(`*, competitions(title)`)
                 .order('created_at', { ascending: false });
+            
+            if (competitionId) {
+                query = query.eq('competition_id', competitionId);
+            }
+            
+            const { data: winners, error } = await query;
             
             if (error) throw error;
             
@@ -401,6 +410,224 @@ async function handleApiRequest(req, res, pathname, method) {
             if (error) throw error;
             res.writeHead(200);
             res.end(JSON.stringify({ success: true }));
+            return;
+        }
+
+        // Approve winner (PROTECTED)
+        if (pathname === '/api/winners/approve' && method === 'POST') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const body = await getRequestBody(req);
+            const { competition_id, wallet_address, place } = JSON.parse(body);
+            
+            const { data: leaderboardData } = await supabase
+                .from('leaderboard_data')
+                .select('*')
+                .eq('competition_id', competition_id)
+                .eq('wallet_address', wallet_address)
+                .single();
+            
+            if (!leaderboardData) {
+                res.writeHead(404);
+                res.end(JSON.stringify({ error: 'Participant not found in leaderboard' }));
+                return;
+            }
+            
+            const { data: competition } = await supabase
+                .from('competitions')
+                .select('prize_structure')
+                .eq('id', competition_id)
+                .single();
+            
+            const prizeAmount = competition?.prize_structure?.[place.toString()] || 0;
+            
+            const { error } = await supabase
+                .from('winners')
+                .upsert({
+                    competition_id,
+                    wallet_address,
+                    username: leaderboardData.username,
+                    place,
+                    amount_usd: prizeAmount,
+                    payment_status: 'approved',
+                    paid_at: new Date().toISOString()
+                }, {
+                    onConflict: 'competition_id,wallet_address,place'
+                });
+            
+            if (error) throw error;
+            res.writeHead(200);
+            res.end(JSON.stringify({ success: true }));
+            return;
+        }
+
+        // Disqualify winner (PROTECTED)
+        if (pathname === '/api/winners/disqualify' && method === 'POST') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const body = await getRequestBody(req);
+            const { competition_id, wallet_address, place } = JSON.parse(body);
+            
+            const { error: updateError } = await supabase
+                .from('winners')
+                .upsert({
+                    competition_id,
+                    wallet_address,
+                    username: '',
+                    place,
+                    amount_usd: 0,
+                    payment_status: 'disqualified',
+                    paid_at: null
+                }, {
+                    onConflict: 'competition_id,wallet_address,place'
+                });
+            
+            if (updateError) throw updateError;
+            
+            const { data: leaderboard } = await supabase
+                .from('leaderboard_data')
+                .select('*')
+                .eq('competition_id', competition_id)
+                .order('rank', { ascending: true });
+            
+            const nextRunner = leaderboard?.find(p => 
+                p.rank > place && 
+                p.wallet_address !== wallet_address
+            );
+            
+            if (nextRunner) {
+                const { data: competition } = await supabase
+                    .from('competitions')
+                    .select('prize_structure')
+                    .eq('id', competition_id)
+                    .single();
+                
+                const prizeAmount = competition?.prize_structure?.[place.toString()] || 0;
+                
+                await supabase
+                    .from('winners')
+                    .upsert({
+                        competition_id,
+                        wallet_address: nextRunner.wallet_address,
+                        username: nextRunner.username,
+                        place,
+                        amount_usd: prizeAmount,
+                        payment_status: 'pending',
+                        paid_at: null
+                    }, {
+                        onConflict: 'competition_id,wallet_address,place'
+                    });
+            }
+            
+            res.writeHead(200);
+            res.end(JSON.stringify({ success: true, next_runner: nextRunner?.username }));
+            return;
+        }
+
+        // Revoke winner approval (PROTECTED)
+        if (pathname === '/api/winners/revoke' && method === 'POST') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const body = await getRequestBody(req);
+            const { competition_id, wallet_address, place } = JSON.parse(body);
+            
+            const { error } = await supabase
+                .from('winners')
+                .update({
+                    payment_status: 'pending',
+                    paid_at: null
+                })
+                .eq('competition_id', competition_id)
+                .eq('wallet_address', wallet_address)
+                .eq('place', place);
+            
+            if (error) throw error;
+            res.writeHead(200);
+            res.end(JSON.stringify({ success: true }));
+            return;
+        }
+
+        // Reinstate winner (PROTECTED)
+        if (pathname === '/api/winners/reinstate' && method === 'POST') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const body = await getRequestBody(req);
+            const { competition_id, wallet_address, place } = JSON.parse(body);
+            
+            const { error } = await supabase
+                .from('winners')
+                .update({
+                    payment_status: 'pending',
+                    paid_at: null
+                })
+                .eq('competition_id', competition_id)
+                .eq('wallet_address', wallet_address)
+                .eq('place', place);
+            
+            if (error) throw error;
+            res.writeHead(200);
+            res.end(JSON.stringify({ success: true }));
+            return;
+        }
+
+        // Get user stats (PROTECTED)
+        if (pathname === '/api/user-stats' && method === 'GET') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const url = new URL(req.url, `http://${req.headers.host}`);
+            const searchTerm = url.searchParams.get('search');
+            
+            if (!searchTerm) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ error: 'Search term required' }));
+                return;
+            }
+            
+            const { data: leaderboardEntries } = await supabase
+                .from('leaderboard_data')
+                .select('*')
+                .or(`username.ilike.%${searchTerm}%,wallet_address.ilike.%${searchTerm}%`);
+            
+            const { data: winnerEntries } = await supabase
+                .from('winners')
+                .select('*')
+                .or(`username.ilike.%${searchTerm}%,wallet_address.ilike.%${searchTerm}%`);
+            
+            const uniqueCompetitions = new Set(leaderboardEntries?.map(e => e.competition_id) || []);
+            const totalWinnings = winnerEntries?.reduce((sum, w) => sum + (w.amount_usd || 0), 0) || 0;
+            const bestRank = Math.min(...(leaderboardEntries?.map(e => e.rank) || [Infinity]));
+            
+            res.writeHead(200);
+            res.end(JSON.stringify({
+                competitions_count: uniqueCompetitions.size,
+                total_winnings: totalWinnings,
+                best_rank: bestRank === Infinity ? null : bestRank
+            }));
             return;
         }
 
