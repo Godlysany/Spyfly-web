@@ -68,6 +68,7 @@ Thumbs.db
 
 # Database dumps
 *.sql
+!migrations.sql
 *.db
 *.sqlite
 *.sqlite3
