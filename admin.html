@@ -290,9 +290,21 @@
                         <input type="number" id="comp-pool" placeholder="15000" required>
                     </div>
                     <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="comp-description" rows="3" placeholder="Brief description of the competition"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Entry Requirements</label>
+                        <textarea id="comp-requirements" rows="2" placeholder="e.g., Minimum 5 SOL trading volume"></textarea>
+                    </div>
+                    <div class="form-group">
                         <label>Prize Structure (JSON)</label>
                         <textarea id="comp-prizes" rows="6" required>{"1": 7500, "2": 4500, "3": 2250, "4": 750}</textarea>
                         <small style="color: rgba(255,255,255,0.6);">Format: {"position": amount}</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Competition Rules</label>
+                        <textarea id="comp-rules" rows="4" placeholder="Enter each rule on a new line"></textarea>
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal('create-competition-modal')">Cancel</button>
@@ -311,21 +323,160 @@
                 <button class="modal-close" onclick="closeModal('competition-detail-modal')">&times;</button>
             </div>
             <div class="modal-body">
-                <!-- Competition Info -->
-                <div style="background: rgba(45, 212, 127, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <div id="competition-info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    </div>
-                </div>
-
                 <!-- Tabs within modal -->
                 <div style="border-bottom: 2px solid rgba(45, 212, 127, 0.2); margin-bottom: 20px;">
-                    <button class="tab-btn active" onclick="switchDetailTab('participants')" id="tab-btn-participants">👥 Participants</button>
+                    <button class="tab-btn active" onclick="switchDetailTab('overview')" id="tab-btn-overview">📋 Overview</button>
+                    <button class="tab-btn" onclick="switchDetailTab('edit')" id="tab-btn-edit">✏️ Edit</button>
+                    <button class="tab-btn" onclick="switchDetailTab('participants')" id="tab-btn-participants">👥 Participants</button>
                     <button class="tab-btn" onclick="switchDetailTab('prizes')" id="tab-btn-prizes">💰 Prizes</button>
                     <button class="tab-btn" onclick="switchDetailTab('winners')" id="tab-btn-winners">👑 Winners</button>
                 </div>
 
+                <!-- Overview Tab -->
+                <div id="detail-tab-overview" class="detail-subtab" style="display: block;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 20px;">Competition Information</h4>
+                    
+                    <!-- Metadata KPIs -->
+                    <div class="kpi-grid" style="margin-bottom: 25px;">
+                        <div class="kpi-card" style="background: rgba(45, 212, 127, 0.05);">
+                            <h4 style="color: rgba(255,255,255,0.7);">Status</h4>
+                            <div id="overview-status" class="kpi-value" style="font-size: 1.2rem;">-</div>
+                        </div>
+                        <div class="kpi-card" style="background: rgba(45, 212, 127, 0.05);">
+                            <h4 style="color: rgba(255,255,255,0.7);">Created</h4>
+                            <div id="overview-created" class="kpi-value" style="font-size: 1.2rem;">-</div>
+                        </div>
+                        <div class="kpi-card" style="background: rgba(45, 212, 127, 0.05);">
+                            <h4 style="color: rgba(255,255,255,0.7);">Last Modified</h4>
+                            <div id="overview-modified" class="kpi-value" style="font-size: 1.2rem;">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Competition Details Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <div class="form-group">
+                                <label>Competition ID</label>
+                                <div id="overview-id" style="padding: 12px; background: rgba(45, 212, 127, 0.05); border-radius: 6px; color: white; font-family: monospace;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Title</label>
+                                <div id="overview-title" style="padding: 12px; background: rgba(45, 212, 127, 0.05); border-radius: 6px; color: white;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Period</label>
+                                <div id="overview-period" style="padding: 12px; background: rgba(45, 212, 127, 0.05); border-radius: 6px; color: white;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Competition Type</label>
+                                <div id="overview-type" style="padding: 12px; background: rgba(45, 212, 127, 0.05); border-radius: 6px; color: white;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Prize Pool</label>
+                                <div id="overview-pool" style="padding: 12px; background: rgba(45, 212, 127, 0.05); border-radius: 6px; color: var(--primary-color); font-weight: 700; font-size: 1.2rem;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <div id="overview-start" style="padding: 12px; background: rgba(45, 212, 127, 0.05); border-radius: 6px; color: white;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <div id="overview-end" style="padding: 12px; background: rgba(45, 212, 127, 0.05); border-radius: 6px; color: white;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <div id="overview-description" style="padding: 12px; background: rgba(45, 212, 127, 0.05); border-radius: 6px; color: white; min-height: 60px;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Entry Requirements</label>
+                                <div id="overview-requirements" style="padding: 12px; background: rgba(45, 212, 127, 0.05); border-radius: 6px; color: white;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prize Structure -->
+                    <div class="form-group">
+                        <label>Prize Structure</label>
+                        <div id="overview-prize-structure" style="padding: 15px; background: rgba(45, 212, 127, 0.05); border-radius: 6px;"></div>
+                    </div>
+
+                    <!-- Rules -->
+                    <div class="form-group">
+                        <label>Competition Rules</label>
+                        <div id="overview-rules" style="padding: 12px; background: rgba(45, 212, 127, 0.05); border-radius: 6px; color: white; white-space: pre-line;"></div>
+                    </div>
+                </div>
+
+                <!-- Edit Tab -->
+                <div id="detail-tab-edit" class="detail-subtab" style="display: none;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 20px;">Edit Competition</h4>
+                    <form id="edit-competition-form" onsubmit="updateCompetition(event)">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <div class="form-group">
+                                    <label>Title</label>
+                                    <input type="text" id="edit-title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Period Display</label>
+                                    <input type="text" id="edit-period" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Competition Type</label>
+                                    <select id="edit-type" required>
+                                        <option value="pnl">💰 P&L Competition</option>
+                                        <option value="volume">📊 Volume Competition</option>
+                                        <option value="winrate">🎯 Win Rate Competition</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Prize Pool (USD)</label>
+                                    <input type="number" id="edit-pool" required>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="form-group">
+                                    <label>Start Date</label>
+                                    <input type="datetime-local" id="edit-start" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>End Date</label>
+                                    <input type="datetime-local" id="edit-end" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea id="edit-description" rows="3"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Entry Requirements</label>
+                                    <textarea id="edit-requirements" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Prize Structure (JSON)</label>
+                            <textarea id="edit-prizes" rows="4" required>{"1": 7500, "2": 4500, "3": 2250}</textarea>
+                            <small style="color: rgba(255,255,255,0.6);">Format: {"position": amount}</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Competition Rules</label>
+                            <textarea id="edit-rules" rows="4"></textarea>
+                            <small style="color: rgba(255,255,255,0.6);">Enter each rule on a new line</small>
+                        </div>
+
+                        <div class="modal-actions">
+                            <button type="button" class="btn-secondary" onclick="switchDetailTab('overview')">Cancel</button>
+                            <button type="submit" class="btn-admin">💾 Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+
                 <!-- Participants Tab -->
-                <div id="detail-tab-participants" class="detail-subtab" style="display: block;">
+                <div id="detail-tab-participants" class="detail-subtab" style="display: none;">
                     <h4 style="color: var(--primary-color); margin-bottom: 15px;">Leaderboard Participants</h4>
                     <div id="participants-loading" class="loading">Loading participants...</div>
                     <table class="data-table" id="participants-table" style="display: none;">
@@ -381,7 +532,7 @@
         const API_URL = '/api';
         let competitions = [];
         let currentCompetitionId = null;
-        let currentDetailTab = 'participants';
+        let currentDetailTab = 'overview';
 
         // Authentication Check
         async function checkAuth() {
@@ -477,7 +628,11 @@
             document.getElementById(`detail-tab-${tabName}`).style.display = 'block';
             currentDetailTab = tabName;
             
-            if (tabName === 'participants') {
+            if (tabName === 'overview') {
+                // Overview already loaded
+            } else if (tabName === 'edit') {
+                // Edit form already populated
+            } else if (tabName === 'participants') {
                 loadParticipants();
             } else if (tabName === 'prizes') {
                 loadPrizes();
@@ -502,19 +657,93 @@
             
             document.getElementById('detail-modal-title').textContent = comp.title;
             
-            const infoGrid = document.getElementById('competition-info-grid');
-            infoGrid.innerHTML = `
-                <div><strong style="color: var(--primary-color);">Period:</strong> ${comp.period}</div>
-                <div><strong style="color: var(--primary-color);">Type:</strong> ${getTypeLabel(comp.type)}</div>
-                <div><strong style="color: var(--primary-color);">Status:</strong> ${getStatusBadge(comp)}</div>
-                <div><strong style="color: var(--primary-color);">Prize Pool:</strong> $${comp.prize_pool.toLocaleString()}</div>
-                <div><strong style="color: var(--primary-color);">Start:</strong> ${new Date(comp.start_date).toLocaleDateString()}</div>
-                <div><strong style="color: var(--primary-color);">End:</strong> ${new Date(comp.end_date).toLocaleDateString()}</div>
-            `;
+            // Populate Overview Tab
+            const now = new Date();
+            const start = new Date(comp.start_date);
+            const end = new Date(comp.end_date);
+            let status = 'UPCOMING';
+            if (now >= start && now <= end) status = 'ACTIVE';
+            else if (now > end) status = 'ENDED';
             
+            document.getElementById('overview-status').innerHTML = `<span class="status-badge status-${status.toLowerCase()}">${status}</span>`;
+            document.getElementById('overview-created').textContent = comp.created_at ? new Date(comp.created_at).toLocaleDateString() : 'N/A';
+            document.getElementById('overview-modified').textContent = comp.updated_at ? new Date(comp.updated_at).toLocaleDateString() : 'Never';
+            document.getElementById('overview-id').textContent = comp.id;
+            document.getElementById('overview-title').textContent = comp.title;
+            document.getElementById('overview-period').textContent = comp.period || '-';
+            document.getElementById('overview-type').textContent = getTypeLabel(comp.type);
+            document.getElementById('overview-pool').textContent = `$${comp.prize_pool.toLocaleString()}`;
+            document.getElementById('overview-start').textContent = new Date(comp.start_date).toLocaleString();
+            document.getElementById('overview-end').textContent = new Date(comp.end_date).toLocaleString();
+            document.getElementById('overview-description').textContent = comp.description || 'No description provided';
+            document.getElementById('overview-requirements').textContent = comp.entry_requirements || 'None specified';
+            document.getElementById('overview-rules').textContent = comp.rules || 'No rules specified';
+            
+            // Display prize structure visually
+            const prizeStructure = comp.prize_structure || {};
+            const prizeHtml = Object.entries(prizeStructure).sort((a, b) => parseInt(a[0]) - parseInt(b[0])).map(([position, amount]) => `
+                <div style="display: flex; justify-content: space-between; padding: 8px; background: rgba(45, 212, 127, 0.1); margin-bottom: 5px; border-radius: 4px;">
+                    <span><strong>Position #${position}:</strong></span>
+                    <span style="color: var(--primary-color); font-weight: 700;">$${amount.toLocaleString()}</span>
+                </div>
+            `).join('');
+            document.getElementById('overview-prize-structure').innerHTML = prizeHtml || '<em style="color: rgba(255,255,255,0.5);">No prize structure defined</em>';
+            
+            // Populate Edit Tab
+            document.getElementById('edit-title').value = comp.title;
+            document.getElementById('edit-period').value = comp.period || '';
+            document.getElementById('edit-type').value = comp.type;
+            document.getElementById('edit-pool').value = comp.prize_pool;
+            document.getElementById('edit-start').value = comp.start_date ? new Date(comp.start_date).toISOString().slice(0, 16) : '';
+            document.getElementById('edit-end').value = comp.end_date ? new Date(comp.end_date).toISOString().slice(0, 16) : '';
+            document.getElementById('edit-description').value = comp.description || '';
+            document.getElementById('edit-requirements').value = comp.entry_requirements || '';
+            document.getElementById('edit-prizes').value = JSON.stringify(comp.prize_structure || {}, null, 2);
+            document.getElementById('edit-rules').value = comp.rules || '';
+            
+            // Open modal with Overview tab
             document.getElementById('competition-detail-modal').classList.add('active');
-            currentDetailTab = 'participants';
-            switchDetailTab('participants');
+            currentDetailTab = 'overview';
+            switchDetailTab('overview');
+        }
+
+        async function updateCompetition(event) {
+            event.preventDefault();
+            
+            const updates = {
+                title: document.getElementById('edit-title').value,
+                period: document.getElementById('edit-period').value,
+                type: document.getElementById('edit-type').value,
+                prize_pool: parseInt(document.getElementById('edit-pool').value),
+                start_date: document.getElementById('edit-start').value,
+                end_date: document.getElementById('edit-end').value,
+                description: document.getElementById('edit-description').value,
+                entry_requirements: document.getElementById('edit-requirements').value,
+                prize_structure: JSON.parse(document.getElementById('edit-prizes').value),
+                rules: document.getElementById('edit-rules').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/competitions/${currentCompetitionId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(updates)
+                });
+
+                if (response.ok) {
+                    showMessage('Competition updated successfully!', 'success');
+                    await loadCompetitions();
+                    openCompetitionDetail(currentCompetitionId); // Refresh the modal
+                    switchDetailTab('overview'); // Go back to overview
+                } else {
+                    const error = await response.json();
+                    showMessage(error.error || 'Failed to update competition', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating competition:', error);
+                showMessage('Error updating competition', 'error');
+            }
         }
 
         // Competitions Management
@@ -559,7 +788,10 @@
                 start_date: document.getElementById('comp-start').value,
                 end_date: document.getElementById('comp-end').value,
                 prize_pool: parseInt(document.getElementById('comp-pool').value),
-                prize_structure: JSON.parse(document.getElementById('comp-prizes').value)
+                description: document.getElementById('comp-description').value,
+                entry_requirements: document.getElementById('comp-requirements').value,
+                prize_structure: JSON.parse(document.getElementById('comp-prizes').value),
+                rules: document.getElementById('comp-rules').value
             };
 
             try {

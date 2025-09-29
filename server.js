@@ -786,6 +786,38 @@ async function handleApiRequest(req, res, pathname, method) {
             return;
         }
 
+        // Update competition (PROTECTED)
+        if (pathname.startsWith('/api/competitions/') && method === 'PUT') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            const competitionId = pathname.split('/')[3];
+            const body = await getRequestBody(req);
+            const updates = JSON.parse(body);
+            
+            // Extract prize structure if provided
+            const prizeStructure = updates.prize_structure;
+            delete updates.prize_structure;
+            
+            // Add updated_at timestamp
+            updates.updated_at = new Date().toISOString();
+            
+            const { error } = await supabase
+                .from('competitions')
+                .update(updates)
+                .eq('id', competitionId);
+            
+            if (error) throw error;
+            
+            res.writeHead(200);
+            res.end(JSON.stringify({ success: true }));
+            return;
+        }
+
         // Delete competition (PROTECTED)
         if (pathname.startsWith('/api/competitions/') && method === 'DELETE') {
             const admin = await verifyAdminToken(req);
