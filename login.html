@@ -232,9 +232,9 @@
                     successMessage.textContent = 'Login successful! Redirecting...';
                     successMessage.style.display = 'block';
                     
-                    // Redirect to admin panel
+                    // Redirect to admin panel (use absolute path to preserve cookie)
                     setTimeout(() => {
-                        window.location.href = 'admin.html';
+                        window.location.href = '/admin.html';
                     }, 1500);
                     
                 } else {
@@ -263,7 +263,7 @@
                 
                 if (response.ok) {
                     // Already logged in, redirect to admin
-                    window.location.href = 'admin.html';
+                    window.location.href = '/admin.html';
                 }
             } catch (error) {
                 // Not logged in or network error, stay on login page

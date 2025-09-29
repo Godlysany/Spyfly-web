@@ -548,11 +548,11 @@
                     
                     loadInitialData();
                 } else {
-                    window.location.href = '/login.html';
+                    window.location.replace('/login.html');
                 }
             } catch (error) {
                 console.error('Auth check failed:', error);
-                window.location.href = '/login.html';
+                window.location.replace('/login.html');
             }
         }
 
@@ -1194,7 +1194,13 @@
             }, 5000);
         }
 
-        checkAuth();
+        // Wait for DOM and all resources to be ready before checking auth
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkAuth);
+        } else {
+            // DOMContentLoaded already fired
+            checkAuth();
+        }
     </script>
 </body>
 </html>
