@@ -193,11 +193,12 @@ async function handleApiRequest(req, res, pathname, method) {
                     locked_until: null
                 })
                 .eq('id', admin.id);
-                
+            
+            // Set cookie with HttpOnly flag for security
+            res.setHeader('Set-Cookie', `admin_token=${token}; HttpOnly; Path=/; Max-Age=28800; SameSite=Lax`);
             res.writeHead(200);
             res.end(JSON.stringify({
                 success: true,
-                token,
                 admin: {
                     id: admin.id,
                     username: admin.username,
