@@ -27,15 +27,29 @@ jobs:
 
       - name: 🚀 Apply Database Migration
         if: steps.check-migration.outputs.has_migration == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           echo "🗄 Connecting to Supabase database..."
+          
           # Install PostgreSQL client
           sudo apt-get update -q
           sudo apt-get install -y postgresql-client
           
-          # Apply migration using DATABASE_URL
+          # Validate DATABASE_URL format (show only host, hide credentials)
+          if [[ ! "$DATABASE_URL" =~ ^postgresql:// ]]; then
+            echo "❌ ERROR: DATABASE_URL must start with 'postgresql://'"
+            echo "Current format detected: ${DATABASE_URL:0:15}..."
+            exit 1
+          fi
+          
+          # Extract and display connection info (without credentials)
+          HOST=$(echo "$DATABASE_URL" | sed -n 's/.*@\([^:]*\):.*/\1/p')
+          echo "📡 Connecting to: $HOST"
+          
+          # Apply migration using environment variable
           echo "📝 Applying migration to database..."
-          psql "${{ secrets.DATABASE_URL }}" -f migrations.sql -v ON_ERROR_STOP=1
+          psql "$DATABASE_URL" -f migrations.sql -v ON_ERROR_STOP=1
           
           echo "✅ Database migration completed successfully!"
 
