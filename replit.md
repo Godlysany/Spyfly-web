@@ -48,7 +48,25 @@ A modern, interactive website for SpyFly, a fictional bot that scrapes alpha cal
 ```
 
 ## Recent Changes (Sept 30, 2025)
-### LATEST: Critical Data Integration & Display Fixes
+### LATEST: Complete Field Mapping Resolution - All Views Fixed
+- ✅ **Fixed ALL Status View Displays (Status 1, 2, 3)**:
+  - **Issue**: Prize Distribution and Hall of Fame sections showing $NaN in Status 2 and Status 3 views
+  - **Root Cause**: Sophisticated status views still using deprecated field names after initial fixes
+  - **Solution**: Systematically replaced all instances of deprecated fields across all 3 status views:
+    - Status 1 (Active + History): Fixed 7 instances of `prize_pool_usd` and `amount_usd`
+    - Status 2 (Upcoming + History): Fixed prize breakdown and preview calculations
+    - Status 3 (History Only): Fixed historical stats and winner displays
+  - **Method**: Used sed batch replacement for consistency across entire codebase
+  - **Files Modified**: `leaderboard.js` (all sophisticated view functions), `script.js` (landing page)
+  - **Result**: All prize amounts now display correctly ($10,000 instead of $NaN) across all views
+
+- ✅ **Verified Data Flow End-to-End**:
+  - Database: `total_prize_pool`, `prize_amount` (correct schema)
+  - API: Returns both field names for backward compatibility
+  - Frontend: Uses fallback chain `prize_pool || total_prize_pool || 0` and `prize_amount || amount_usd || 0`
+  - All views tested and confirmed working with real data
+
+### Critical Data Integration & Display Fixes
 - ✅ **Fixed Frontend-Backend Data Mapping**:
   - **Landing Page & Leaderboard**: Resolved $NaN displays across entire website
   - **Root Cause**: Frontend JavaScript was using deprecated field names (`prize_pool_usd`, `amount_usd`)

@@ -782,7 +782,7 @@ function initPrizeHub(data) {
                             <div class="winner-item">
                                 <span class="winner-rank">${['🥇', '🥈', '🥉'][i] || `#${w.place}`}</span>
                                 <span class="winner-name">${w.username || 'Anonymous'}</span>
-                                <span class="winner-prize">$${(w.amount_usd || 0).toLocaleString()}</span>
+                                <span class="winner-prize">$${(w.prize_amount || w.amount_usd || 0).toLocaleString()}</span>
                             </div>
                         `).join('')}
                     </div>
