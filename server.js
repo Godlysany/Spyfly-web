@@ -1143,6 +1143,80 @@ async function handleApiRequest(req, res, pathname, method) {
             return;
         }
 
+        // Setup leaderboard table and populate with test data (ADMIN)
+        if (pathname === '/api/admin/setup-leaderboard' && method === 'POST') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+
+            try {
+                // First, try to insert test data (will fail if table doesn't exist)
+                const traderNames = [
+                    'crypto_wizard', 'alpha_hunter', 'moon_sniper', 'degen_king', 'fly_whisperer',
+                    'volume_king', 'whale_hunter', 'precision_pro', 'snipe_master', 'accuracy_ace',
+                    'legend_trader', 'profit_machine', 'volume_beast', 'whale_slayer', 'perfect_sniper',
+                    'accuracy_king', 'goat_trader', 'alpha_legend', 'moon_emperor', 'profit_god',
+                    'volume_titan', 'trade_machine', 'whale_destroyer', 'precision_lord', 'snipe_god'
+                ];
+
+                const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+                const randomFloat = (min, max) => (Math.random() * (max - min) + min).toFixed(2);
+
+                const leaderboardEntries = traderNames.map(username => ({
+                    username,
+                    pnl: parseFloat(randomFloat(10000, 500000)),
+                    volume: parseFloat(randomFloat(1000000, 20000000)),
+                    win_rate: parseFloat(randomFloat(65, 95)),
+                    trades_today: random(5, 50)
+                }));
+
+                // Clear existing data
+                await supabase.from('leaderboard_data').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+
+                // Insert test data
+                const { data, error } = await supabase
+                    .from('leaderboard_data')
+                    .insert(leaderboardEntries);
+
+                if (error) {
+                    res.writeHead(500);
+                    res.end(JSON.stringify({ 
+                        error: 'Table does not exist. Please create it manually in Supabase SQL Editor',
+                        sql: `
+CREATE TABLE leaderboard_data (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username VARCHAR(255) NOT NULL,
+    pnl DECIMAL(15,2) DEFAULT 0,
+    volume DECIMAL(18,2) DEFAULT 0,
+    win_rate DECIMAL(5,2) DEFAULT 0,
+    trades_today INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX idx_leaderboard_username ON leaderboard_data(username);
+CREATE INDEX idx_leaderboard_pnl ON leaderboard_data(pnl DESC);
+                        `.trim()
+                    }));
+                    return;
+                }
+
+                res.writeHead(200);
+                res.end(JSON.stringify({ 
+                    success: true, 
+                    message: `Populated ${leaderboardEntries.length} traders`,
+                    traders_count: leaderboardEntries.length
+                }));
+            } catch (error) {
+                res.writeHead(500);
+                res.end(JSON.stringify({ error: error.message }));
+            }
+            return;
+        }
+
         // 404 for unknown API endpoints
         res.writeHead(404);
         res.end(JSON.stringify({ error: 'API endpoint not found' }));
