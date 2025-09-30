@@ -30,8 +30,9 @@ ON CONFLICT (key) DO NOTHING;
 -- ============================================
 -- 2. ADMIN USER SETUP
 -- ============================================
+-- Password: admin123
 INSERT INTO admin_users (username, password_hash, is_active)
-VALUES ('admin', '$2b$10$z4ao/AGeP5U844fXAji0puNnwRorrrf.2wZacbCV6UYGsIvejT3He', true)
+VALUES ('admin', '$2b$10$3J.tE0592UuVwbWL90Zx9exEGcyvTBfPMZBkEKETOqSDLkYuIPz4C', true)
 ON CONFLICT (username) DO UPDATE SET
     password_hash = EXCLUDED.password_hash,
     is_active = EXCLUDED.is_active;
