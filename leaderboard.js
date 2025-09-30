@@ -937,7 +937,7 @@ function renderSophisticatedStatus1(data, prizeHub) {
                     <div class="historical-kpi-grid">
                         <div class="kpi-card highlight">
                             <div class="kpi-icon">💰</div>
-                            <div class="kpi-value">$${(stats.total_distributed_usd || 45000).toLocaleString()}</div>
+                            <div class="kpi-value">$${(stats.total_distributed_usd || 0).toLocaleString()}</div>
                             <div class="kpi-label">Total Distributed</div>
                         </div>
                         <div class="kpi-card">
@@ -947,12 +947,12 @@ function renderSophisticatedStatus1(data, prizeHub) {
                         </div>
                         <div class="kpi-card highlight">
                             <div class="kpi-icon">📊</div>
-                            <div class="kpi-value">$${stats.total_volume ? (stats.total_volume/1000000).toFixed(1) + 'M' : '18.3M'}</div>
+                            <div class="kpi-value">$${(stats.total_volume ? (stats.total_volume/1000000).toFixed(1) + 'M' : '0')}</div>
                             <div class="kpi-label">Total Volume</div>
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-icon">📈</div>
-                            <div class="kpi-value">${stats.total_trades ? (stats.total_trades/1000).toFixed(1) + 'K' : '45.2K'}</div>
+                            <div class="kpi-value">${(stats.total_trades ? (stats.total_trades/1000).toFixed(1) + 'K' : '0')}</div>
                             <div class="kpi-label">Total Trades</div>
                         </div>
                     </div>
@@ -1221,7 +1221,7 @@ function renderSophisticatedStatus2(data, prizeHub) {
                     <div class="historical-kpi-grid">
                         <div class="kpi-card highlight">
                             <div class="kpi-icon">💰</div>
-                            <div class="kpi-value">$${(stats.total_distributed_usd || 45000).toLocaleString()}</div>
+                            <div class="kpi-value">$${(stats.total_distributed_usd || 0).toLocaleString()}</div>
                             <div class="kpi-label">Total Distributed</div>
                         </div>
                         <div class="kpi-card">
@@ -1231,12 +1231,12 @@ function renderSophisticatedStatus2(data, prizeHub) {
                         </div>
                         <div class="kpi-card highlight">
                             <div class="kpi-icon">📊</div>
-                            <div class="kpi-value">$${stats.total_volume ? (stats.total_volume/1000000).toFixed(1) + 'M' : '18.3M'}</div>
+                            <div class="kpi-value">$${(stats.total_volume ? (stats.total_volume/1000000).toFixed(1) + 'M' : '0')}</div>
                             <div class="kpi-label">Total Volume</div>
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-icon">📈</div>
-                            <div class="kpi-value">${stats.total_trades ? (stats.total_trades/1000).toFixed(1) + 'K' : '45.2K'}</div>
+                            <div class="kpi-value">${(stats.total_trades ? (stats.total_trades/1000).toFixed(1) + 'K' : '0')}</div>
                             <div class="kpi-label">Total Trades</div>
                         </div>
                     </div>
@@ -1363,7 +1363,7 @@ function renderSophisticatedStatus3(data, prizeHub) {
                     <div class="historical-kpi-grid">
                         <div class="kpi-card highlight">
                             <div class="kpi-icon">💰</div>
-                            <div class="kpi-value">$${(stats.total_distributed_usd || 45000).toLocaleString()}</div>
+                            <div class="kpi-value">$${(stats.total_distributed_usd || 0).toLocaleString()}</div>
                             <div class="kpi-label">Total Distributed</div>
                         </div>
                         <div class="kpi-card">
@@ -1373,12 +1373,12 @@ function renderSophisticatedStatus3(data, prizeHub) {
                         </div>
                         <div class="kpi-card highlight">
                             <div class="kpi-icon">📊</div>
-                            <div class="kpi-value">$${stats.total_volume ? (stats.total_volume/1000000).toFixed(1) + 'M' : '18.3M'}</div>
+                            <div class="kpi-value">$${(stats.total_volume ? (stats.total_volume/1000000).toFixed(1) + 'M' : '0')}</div>
                             <div class="kpi-label">Total Volume</div>
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-icon">📈</div>
-                            <div class="kpi-value">${stats.total_trades ? (stats.total_trades/1000).toFixed(1) + 'K' : '45.2K'}</div>
+                            <div class="kpi-value">${(stats.total_trades ? (stats.total_trades/1000).toFixed(1) + 'K' : '0')}</div>
                             <div class="kpi-label">Total Trades</div>
                         </div>
                     </div>

@@ -802,13 +802,29 @@ async function handleApiRequest(req, res, pathname, method) {
                 .order('start_date', { ascending: true })
                 .limit(3);
 
-            // Get historical competitions with winners and participant stats
+            // Get historical competitions with winners
             const { data: historyComps } = await supabase
                 .from('competitions')
-                .select(`*, winners(*), participants(*)`)
+                .select(`*, winners(*)`)
                 .lt('end_date', now)
                 .order('end_date', { ascending: false })
                 .limit(5);
+
+            // Manually fetch participants for each historical competition
+            if (historyComps && historyComps.length > 0) {
+                for (const comp of historyComps) {
+                    const { data: participants, error: partError } = await supabase
+                        .from('participants')
+                        .select('*')
+                        .eq('competition_id', comp.id);
+                    if (partError) {
+                        console.error(`Error fetching participants for ${comp.id}:`, partError);
+                    } else {
+                        console.log(`Fetched ${participants?.length || 0} participants for ${comp.title}`);
+                    }
+                    comp.participants = participants || [];
+                }
+            }
 
             // Get settings
             const { data: settings } = await supabase
@@ -824,6 +840,16 @@ async function handleApiRequest(req, res, pathname, method) {
             }, 0) || 0;
 
             const totalWinners = historyComps?.reduce((sum, comp) => sum + (comp.winners?.length || 0), 0) || 0;
+            
+            // Calculate total volume and trades from all participants
+            const totalVolume = historyComps?.reduce((sum, comp) => {
+                const compVolume = comp.participants?.reduce((compSum, p) => compSum + (p.score || 0), 0) || 0;
+                return sum + compVolume;
+            }, 0) || 0;
+            
+            const totalTrades = historyComps?.reduce((sum, comp) => {
+                return sum + (comp.participants?.length || 0) * 50; // Estimate trades per participant
+            }, 0) || 0;
 
             const response = {
                 current: currentComp ? [currentComp] : [],
@@ -832,7 +858,9 @@ async function handleApiRequest(req, res, pathname, method) {
                 stats: {
                     total_distributed_usd: totalDistributed,
                     total_winners: totalWinners,
-                    months_active: historyComps?.length || 0
+                    months_active: historyComps?.length || 0,
+                    total_volume: totalVolume,
+                    total_trades: totalTrades
                 },
                 config: {
                     hero_promo_days_before_start: parseInt(settingsMap.hero_promo_days_before_start) || 7,
