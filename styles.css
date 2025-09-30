@@ -5545,9 +5545,10 @@ nav ul li a.active {
 
 .prize-breakdown {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 15px;
     margin: 30px 0;
+    max-width: 800px;
 }
 
 .breakdown-item {

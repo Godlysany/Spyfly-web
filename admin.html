@@ -574,17 +574,31 @@
 
         // Authentication Check
         async function checkAuth() {
+            console.log('🔐 Starting authentication check...');
+            
+            // Set a timeout fallback in case fetch hangs
+            const authTimeout = setTimeout(() => {
+                console.error('⏰ Auth check timeout - redirecting to login');
+                localStorage.removeItem('admin_token');
+                window.location.replace('/login.html');
+            }, 10000); // 10 second timeout
+            
             try {
                 // Check localStorage for token (Railway workaround)
                 const storedToken = localStorage.getItem('admin_token');
+                console.log('📦 Stored token:', storedToken ? 'EXISTS' : 'NONE');
                 
                 const response = await fetch(`${API_URL}/auth/check`, {
                     credentials: 'include',
                     headers: storedToken ? { 'Authorization': `Bearer ${storedToken}` } : {}
                 });
                 
+                clearTimeout(authTimeout); // Clear timeout if request succeeds
+                console.log('📡 Auth response status:', response.status);
+                
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('✅ Auth data:', data);
                     if (data.authenticated) {
                         document.getElementById('admin-username').textContent = data.username || 'admin';
                         document.getElementById('auth-overlay').style.display = 'none';
@@ -595,11 +609,13 @@
                 }
                 
                 // Auth failed - redirect to login
-                console.log('Authentication failed, redirecting to login');
+                console.log('❌ Authentication failed, redirecting to login');
                 localStorage.removeItem('admin_token'); // Clear invalid token
                 window.location.replace('/login.html');
             } catch (error) {
-                console.error('Auth check failed:', error);
+                clearTimeout(authTimeout); // Clear timeout on error
+                console.error('❌ Auth check error:', error);
+                console.error('Error details:', error.message, error.stack);
                 localStorage.removeItem('admin_token'); // Clear token on error
                 window.location.replace('/login.html');
             }
