@@ -298,9 +298,14 @@
                         <textarea id="comp-requirements" rows="2" placeholder="e.g., Minimum 5 SOL trading volume"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Prize Structure (JSON)</label>
+                        <label>Prize Structure</label>
+                        <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+                            <button type="button" class="btn-admin btn-small" onclick="autoCalculatePrizes(3)" style="flex: 1;">Auto: Top 3 (50/30/20%)</button>
+                            <button type="button" class="btn-admin btn-small" onclick="autoCalculatePrizes(5)" style="flex: 1;">Auto: Top 5</button>
+                            <button type="button" class="btn-admin btn-small" onclick="autoCalculatePrizes(10)" style="flex: 1;">Auto: Top 10</button>
+                        </div>
                         <textarea id="comp-prizes" rows="6" required>{"1": 7500, "2": 4500, "3": 2250, "4": 750}</textarea>
-                        <small style="color: rgba(255,255,255,0.6);">Format: {"position": amount}</small>
+                        <small style="color: rgba(255,255,255,0.6);">Click Auto buttons or edit manually. Format: {"position": amount}</small>
                     </div>
                     <div class="form-group">
                         <label>Competition Rules</label>
@@ -839,6 +844,42 @@
             }
         }
 
+        function autoCalculatePrizes(places) {
+            const prizePool = parseInt(document.getElementById('comp-pool').value);
+            
+            if (!prizePool || prizePool <= 0) {
+                showMessage('Please enter a valid prize pool amount first', 'error');
+                return;
+            }
+            
+            const prizeStructure = {};
+            
+            // Different distribution patterns based on number of places
+            if (places === 3) {
+                // 50%, 30%, 20%
+                prizeStructure[1] = Math.floor(prizePool * 0.50);
+                prizeStructure[2] = Math.floor(prizePool * 0.30);
+                prizeStructure[3] = Math.floor(prizePool * 0.20);
+            } else if (places === 5) {
+                // 40%, 25%, 20%, 10%, 5%
+                prizeStructure[1] = Math.floor(prizePool * 0.40);
+                prizeStructure[2] = Math.floor(prizePool * 0.25);
+                prizeStructure[3] = Math.floor(prizePool * 0.20);
+                prizeStructure[4] = Math.floor(prizePool * 0.10);
+                prizeStructure[5] = Math.floor(prizePool * 0.05);
+            } else if (places === 10) {
+                // Top heavy: 35%, 20%, 15%, 10%, 8%, 5%, 3%, 2%, 1%, 1%
+                const percentages = [0.35, 0.20, 0.15, 0.10, 0.08, 0.05, 0.03, 0.02, 0.01, 0.01];
+                for (let i = 0; i < 10; i++) {
+                    prizeStructure[i + 1] = Math.floor(prizePool * percentages[i]);
+                }
+            }
+            
+            // Update the textarea with formatted JSON
+            document.getElementById('comp-prizes').value = JSON.stringify(prizeStructure, null, 2);
+            showMessage(`Prize structure auto-calculated for top ${places} places`, 'success');
+        }
+
         // Participants Management
         async function loadParticipants() {
             document.getElementById('participants-loading').style.display = 'block';
@@ -1073,23 +1114,32 @@
             try {
                 const [compsRes, winnersRes] = await Promise.all([
                     fetch(`${API_URL}/competitions`),
-                    fetch(`${API_URL}/winners`)
+                    fetch(`${API_URL}/winners`, { credentials: 'include' })
                 ]);
                 
                 const allCompetitions = await compsRes.json();
-                const allWinners = await winnersRes.json();
+                const allWinners = winnersRes.ok ? await winnersRes.json() : [];
                 
-                const totalPrizes = allCompetitions.reduce((sum, c) => sum + c.prize_pool, 0);
-                const approvedWinners = allWinners.filter(w => w.status === 'approved').length;
+                const totalPrizes = allCompetitions.reduce((sum, c) => sum + (parseFloat(c.prize_pool) || 0), 0);
+                const paidWinners = allWinners.filter(w => w.payment_status === 'paid').length;
+                
+                // Get unique participants count from competitions
+                const uniqueParticipants = new Set();
+                allCompetitions.forEach(comp => {
+                    if (comp.participant_count) {
+                        uniqueParticipants.add(comp.participant_count);
+                    }
+                });
                 
                 document.getElementById('stat-total-comps').textContent = allCompetitions.length;
                 document.getElementById('stat-total-prizes').textContent = `$${totalPrizes.toLocaleString()}`;
-                document.getElementById('stat-total-winners').textContent = approvedWinners;
-                document.getElementById('stat-unique-users').textContent = '...';
+                document.getElementById('stat-total-winners').textContent = paidWinners;
+                document.getElementById('stat-unique-users').textContent = allWinners.length > 0 ? new Set(allWinners.map(w => w.wallet_address)).size : '0';
                 
                 const typeBreakdown = {};
                 allCompetitions.forEach(comp => {
-                    typeBreakdown[comp.type] = (typeBreakdown[comp.type] || 0) + 1;
+                    const type = comp.type || 'unknown';
+                    typeBreakdown[type] = (typeBreakdown[type] || 0) + 1;
                 });
                 
                 const typeStatsHTML = Object.entries(typeBreakdown).map(([type, count]) => `
@@ -1102,9 +1152,13 @@
                     </div>
                 `).join('');
                 
-                document.getElementById('comp-type-stats').innerHTML = typeStatsHTML;
+                document.getElementById('comp-type-stats').innerHTML = typeStatsHTML || '<div style="color: rgba(255,255,255,0.5); padding: 20px;">No competition type data available</div>';
             } catch (error) {
                 console.error('Error loading statistics:', error);
+                document.getElementById('stat-total-comps').textContent = '0';
+                document.getElementById('stat-total-prizes').textContent = '$0';
+                document.getElementById('stat-total-winners').textContent = '0';
+                document.getElementById('stat-unique-users').textContent = '0';
             }
         }
 
