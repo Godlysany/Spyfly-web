@@ -298,14 +298,55 @@
                         <textarea id="comp-requirements" rows="2" placeholder="e.g., Minimum 5 SOL trading volume"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Prize Structure</label>
-                        <div style="display: flex; gap: 10px; margin-bottom: 8px;">
-                            <button type="button" class="btn-admin btn-small" onclick="autoCalculatePrizes(3)" style="flex: 1;">Auto: Top 3 (50/30/20%)</button>
-                            <button type="button" class="btn-admin btn-small" onclick="autoCalculatePrizes(5)" style="flex: 1;">Auto: Top 5</button>
-                            <button type="button" class="btn-admin btn-small" onclick="autoCalculatePrizes(10)" style="flex: 1;">Auto: Top 10</button>
+                        <label>Prize Distribution</label>
+                        
+                        <!-- Auto-calculation buttons -->
+                        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                            <button type="button" class="btn-admin btn-small" onclick="autoDistributePrizes('top3')" style="flex: 1; font-size: 0.85rem;">
+                                🥇 Top 3<br><small style="opacity: 0.7;">(50/30/20%)</small>
+                            </button>
+                            <button type="button" class="btn-admin btn-small" onclick="autoDistributePrizes('top5')" style="flex: 1; font-size: 0.85rem;">
+                                🏆 Top 5<br><small style="opacity: 0.7;">(40/25/20/10/5%)</small>
+                            </button>
+                            <button type="button" class="btn-admin btn-small" onclick="autoDistributePrizes('top10')" style="flex: 1; font-size: 0.85rem;">
+                                💎 Top 10<br><small style="opacity: 0.7;">(Heavy)</small>
+                            </button>
+                            <button type="button" class="btn-admin btn-small" onclick="autoDistributePrizes('equal')" style="flex: 1; font-size: 0.85rem;">
+                                ⚖️ Equal<br><small style="opacity: 0.7;">(Same)</small>
+                            </button>
                         </div>
-                        <textarea id="comp-prizes" rows="6" required>{"1": 7500, "2": 4500, "3": 2250, "4": 750}</textarea>
-                        <small style="color: rgba(255,255,255,0.6);">Click Auto buttons or edit manually. Format: {"position": amount}</small>
+
+                        <!-- Prize pool tracker -->
+                        <div id="prize-pool-tracker" style="background: rgba(45, 212, 127, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px; display: none;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span>Total Pool:</span>
+                                <strong id="tracker-total-pool">$0</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span>Allocated:</span>
+                                <strong id="tracker-allocated" style="color: var(--primary-color);">$0</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Remaining:</span>
+                                <strong id="tracker-remaining">$0</strong>
+                            </div>
+                            <div style="margin-top: 8px; height: 6px; background: rgba(0,0,0,0.3); border-radius: 3px; overflow: hidden;">
+                                <div id="tracker-progress-bar" style="height: 100%; background: var(--primary-color); width: 0%; transition: all 0.3s;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Prize positions container -->
+                        <div id="prize-positions-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 12px;">
+                            <!-- Positions will be added here dynamically -->
+                        </div>
+
+                        <!-- Add position button -->
+                        <button type="button" class="btn-secondary btn-small" onclick="addPrizePosition()" style="width: 100%; margin-bottom: 8px;">
+                            + Add Prize Position
+                        </button>
+
+                        <!-- Hidden field for actual data -->
+                        <input type="hidden" id="comp-prizes" required>
                     </div>
                     <div class="form-group">
                         <label>Competition Rules</label>
@@ -844,41 +885,159 @@
             }
         }
 
-        function autoCalculatePrizes(places) {
-            const prizePool = parseInt(document.getElementById('comp-pool').value);
+        // Advanced Prize Distribution System
+        let prizePositions = [];
+
+        function addPrizePosition(position = null, amount = 0) {
+            const nextPosition = position || (prizePositions.length + 1);
+            
+            const positionData = {
+                position: nextPosition,
+                amount: amount
+            };
+            
+            prizePositions.push(positionData);
+            renderPrizePositions();
+            updatePrizeTracker();
+        }
+
+        function removePrizePosition(position) {
+            prizePositions = prizePositions.filter(p => p.position !== position);
+            renderPrizePositions();
+            updatePrizeTracker();
+        }
+
+        function renderPrizePositions() {
+            const container = document.getElementById('prize-positions-container');
+            
+            if (prizePositions.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.5); padding: 20px;">No prize positions added yet. Click "Add Prize Position" or use auto-calculation.</div>';
+                return;
+            }
+
+            // Sort by position
+            prizePositions.sort((a, b) => a.position - b.position);
+
+            container.innerHTML = prizePositions.map(prize => `
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px;">
+                    <div style="flex: 0 0 80px;">
+                        <label style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">Position</label>
+                        <input type="number" value="${prize.position}" min="1" 
+                            style="width: 100%; padding: 6px; background: rgba(0,0,0,0.3); border: 1px solid rgba(45, 212, 127, 0.3); border-radius: 4px; color: white; font-size: 0.9rem;"
+                            onchange="updatePrizePosition(${prize.position}, 'position', this.value)" readonly>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">Prize Amount ($)</label>
+                        <input type="number" value="${prize.amount}" min="0" step="100"
+                            style="width: 100%; padding: 6px; background: rgba(0,0,0,0.3); border: 1px solid rgba(45, 212, 127, 0.3); border-radius: 4px; color: white; font-size: 0.9rem;"
+                            oninput="updatePrizePosition(${prize.position}, 'amount', this.value)">
+                    </div>
+                    <button type="button" onclick="removePrizePosition(${prize.position})" 
+                        style="flex: 0 0 40px; height: 40px; background: rgba(255,0,0,0.2); border: 1px solid rgba(255,0,0,0.3); border-radius: 4px; color: #ff6b6b; cursor: pointer; font-size: 1.2rem; margin-top: 20px;"
+                        title="Remove position">×</button>
+                </div>
+            `).join('');
+
+            syncPrizesToHiddenField();
+        }
+
+        function updatePrizePosition(oldPosition, field, value) {
+            const prize = prizePositions.find(p => p.position === oldPosition);
+            if (prize) {
+                if (field === 'amount') {
+                    prize.amount = parseFloat(value) || 0;
+                }
+                // Position is readonly, but keep the logic for future
+                updatePrizeTracker();
+                syncPrizesToHiddenField();
+            }
+        }
+
+        function updatePrizeTracker() {
+            const prizePool = parseFloat(document.getElementById('comp-pool').value) || 0;
+            const allocated = prizePositions.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+            const remaining = prizePool - allocated;
+            const percentage = prizePool > 0 ? (allocated / prizePool) * 100 : 0;
+
+            // Show tracker if prize pool is set
+            document.getElementById('prize-pool-tracker').style.display = prizePool > 0 ? 'block' : 'none';
+
+            // Update values
+            document.getElementById('tracker-total-pool').textContent = `$${prizePool.toLocaleString()}`;
+            document.getElementById('tracker-allocated').textContent = `$${allocated.toLocaleString()}`;
+            document.getElementById('tracker-remaining').textContent = `$${remaining.toLocaleString()}`;
+            document.getElementById('tracker-remaining').style.color = remaining < 0 ? '#ff6b6b' : remaining === 0 ? 'var(--primary-color)' : 'white';
+            
+            // Update progress bar
+            const progressBar = document.getElementById('tracker-progress-bar');
+            progressBar.style.width = `${Math.min(percentage, 100)}%`;
+            progressBar.style.background = percentage > 100 ? '#ff6b6b' : 'var(--primary-color)';
+
+            // Show warning if over budget
+            if (remaining < 0) {
+                showMessage(`⚠️ Prize allocation exceeds pool by $${Math.abs(remaining).toLocaleString()}`, 'error');
+            }
+        }
+
+        function syncPrizesToHiddenField() {
+            const prizeStructure = {};
+            prizePositions.forEach(p => {
+                prizeStructure[p.position] = parseFloat(p.amount) || 0;
+            });
+            document.getElementById('comp-prizes').value = JSON.stringify(prizeStructure);
+        }
+
+        function autoDistributePrizes(pattern) {
+            const prizePool = parseFloat(document.getElementById('comp-pool').value);
             
             if (!prizePool || prizePool <= 0) {
                 showMessage('Please enter a valid prize pool amount first', 'error');
                 return;
             }
+
+            prizePositions = [];
             
-            const prizeStructure = {};
-            
-            // Different distribution patterns based on number of places
-            if (places === 3) {
+            if (pattern === 'top3') {
                 // 50%, 30%, 20%
-                prizeStructure[1] = Math.floor(prizePool * 0.50);
-                prizeStructure[2] = Math.floor(prizePool * 0.30);
-                prizeStructure[3] = Math.floor(prizePool * 0.20);
-            } else if (places === 5) {
+                addPrizePosition(1, Math.floor(prizePool * 0.50));
+                addPrizePosition(2, Math.floor(prizePool * 0.30));
+                addPrizePosition(3, Math.floor(prizePool * 0.20));
+                showMessage('Top 3 distribution applied: 50/30/20%', 'success');
+            } else if (pattern === 'top5') {
                 // 40%, 25%, 20%, 10%, 5%
-                prizeStructure[1] = Math.floor(prizePool * 0.40);
-                prizeStructure[2] = Math.floor(prizePool * 0.25);
-                prizeStructure[3] = Math.floor(prizePool * 0.20);
-                prizeStructure[4] = Math.floor(prizePool * 0.10);
-                prizeStructure[5] = Math.floor(prizePool * 0.05);
-            } else if (places === 10) {
+                addPrizePosition(1, Math.floor(prizePool * 0.40));
+                addPrizePosition(2, Math.floor(prizePool * 0.25));
+                addPrizePosition(3, Math.floor(prizePool * 0.20));
+                addPrizePosition(4, Math.floor(prizePool * 0.10));
+                addPrizePosition(5, Math.floor(prizePool * 0.05));
+                showMessage('Top 5 distribution applied: 40/25/20/10/5%', 'success');
+            } else if (pattern === 'top10') {
                 // Top heavy: 35%, 20%, 15%, 10%, 8%, 5%, 3%, 2%, 1%, 1%
                 const percentages = [0.35, 0.20, 0.15, 0.10, 0.08, 0.05, 0.03, 0.02, 0.01, 0.01];
-                for (let i = 0; i < 10; i++) {
-                    prizeStructure[i + 1] = Math.floor(prizePool * percentages[i]);
+                percentages.forEach((pct, i) => {
+                    addPrizePosition(i + 1, Math.floor(prizePool * pct));
+                });
+                showMessage('Top 10 distribution applied (top-heavy)', 'success');
+            } else if (pattern === 'equal') {
+                // Equal distribution - ask how many positions
+                const positions = parseInt(prompt('How many equal prize positions? (e.g., 3, 5, 10)', '5'));
+                if (positions && positions > 0) {
+                    const amountEach = Math.floor(prizePool / positions);
+                    for (let i = 1; i <= positions; i++) {
+                        addPrizePosition(i, amountEach);
+                    }
+                    showMessage(`Equal distribution applied: ${positions} positions, $${amountEach.toLocaleString()} each`, 'success');
                 }
             }
-            
-            // Update the textarea with formatted JSON
-            document.getElementById('comp-prizes').value = JSON.stringify(prizeStructure, null, 2);
-            showMessage(`Prize structure auto-calculated for top ${places} places`, 'success');
         }
+
+        // Initialize prize system when prize pool changes
+        document.addEventListener('DOMContentLoaded', () => {
+            const prizePoolInput = document.getElementById('comp-pool');
+            if (prizePoolInput) {
+                prizePoolInput.addEventListener('input', updatePrizeTracker);
+            }
+        });
 
         // Participants Management
         async function loadParticipants() {
