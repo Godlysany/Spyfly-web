@@ -766,8 +766,6 @@
             document.getElementById('edit-rules').value = comp.rules || '';
             
             // Check if competition is completed (read-only mode)
-            const now = new Date();
-            const end = new Date(comp.end_date);
             const isCompleted = now > end;
             
             // Hide Edit tab and Delete button for completed competitions
