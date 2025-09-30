@@ -491,8 +491,8 @@ function renderTransitionView(data) {
     const upcomingComps = data.upcoming || [];
     
     // Calculate total jackpot across all competitions
-    const currentPrize = currentComp ? currentComp.prize_pool_usd : 0;
-    const upcomingPrizes = upcomingComps.reduce((sum, comp) => sum + comp.prize_pool_usd, 0);
+    const currentPrize = currentComp ? (currentComp.prize_pool || currentComp.total_prize_pool || 0) : 0;
+    const upcomingPrizes = upcomingComps.reduce((sum, comp) => sum + (comp.prize_pool || comp.total_prize_pool || 0), 0);
     const totalJackpot = currentPrize + upcomingPrizes;
     
     // Format dates for display
@@ -529,7 +529,7 @@ function renderTransitionView(data) {
                             <i class="fas fa-trophy"></i>
                             <div>
                                 <strong>Prize Pool</strong>
-                                <span>$${currentComp ? (currentComp.prize_pool_usd/1000).toFixed(0) : '15'}K ready to win</span>
+                                <span>$${currentComp ? ((currentComp.prize_pool || currentComp.total_prize_pool || 0)/1000).toFixed(0) : '15'}K ready to win</span>
                             </div>
                         </div>
                         <div class="transition-stat">
@@ -577,7 +577,7 @@ function renderTransitionView(data) {
                     <div class="big-prize-display">
                         <div class="prize-spotlight">
                             <div class="prize-icon">💰</div>
-                            <div class="prize-value">$${currentComp ? (currentComp.prize_pool_usd/1000).toFixed(0) : '15'}K</div>
+                            <div class="prize-value">$${currentComp ? ((currentComp.prize_pool || currentComp.total_prize_pool || 0)/1000).toFixed(0) : '15'}K</div>
                             <div class="prize-label">LIVE PRIZE POOL</div>
                         </div>
                     </div>
@@ -615,7 +615,7 @@ function renderTransitionView(data) {
                         <div class="tier-rank">🏆</div>
                         <div class="tier-details">
                             <div class="tier-title">Champion</div>
-                            <div class="tier-amount">$${currentComp ? Math.floor(currentComp.prize_pool_usd * 0.5).toLocaleString() : '7,500'}</div>
+                            <div class="tier-amount">$${currentComp ? Math.floor((currentComp.prize_pool || currentComp.total_prize_pool || 0) * 0.5).toLocaleString() : '7,500'}</div>
                             <div class="tier-percentage">50% of total pool</div>
                         </div>
                     </div>
@@ -624,7 +624,7 @@ function renderTransitionView(data) {
                         <div class="tier-rank">🥈</div>
                         <div class="tier-details">
                             <div class="tier-title">Runner-up</div>
-                            <div class="tier-amount">$${currentComp ? Math.floor(currentComp.prize_pool_usd * 0.3).toLocaleString() : '4,500'}</div>
+                            <div class="tier-amount">$${currentComp ? Math.floor((currentComp.prize_pool || currentComp.total_prize_pool || 0) * 0.3).toLocaleString() : '4,500'}</div>
                             <div class="tier-percentage">30% of total pool</div>
                         </div>
                     </div>
@@ -633,7 +633,7 @@ function renderTransitionView(data) {
                         <div class="tier-rank">🥉</div>
                         <div class="tier-details">
                             <div class="tier-title">Third Place</div>
-                            <div class="tier-amount">$${currentComp ? Math.floor(currentComp.prize_pool_usd * 0.2).toLocaleString() : '3,000'}</div>
+                            <div class="tier-amount">$${currentComp ? Math.floor((currentComp.prize_pool || currentComp.total_prize_pool || 0) * 0.2).toLocaleString() : '3,000'}</div>
                             <div class="tier-percentage">20% of total pool</div>
                         </div>
                     </div>
@@ -649,7 +649,7 @@ function renderTransitionView(data) {
                         <div class="next-comp-card ${comp.competition_type}">
                             <div class="next-comp-header">
                                 <span class="next-comp-type">${getCompetitionTypeDisplay(comp.competition_type)}</span>
-                                <span class="next-comp-prize">$${(comp.prize_pool_usd/1000).toFixed(0)}K</span>
+                                <span class="next-comp-prize">$${((comp.prize_pool || comp.total_prize_pool || 0)/1000).toFixed(0)}K</span>
                             </div>
                             <h4 class="next-comp-title">${comp.title}</h4>
                             <div class="next-comp-date">
@@ -759,8 +759,8 @@ function renderSophisticatedStatus1(data, prizeHub) {
     const stats = data.stats || {};
     
     // Calculate total jackpot across all competitions (current + upcoming + historical)
-    const currentPrize = currentComp ? currentComp.prize_pool_usd : 0;
-    const upcomingPrizes = upcomingComps.reduce((sum, comp) => sum + comp.prize_pool_usd, 0);
+    const currentPrize = currentComp ? (currentComp.prize_pool || currentComp.total_prize_pool || 0) : 0;
+    const upcomingPrizes = upcomingComps.reduce((sum, comp) => sum + (comp.prize_pool || comp.total_prize_pool || 0), 0);
     const historicalPrizes = stats.total_distributed_usd || 0;
     const totalJackpot = currentPrize + upcomingPrizes + historicalPrizes;
     
@@ -798,7 +798,7 @@ function renderSophisticatedStatus1(data, prizeHub) {
                             <i class="fas fa-trophy"></i>
                             <div>
                                 <strong>Prize Pool</strong>
-                                <span>$${currentComp ? (currentComp.prize_pool_usd/1000).toFixed(0) : '15'}K ready to win</span>
+                                <span>$${currentComp ? ((currentComp.prize_pool || currentComp.total_prize_pool || 0)/1000).toFixed(0) : '15'}K ready to win</span>
                             </div>
                         </div>
                         <div class="transition-stat">
@@ -844,7 +844,7 @@ function renderSophisticatedStatus1(data, prizeHub) {
                     <div class="big-prize-display">
                         <div class="prize-spotlight">
                             <div class="prize-icon">💰</div>
-                            <div class="prize-value">$${currentComp ? (currentComp.prize_pool_usd/1000).toFixed(0) : '15'}K</div>
+                            <div class="prize-value">$${currentComp ? ((currentComp.prize_pool || currentComp.total_prize_pool || 0)/1000).toFixed(0) : '15'}K</div>
                             <div class="prize-label">LIVE PRIZE POOL</div>
                         </div>
                     </div>
@@ -882,7 +882,7 @@ function renderSophisticatedStatus1(data, prizeHub) {
                         <div class="position-icon">🏆</div>
                         <div class="position-details">
                             <h4>Champion</h4>
-                            <div class="prize-amount">$${Math.floor((currentComp ? currentComp.prize_pool_usd : 15000) * 0.5).toLocaleString()}</div>
+                            <div class="prize-amount">$${Math.floor((currentComp ? (currentComp.prize_pool || currentComp.total_prize_pool || 0) : 15000) * 0.5).toLocaleString()}</div>
                             <div class="percentage">50% of total pool</div>
                         </div>
                     </div>
@@ -890,7 +890,7 @@ function renderSophisticatedStatus1(data, prizeHub) {
                         <div class="position-icon">🥈</div>
                         <div class="position-details">
                             <h4>Runner-up</h4>
-                            <div class="prize-amount">$${Math.floor((currentComp ? currentComp.prize_pool_usd : 15000) * 0.3).toLocaleString()}</div>
+                            <div class="prize-amount">$${Math.floor((currentComp ? (currentComp.prize_pool || currentComp.total_prize_pool || 0) : 15000) * 0.3).toLocaleString()}</div>
                             <div class="percentage">30% of total pool</div>
                         </div>
                     </div>
@@ -898,7 +898,7 @@ function renderSophisticatedStatus1(data, prizeHub) {
                         <div class="position-icon">🥉</div>
                         <div class="position-details">
                             <h4>Third Place</h4>
-                            <div class="prize-amount">$${Math.floor((currentComp ? currentComp.prize_pool_usd : 15000) * 0.2).toLocaleString()}</div>
+                            <div class="prize-amount">$${Math.floor((currentComp ? (currentComp.prize_pool || currentComp.total_prize_pool || 0) : 15000) * 0.2).toLocaleString()}</div>
                             <div class="percentage">20% of total pool</div>
                         </div>
                     </div>
@@ -917,7 +917,7 @@ function renderSophisticatedStatus1(data, prizeHub) {
                                     <span class="championship-type">${getCompetitionTypeDisplay(comp.competition_type)}</span>
                                     <span class="championship-status">📅 ${new Date(comp.start_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
                                 </div>
-                                <div class="championship-prize">$${(comp.prize_pool_usd/1000).toFixed(0)}K</div>
+                                <div class="championship-prize">$${((comp.prize_pool || comp.total_prize_pool || 0)/1000).toFixed(0)}K</div>
                             </div>
                             <h4 class="championship-title">${comp.title}</h4>
                         </div>
@@ -1018,7 +1018,7 @@ function renderSophisticatedStatus2(data, prizeHub) {
     const stats = data.stats || {};
     
     // Calculate total jackpot across all competitions (upcoming + historical)
-    const upcomingPrizes = upcomingComps.reduce((sum, comp) => sum + comp.prize_pool_usd, 0);
+    const upcomingPrizes = upcomingComps.reduce((sum, comp) => sum + (comp.prize_pool || comp.total_prize_pool || 0), 0);
     const historicalPrizes = stats.total_distributed_usd || 0;
     const totalJackpot = upcomingPrizes + historicalPrizes;
     
@@ -1056,7 +1056,7 @@ function renderSophisticatedStatus2(data, prizeHub) {
                             <i class="fas fa-trophy"></i>
                             <div>
                                 <strong>Prize Pool Ready</strong>
-                                <span>$${upcomingComp ? (upcomingComp.prize_pool_usd/1000).toFixed(0) : '18'}K awaiting winners</span>
+                                <span>$${upcomingComp ? ((upcomingComp.prize_pool || upcomingComp.total_prize_pool || 0)/1000).toFixed(0) : '18'}K awaiting winners</span>
                             </div>
                         </div>
                         <div class="launch-feature">
@@ -1114,7 +1114,7 @@ function renderSophisticatedStatus2(data, prizeHub) {
                 <div class="launch-visual">
                     <div class="launch-stats-preview">
                         <div class="stat-item">
-                            <div class="stat-number">$${upcomingComp ? (upcomingComp.prize_pool_usd/1000).toFixed(0) : '18'}K</div>
+                            <div class="stat-number">$${upcomingComp ? ((upcomingComp.prize_pool || upcomingComp.total_prize_pool || 0)/1000).toFixed(0) : '18'}K</div>
                             <div class="stat-label">Prize Pool Ready</div>
                         </div>
                         <div class="stat-item">
@@ -1131,15 +1131,15 @@ function renderSophisticatedStatus2(data, prizeHub) {
                         <div class="preview-title">Championship Preview</div>
                         <div class="preview-row preview-winner">
                             <span>🥇 @your_username</span>
-                            <span class="preview-pnl">$${upcomingComp ? Math.round(upcomingComp.prize_pool_usd * 0.5).toLocaleString() : '9,000'}</span>
+                            <span class="preview-pnl">$${upcomingComp ? Math.round((upcomingComp.prize_pool || upcomingComp.total_prize_pool || 0) * 0.5).toLocaleString() : '9,000'}</span>
                         </div>
                         <div class="preview-row">
                             <span>🥈 @elite_trader</span>
-                            <span class="preview-pnl">$${upcomingComp ? Math.round(upcomingComp.prize_pool_usd * 0.3).toLocaleString() : '5,400'}</span>
+                            <span class="preview-pnl">$${upcomingComp ? Math.round((upcomingComp.prize_pool || upcomingComp.total_prize_pool || 0) * 0.3).toLocaleString() : '5,400'}</span>
                         </div>
                         <div class="preview-row">
                             <span>🥉 @alpha_pro</span>
-                            <span class="preview-pnl">$${upcomingComp ? Math.round(upcomingComp.prize_pool_usd * 0.2).toLocaleString() : '3,600'}</span>
+                            <span class="preview-pnl">$${upcomingComp ? Math.round((upcomingComp.prize_pool || upcomingComp.total_prize_pool || 0) * 0.2).toLocaleString() : '3,600'}</span>
                         </div>
                     </div>
                 </div>
@@ -1156,8 +1156,8 @@ function renderSophisticatedStatus2(data, prizeHub) {
                                     <span class="position-icon">${['🥇', '🥈', '🥉'][index] || '🏆'}</span>
                                     <span class="position-text">${['Champion', 'Runner-up', 'Third Place'][index] || `${prize.place} Place`}</span>
                                 </div>
-                                <div class="prize-amount">$${prize.amount_usd.toLocaleString()}</div>
-                                <div class="prize-percentage">${prize.percent}% of pool</div>
+                                <div class="prize-amount">$${(prize.prize_amount || prize.amount_usd || 0).toLocaleString()}</div>
+                                <div class="prize-percentage">${prize.percent || Math.round((prize.prize_amount / (upcomingComp.prize_pool || upcomingComp.total_prize_pool || 1)) * 100)}% of pool</div>
                             </div>
                         `).join('')}
                     ` : `
@@ -1166,7 +1166,7 @@ function renderSophisticatedStatus2(data, prizeHub) {
                                 <span class="position-icon">🥇</span>
                                 <span class="position-text">Champion</span>
                             </div>
-                            <div class="prize-amount">$${upcomingComp ? Math.round(upcomingComp.prize_pool_usd * 0.5).toLocaleString() : '9,000'}</div>
+                            <div class="prize-amount">$${upcomingComp ? Math.round((upcomingComp.prize_pool || upcomingComp.total_prize_pool || 0) * 0.5).toLocaleString() : '9,000'}</div>
                             <div class="prize-percentage">50% of pool</div>
                         </div>
                         <div class="prize-tier runner-up">
@@ -1174,7 +1174,7 @@ function renderSophisticatedStatus2(data, prizeHub) {
                                 <span class="position-icon">🥈</span>
                                 <span class="position-text">Runner-up</span>
                             </div>
-                            <div class="prize-amount">$${upcomingComp ? Math.round(upcomingComp.prize_pool_usd * 0.3).toLocaleString() : '5,400'}</div>
+                            <div class="prize-amount">$${upcomingComp ? Math.round((upcomingComp.prize_pool || upcomingComp.total_prize_pool || 0) * 0.3).toLocaleString() : '5,400'}</div>
                             <div class="prize-percentage">30% of pool</div>
                         </div>
                         <div class="prize-tier third-place">
@@ -1182,7 +1182,7 @@ function renderSophisticatedStatus2(data, prizeHub) {
                                 <span class="position-icon">🥉</span>
                                 <span class="position-text">Third Place</span>
                             </div>
-                            <div class="prize-amount">$${upcomingComp ? Math.round(upcomingComp.prize_pool_usd * 0.2).toLocaleString() : '3,600'}</div>
+                            <div class="prize-amount">$${upcomingComp ? Math.round((upcomingComp.prize_pool || upcomingComp.total_prize_pool || 0) * 0.2).toLocaleString() : '3,600'}</div>
                             <div class="prize-percentage">20% of pool</div>
                         </div>
                     `}
@@ -1201,7 +1201,7 @@ function renderSophisticatedStatus2(data, prizeHub) {
                                     <span class="championship-type">${getCompetitionTypeDisplay(comp.competition_type)}</span>
                                     <span class="championship-status">📅 ${new Date(comp.start_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
                                 </div>
-                                <div class="championship-prize">$${(comp.prize_pool_usd/1000).toFixed(0)}K</div>
+                                <div class="championship-prize">$${((comp.prize_pool || comp.total_prize_pool || 0)/1000).toFixed(0)}K</div>
                             </div>
                             <h4 class="championship-title">${comp.title}</h4>
                         </div>
@@ -1455,7 +1455,7 @@ function generateWinnersCarousel(historyData) {
             <div class="winner-rank">${['🥇', '🥈', '🥉'][winner.place - 1] || '🏆'}</div>
             <div class="winner-info">
                 <div class="winner-name">${winner.username.startsWith('@') ? winner.username : '@' + winner.username}</div>
-                <div class="winner-prize">$${winner.amount_usd.toLocaleString()}</div>
+                <div class="winner-prize">$${(winner.prize_amount || winner.amount_usd || 0).toLocaleString()}</div>
                 <div class="winner-competition">${winner.competition_title}</div>
                 <div class="winner-type">${getCompetitionTypeDisplay(winner.competition_type)}</div>
             </div>
@@ -1487,7 +1487,7 @@ function generateHallOfFameDisplay(historyData, specificIndex = null) {
                     <div class="winner-position">${['🥇', '🥈', '🥉'][winner.place - 1] || '🏆'}</div>
                     <div class="winner-details">
                         <div class="winner-username">${winner.username.startsWith('@') ? winner.username : '@' + winner.username}</div>
-                        <div class="winner-prize">$${winner.amount_usd.toLocaleString()}</div>
+                        <div class="winner-prize">$${(winner.prize_amount || winner.amount_usd || 0).toLocaleString()}</div>
                         <div class="winner-performance">${getWinnerPerformanceLabel(winner, competition)}</div>
                     </div>
                 </div>
@@ -1547,7 +1547,7 @@ function generateChampionshipHistoryTable(historyData) {
                     </span>
                 </div>
                 <div class="table-col">
-                    <div class="prize-amount">$${(competition.prize_pool_usd/1000).toFixed(0)}K</div>
+                    <div class="prize-amount">$${((competition.prize_pool || competition.total_prize_pool || 0)/1000).toFixed(0)}K</div>
                 </div>
                 <div class="table-col">
                     <div class="participants-count">${participantCount}</div>
@@ -1578,7 +1578,7 @@ function generateTournamentsList(historyData) {
                     <span class="tournament-type">${getCompetitionTypeDisplay(tournament.competition_type)}</span>
                 </div>
                 <div class="tournament-stats">
-                    <span class="stat">💰 $${(tournament.prize_pool_usd/1000).toFixed(0)}K Pool</span>
+                    <span class="stat">💰 $${((tournament.prize_pool || tournament.total_prize_pool || 0)/1000).toFixed(0)}K Pool</span>
                     <span class="stat">🏆 ${tournament.winners ? tournament.winners.length : 0} Winners</span>
                     <span class="stat">📅 ${new Date(tournament.end_date).toLocaleDateString()}</span>
                 </div>
@@ -1978,7 +1978,7 @@ function renderSophisticatedViewOriginal(data, prizeHub) {
                 <div class="live-comp-details">
                     <div class="detail-item">
                         <span class="detail-label">Prize Pool</span>
-                        <span class="detail-value">$${(currentComp.prize_pool_usd/1000).toFixed(0)}K</span>
+                        <span class="detail-value">$${((currentComp.prize_pool || currentComp.total_prize_pool || 0)/1000).toFixed(0)}K</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Category</span>
@@ -2006,7 +2006,7 @@ function renderSophisticatedViewOriginal(data, prizeHub) {
                         <div class="upcoming-card ${comp.competition_type}">
                             <div class="upcoming-card-header">
                                 <span class="upcoming-type-badge">${getCompetitionTypeDisplay(comp.competition_type)}</span>
-                                <span class="upcoming-prize">$${(comp.prize_pool_usd/1000).toFixed(0)}K</span>
+                                <span class="upcoming-prize">$${((comp.prize_pool || comp.total_prize_pool || 0)/1000).toFixed(0)}K</span>
                             </div>
                             <h4 class="upcoming-title">${comp.title}</h4>
                             <div class="upcoming-date">
@@ -2062,7 +2062,7 @@ function renderSophisticatedViewOriginal(data, prizeHub) {
                                     <div class="timeline-content">
                                         <h4>${comp.title}</h4>
                                         <div class="timeline-details">
-                                            <span>$${(comp.prize_pool_usd/1000).toFixed(0)}K Prize Pool</span>
+                                            <span>$${((comp.prize_pool || comp.total_prize_pool || 0)/1000).toFixed(0)}K Prize Pool</span>
                                             <span>${comp.winners?.length || 0} Winners</span>
                                             <span>${new Date(comp.end_date).toLocaleDateString()}</span>
                                         </div>
