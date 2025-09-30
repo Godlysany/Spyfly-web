@@ -4,7 +4,16 @@
 SpyFly is a full-stack web application for a fictional bot that scrapes alpha calls from Solana meme caller groups. The website provides a modern, interactive experience with a sleek dark theme, animated elements, a sophisticated leaderboard system, and a production-ready prize management CMS. Its core purpose is to showcase competition data, manage prizes, and display historical performance, targeting the Solana meme coin trading community.
 
 ### Recent Changes
-**September 30, 2025**
+**September 30, 2025 - Latest Session**
+- **Railway Deployment Fix**: Implemented dual authentication support (cookies + Authorization headers) for Railway/production environments
+- **Admin Authentication**: Enhanced `verifyAdminToken()` to check Authorization header first, then fallback to cookies
+- **Login System**: Updated login flow to store JWT token in localStorage for Railway compatibility where cookies may not persist
+- **Auth Check**: Modified admin.html to send stored token via Authorization header on all auth requests
+- **Leaderboard API**: Created `/api/leaderboard` endpoint with real-time stats calculation from `leaderboard_data` table
+- **Dynamic Stats**: Added `loadLeaderboardStats()` function in leaderboard.js to fetch and display live stats (traders, volume, win rate, trades)
+- **Data Integration**: Leaderboard page now displays real database stats instead of hardcoded values
+
+**September 30, 2025 - Previous Session**
 - Fixed debug UI buttons to use real API data instead of hardcoded mock data
 - Added `/api/cleanup-duplicates` endpoint for database maintenance (removed 45 duplicate winner records)
 - Fixed admin authentication: corrected password hash in `migrations.sql` (credentials: admin/admin123)
