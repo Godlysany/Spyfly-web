@@ -266,15 +266,19 @@ window.testSimple = function() {
 // SMART PRIZE HUB - LAUNCH VS SOPHISTICATED VIEW
 // ===================================================================
 async function initSmartPrizeHub() {
+    console.log('🚀 initSmartPrizeHub() called');
     try {
         const response = await fetch('/api/prizes');
         const data = await response.json();
+        console.log('📊 API data received:', data);
         
         // Enhanced detection logic for 4 distinct states
         const hasCurrent = data.current && data.current.length > 0;
         const hasUpcoming = data.upcoming && data.upcoming.length > 0;
         const hasHistory = data.history && data.history.length > 0;
         const hasStats = data.stats && data.stats.total_winners > 0;
+        
+        console.log('🔍 View detection:', { hasCurrent, hasUpcoming, hasHistory, hasStats });
         
         if (!hasCurrent && !hasUpcoming && !hasHistory && !hasStats) {
             // ZERO DATA: Nothing configured in CMS - hide prize section entirely
@@ -287,12 +291,15 @@ async function initSmartPrizeHub() {
             renderTransitionView(data);
         } else if (hasHistory && hasStats) {
             // SOPHISTICATED: Full ecosystem with completed competitions and winners
+            console.log('✅ Rendering SOPHISTICATED VIEW');
             renderSophisticatedView(data);
         } else {
             // FALLBACK: Any other combination defaults to transition
+            console.log('⚠️ Rendering FALLBACK (Transition)');
             renderTransitionView(data);
         }
     } catch (error) {
+        console.error('❌ Error in initSmartPrizeHub:', error);
         console.log('API not available, using zero data view');
         renderZeroDataView();
     }
