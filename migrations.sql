@@ -256,3 +256,49 @@ BEGIN
     RAISE NOTICE '🚀 Ready for CMS testing!';
     RAISE NOTICE '========================================';
 END $$;
+
+-- ============================================
+-- ADD MOCK PARTICIPANT DATA FOR TESTING
+-- ============================================
+
+-- Active Competition (October Trading Championship)
+INSERT INTO participants (competition_id, wallet_address, username, score, entry_date)
+VALUES 
+    ('11111111-1111-1111-1111-111111111111', '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'TopTrader2024', 15420.50, NOW() - INTERVAL '8 days'),
+    ('11111111-1111-1111-1111-111111111111', 'AxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'CryptoKing', 12350.75, NOW() - INTERVAL '7 days'),
+    ('11111111-1111-1111-1111-111111111111', 'BxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'DiamondHands', 10890.25, NOW() - INTERVAL '6 days'),
+    ('11111111-1111-1111-1111-111111111111', 'CxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'MoonShot', 9150.00, NOW() - INTERVAL '5 days'),
+    ('11111111-1111-1111-1111-111111111111', 'DxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'AlphaHunter', 8200.50, NOW() - INTERVAL '4 days'),
+    ('11111111-1111-1111-1111-111111111111', 'ExQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'SolanaWhale', 7500.00, NOW() - INTERVAL '3 days'),
+    ('11111111-1111-1111-1111-111111111111', 'FxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'ProfitMaster', 6800.25, NOW() - INTERVAL '2 days'),
+    ('11111111-1111-1111-1111-111111111111', 'GxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'TradeGenius', 5900.00, NOW() - INTERVAL '1 day')
+ON CONFLICT DO NOTHING;
+
+-- Completed Competition (September Volume Challenge) 
+INSERT INTO participants (competition_id, wallet_address, username, score, entry_date)
+VALUES 
+    ('22222222-2222-2222-2222-222222222222', '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'VolumeKing', 2500000.00, NOW() - INTERVAL '35 days'),
+    ('22222222-2222-2222-2222-222222222222', 'AxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'TradeWarrior', 1850000.00, NOW() - INTERVAL '34 days'),
+    ('22222222-2222-2222-2222-222222222222', 'BxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'BigPlayer', 1200000.00, NOW() - INTERVAL '33 days'),
+    ('22222222-2222-2222-2222-222222222222', 'HxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'ChartMaster', 950000.00, NOW() - INTERVAL '32 days'),
+    ('22222222-2222-2222-2222-222222222222', 'IxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'SpeedTrader', 780000.00, NOW() - INTERVAL '31 days')
+ON CONFLICT DO NOTHING;
+
+-- Completed Competition (August Win Rate Championship)
+INSERT INTO participants (competition_id, wallet_address, username, score, entry_date)
+VALUES 
+    ('33333333-3333-3333-3333-333333333333', 'CxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'AccuracyPro', 0.92, NOW() - INTERVAL '65 days'),
+    ('33333333-3333-3333-3333-333333333333', 'DxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'PrecisionTrader', 0.88, NOW() - INTERVAL '64 days'),
+    ('33333333-3333-3333-3333-333333333333', 'JxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'ConsistentWinner', 0.85, NOW() - INTERVAL '63 days'),
+    ('33333333-3333-3333-3333-333333333333', 'KxQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin', 'SmartPicks', 0.81, NOW() - INTERVAL '62 days')
+ON CONFLICT DO NOTHING;
+
+-- ============================================
+-- FIX: DELETE DUPLICATE NOVEMBER COMPETITIONS
+-- ============================================
+-- Keep only ONE November competition
+DELETE FROM competitions 
+WHERE title = 'November Championship - DRAFT' 
+AND id NOT IN (
+    SELECT MIN(id) FROM competitions WHERE title = 'November Championship - DRAFT'
+);
