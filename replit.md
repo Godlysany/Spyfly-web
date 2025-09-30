@@ -48,6 +48,34 @@ A modern, interactive website for SpyFly, a fictional bot that scrapes alpha cal
 ```
 
 ## Recent Changes (Sept 30, 2025)
+### UX Improvements & Data Structure Fixes
+- ✅ **Added Mock Participant Data**:
+  - Added realistic participant/leaderboard data for all active and completed competitions
+  - October Trading Championship: 8 participants with P&L scores
+  - September Volume Challenge: 5 participants with volume scores  
+  - August Win Rate Championship: 4 participants with win rate scores
+  - Enables full testing of Participants tab and leaderboard functionality
+
+- ✅ **Fixed Duplicate Competition Issue**:
+  - Removed duplicate November Championship entries showing 7 times in table
+  - Added SQL cleanup to migrations.sql to prevent future duplicates
+
+- ✅ **Read-Only Mode for Completed Competitions**:
+  - Completed competitions (past end date) can no longer be edited or deleted
+  - Edit tab hidden for completed competitions
+  - Delete button hidden for completed competitions
+  - Winner selection, approval, and disqualification still available
+
+- ✅ **Removed Period Field**:
+  - Removed redundant "Period" field from Create and Edit forms
+  - Competition table now shows actual Start and End dates
+  - Cleaner, more informative date display
+
+- ✅ **Fixed Prize Validation Issues**:
+  - Changed step validation from "100" to "any" - accepts any decimal value
+  - Fixed error messages appearing behind modal (z-index: 99999)
+  - Error messages now properly positioned above all UI elements
+
 ### Critical Bug Fixes - Post Security Audit Regressions
 - ✅ **Fixed API Data Mapping Issues**:
   - Resolved competition data loading failure - table was empty despite database having data
