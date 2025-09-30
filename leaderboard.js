@@ -2164,8 +2164,11 @@ function initLeaderboardInteractivity() {
     // Load real leaderboard stats
     async function loadLeaderboardStats() {
         try {
+            console.log('🔄 Loading leaderboard stats...');
             const response = await fetch('/api/leaderboard');
+            console.log('✅ Response received:', response.status);
             const data = await response.json();
+            console.log('📊 Data:', data);
             
             if (data.stats) {
                 // Update stat displays with real data
@@ -2173,13 +2176,17 @@ function initLeaderboardInteractivity() {
                 const formatVolume = (num) => '$' + (num / 1000000).toFixed(1) + 'M';
                 const formatPercent = (num) => num.toFixed(1) + '%';
                 
+                console.log('📈 Updating stats...');
                 document.getElementById('active-traders-stat').textContent = formatNumber(data.stats.active_traders);
                 document.getElementById('total-volume-stat').textContent = formatVolume(data.stats.total_volume);
                 document.getElementById('avg-winrate-stat').textContent = formatPercent(data.stats.avg_win_rate);
                 document.getElementById('trades-today-stat').textContent = formatNumber(data.stats.trades_today);
+                console.log('✅ Stats updated successfully');
+            } else {
+                console.warn('⚠️ No stats in response');
             }
         } catch (error) {
-            console.error('Error loading leaderboard stats:', error);
+            console.error('❌ Error loading leaderboard stats:', error);
         }
     }
     
