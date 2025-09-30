@@ -575,21 +575,32 @@
         // Authentication Check
         async function checkAuth() {
             try {
+                // Check localStorage for token (Railway workaround)
+                const storedToken = localStorage.getItem('admin_token');
+                
                 const response = await fetch(`${API_URL}/auth/check`, {
-                    credentials: 'include'
+                    credentials: 'include',
+                    headers: storedToken ? { 'Authorization': `Bearer ${storedToken}` } : {}
                 });
+                
                 if (response.ok) {
                     const data = await response.json();
-                    document.getElementById('admin-username').textContent = data.username || 'admin';
-                    document.getElementById('auth-overlay').style.display = 'none';
-                    document.getElementById('admin-content').style.display = 'block';
-                    
-                    loadInitialData();
-                } else {
-                    window.location.replace('/login.html');
+                    if (data.authenticated) {
+                        document.getElementById('admin-username').textContent = data.username || 'admin';
+                        document.getElementById('auth-overlay').style.display = 'none';
+                        document.getElementById('admin-content').style.display = 'block';
+                        loadInitialData();
+                        return;
+                    }
                 }
+                
+                // Auth failed - redirect to login
+                console.log('Authentication failed, redirecting to login');
+                localStorage.removeItem('admin_token'); // Clear invalid token
+                window.location.replace('/login.html');
             } catch (error) {
                 console.error('Auth check failed:', error);
+                localStorage.removeItem('admin_token'); // Clear token on error
                 window.location.replace('/login.html');
             }
         }

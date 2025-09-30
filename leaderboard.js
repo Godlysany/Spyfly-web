@@ -2161,6 +2161,31 @@ function initLeaderboardInteractivity() {
     const metricSelect = document.getElementById('metric-select');
     const leaderboardData = document.getElementById('leaderboard-data');
 
+    // Load real leaderboard stats
+    async function loadLeaderboardStats() {
+        try {
+            const response = await fetch('/api/leaderboard');
+            const data = await response.json();
+            
+            if (data.stats) {
+                // Update stat displays with real data
+                const formatNumber = (num) => num.toLocaleString();
+                const formatVolume = (num) => '$' + (num / 1000000).toFixed(1) + 'M';
+                const formatPercent = (num) => num.toFixed(1) + '%';
+                
+                document.getElementById('active-traders-stat').textContent = formatNumber(data.stats.active_traders);
+                document.getElementById('total-volume-stat').textContent = formatVolume(data.stats.total_volume);
+                document.getElementById('avg-winrate-stat').textContent = formatPercent(data.stats.avg_win_rate);
+                document.getElementById('trades-today-stat').textContent = formatNumber(data.stats.trades_today);
+            }
+        } catch (error) {
+            console.error('Error loading leaderboard stats:', error);
+        }
+    }
+    
+    // Load stats on init
+    loadLeaderboardStats();
+
     // Sample data structure for different periods and metrics
     const leaderboardSampleData = {
         weekly: {

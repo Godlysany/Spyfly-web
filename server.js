@@ -200,7 +200,13 @@ async function handleApiRequest(req, res, pathname, method) {
                 .eq('id', admin.id);
             
             // Set cookie with HttpOnly flag for security
-            res.setHeader('Set-Cookie', `admin_token=${token}; HttpOnly; Path=/; Max-Age=28800; SameSite=Lax`);
+            // Use SameSite=None for Railway deployment compatibility
+            const isProduction = process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT;
+            const cookieOptions = isProduction 
+                ? `admin_token=${token}; HttpOnly; Path=/; Max-Age=28800; SameSite=None; Secure`
+                : `admin_token=${token}; HttpOnly; Path=/; Max-Age=28800; SameSite=Lax`;
+            
+            res.setHeader('Set-Cookie', cookieOptions);
             res.writeHead(200);
             res.end(JSON.stringify({
                 success: true,
@@ -209,7 +215,8 @@ async function handleApiRequest(req, res, pathname, method) {
                     username: admin.username,
                     role: admin.role,
                     created_at: admin.created_at
-                }
+                },
+                token: token  // Also return token for manual storage if needed
             }));
             return;
         }
@@ -681,6 +688,33 @@ async function handleApiRequest(req, res, pathname, method) {
                 competitions_count: uniqueCompetitions.size,
                 total_winnings: totalWinnings,
                 best_rank: bestRank === Infinity ? null : bestRank
+            }));
+            return;
+        }
+
+        // Get leaderboard stats and data
+        if (pathname === '/api/leaderboard' && method === 'GET') {
+            const { data: leaderboardData } = await supabase
+                .from('leaderboard_data')
+                .select('*')
+                .order('pnl', { ascending: false });
+            
+            const activeTraders = new Set(leaderboardData?.map(d => d.username) || []).size;
+            const totalVolume = leaderboardData?.reduce((sum, d) => sum + (d.volume || 0), 0) || 0;
+            const avgWinRate = leaderboardData?.length > 0 
+                ? leaderboardData.reduce((sum, d) => sum + (d.win_rate || 0), 0) / leaderboardData.length 
+                : 0;
+            const tradesToday = leaderboardData?.reduce((sum, d) => sum + (d.trades_today || 0), 0) || 0;
+            
+            res.writeHead(200);
+            res.end(JSON.stringify({
+                stats: {
+                    active_traders: activeTraders,
+                    total_volume: totalVolume,
+                    avg_win_rate: avgWinRate,
+                    trades_today: tradesToday
+                },
+                leaderboard: leaderboardData || []
             }));
             return;
         }
