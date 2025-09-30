@@ -108,15 +108,17 @@ async function handleApiRequest(req, res, pathname, method) {
         
         // Auth check endpoint
         if (pathname === '/api/auth/check' && method === 'GET') {
+            console.log('🔐 Auth check requested');
             const admin = await verifyAdminToken(req);
+            console.log('👤 Admin verified:', admin ? admin.username : 'NOT AUTHENTICATED');
             if (admin) {
-                res.writeHead(200);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ 
                     authenticated: true, 
                     username: admin.username 
                 }));
             } else {
-                res.writeHead(401);
+                res.writeHead(401, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ authenticated: false }));
             }
             return;
@@ -778,6 +780,68 @@ async function handleApiRequest(req, res, pathname, method) {
             if (error) throw error;
             res.writeHead(200);
             res.end(JSON.stringify({ success: true }));
+            return;
+        }
+
+        // Cleanup duplicate winners (ADMIN PROTECTED)
+        if (pathname === '/api/cleanup-duplicates' && method === 'POST') {
+            const admin = await verifyAdminToken(req);
+            if (!admin) {
+                res.writeHead(401);
+                res.end(JSON.stringify({ error: 'Authentication required' }));
+                return;
+            }
+            
+            console.log('🧹 Cleaning up duplicate winner records...');
+            
+            // Get all winners ordered by creation date
+            const { data: winners, error } = await supabase
+                .from('winners')
+                .select('*')
+                .order('created_at', { ascending: true });
+            
+            if (error) {
+                res.writeHead(500);
+                res.end(JSON.stringify({ error: 'Failed to fetch winners' }));
+                return;
+            }
+            
+            // Find duplicates (same competition_id + place + username)
+            const seen = new Map();
+            const duplicateIds = [];
+            
+            winners.forEach(winner => {
+                const key = `${winner.competition_id}-${winner.place}-${winner.username}`;
+                if (seen.has(key)) {
+                    duplicateIds.push(winner.id);
+                } else {
+                    seen.set(key, winner.id);
+                }
+            });
+            
+            let deletedCount = 0;
+            if (duplicateIds.length > 0) {
+                const { error: deleteError } = await supabase
+                    .from('winners')
+                    .delete()
+                    .in('id', duplicateIds);
+                
+                if (deleteError) {
+                    console.error('Error deleting duplicates:', deleteError);
+                    res.writeHead(500);
+                    res.end(JSON.stringify({ error: 'Failed to delete duplicates' }));
+                    return;
+                }
+                deletedCount = duplicateIds.length;
+            }
+            
+            console.log(`✅ Removed ${deletedCount} duplicate winner records`);
+            res.writeHead(200);
+            res.end(JSON.stringify({ 
+                success: true, 
+                message: `Removed ${deletedCount} duplicate records`,
+                deletedCount 
+            }));
             return;
         }
 

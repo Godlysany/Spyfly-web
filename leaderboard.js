@@ -144,105 +144,56 @@ window.testSophisticatedView = function() {
     renderSophisticatedView(mockRichData);
 }
 
-// Test functions for the 3 sophisticated statuses
-window.testSophisticatedStatus1 = function() {
-    console.log('💎 Testing Sophisticated Status 1: Active + History');
-    const mockData = {
-        current: [{
-            title: 'September Trading Championship',
-            prize_pool_usd: 15000,
-            start_date: '2025-09-15T00:00:00+00:00',
-            end_date: '2025-09-30T23:59:59+00:00',
-            competition_type: 'pnl'
-        }],
-        upcoming: [
-            {
-                title: 'October Volume Championship',
-                prize_pool_usd: 18000,
-                start_date: '2025-10-01T00:00:00+00:00',
-                end_date: '2025-10-31T23:59:59+00:00',
-                competition_type: 'volume'
-            }
-        ],
-        history: [
-            {
-                title: 'August P&L Championship',
-                prize_pool_usd: 12000,
-                end_date: '2025-08-31T23:59:59+00:00',
-                competition_type: 'pnl',
-                winners: [
-                    { username: 'cryptowizard', place: 1, amount_usd: 6000 },
-                    { username: 'alphahunter', place: 2, amount_usd: 3600 },
-                    { username: 'trademaster', place: 3, amount_usd: 2400 }
-                ]
-            }
-        ],
-        stats: {
-            total_distributed_usd: 45000,
-            total_competitions: 3,
-            total_participants: 1247,
-            total_volume: 18300000
-        }
-    };
-    renderSophisticatedView(mockData);
+// Test functions for the 3 sophisticated statuses - USING REAL API DATA
+window.testStatus1RealData = async function() {
+    console.log('💎 Testing Status 1: Active + History (Real Data)');
+    try {
+        const response = await fetch('/api/prizes');
+        const data = await response.json();
+        console.log('Real API data for Status 1:', data);
+        
+        // Force Status 1 by ensuring we have current + history
+        renderSophisticatedStatus1(data, document.getElementById('prize-hub'));
+    } catch (error) {
+        console.error('Error loading Status 1:', error);
+    }
 }
 
-window.testSophisticatedStatus2 = function() {
-    console.log('🔜 Testing Sophisticated Status 2: Upcoming + History');
-    const mockData = {
-        current: [], // No active competition
-        upcoming: [
-            {
-                title: 'October Volume Championship',
-                prize_pool_usd: 18000,
-                start_date: '2025-10-01T00:00:00+00:00',
-                end_date: '2025-10-31T23:59:59+00:00',
-                competition_type: 'volume'
-            }
-        ],
-        history: [
-            {
-                title: 'August P&L Championship',
-                prize_pool_usd: 12000,
-                end_date: '2025-08-31T23:59:59+00:00',
-                competition_type: 'pnl',
-                winners: [
-                    { username: 'cryptowizard', place: 1, amount_usd: 6000 }
-                ]
-            }
-        ],
-        stats: {
-            total_distributed_usd: 12000,
-            total_competitions: 1,
-            total_participants: 856
-        }
-    };
-    renderSophisticatedView(mockData);
+window.testStatus2RealData = async function() {
+    console.log('🔜 Testing Status 2: Upcoming + History (Real Data)');
+    try {
+        const response = await fetch('/api/prizes');
+        const data = await response.json();
+        console.log('Real API data for Status 2:', data);
+        
+        // Force Status 2 by simulating no active competition
+        const modifiedData = {
+            ...data,
+            current: [] // Remove active to show upcoming
+        };
+        renderSophisticatedStatus2(modifiedData, document.getElementById('prize-hub'));
+    } catch (error) {
+        console.error('Error loading Status 2:', error);
+    }
 }
 
-window.testSophisticatedStatus3 = function() {
-    console.log('📜 Testing Sophisticated Status 3: History Only');
-    const mockData = {
-        current: [], // No active competition
-        upcoming: [], // No upcoming competitions
-        history: [
-            {
-                title: 'August P&L Championship',
-                prize_pool_usd: 12000,
-                end_date: '2025-08-31T23:59:59+00:00',
-                competition_type: 'pnl',
-                winners: [
-                    { username: 'cryptowizard', place: 1, amount_usd: 6000 }
-                ]
-            }
-        ],
-        stats: {
-            total_distributed_usd: 12000,
-            total_competitions: 1,
-            total_participants: 856
-        }
-    };
-    renderSophisticatedView(mockData);
+window.testStatus3RealData = async function() {
+    console.log('📜 Testing Status 3: History Only (Real Data)');
+    try {
+        const response = await fetch('/api/prizes');
+        const data = await response.json();
+        console.log('Real API data for Status 3:', data);
+        
+        // Force Status 3 by simulating no active or upcoming
+        const modifiedData = {
+            ...data,
+            current: [],
+            upcoming: []
+        };
+        renderSophisticatedStatus3(modifiedData, document.getElementById('prize-hub'));
+    } catch (error) {
+        console.error('Error loading Status 3:', error);
+    }
 }
 
 window.testRealData = function() {
