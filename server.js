@@ -934,11 +934,11 @@ async function handleApiRequest(req, res, pathname, method) {
                 .order('start_date', { ascending: true })
                 .limit(3);
 
-            // Get historical competitions with winners
+            // Get historical competitions with winners BY STATUS
             const { data: historyComps } = await supabase
                 .from('competitions')
                 .select(`*, winners(*)`)
-                .lt('end_date', now)
+                .eq('status', 'completed')
                 .order('end_date', { ascending: false })
                 .limit(5);
 
