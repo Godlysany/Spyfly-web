@@ -1081,7 +1081,7 @@ async function handleApiRequest(req, res, pathname, method) {
                 .from('participants')
                 .select('*')
                 .eq('competition_id', competitionId)
-                .order('rank', { ascending: true });
+                .order('created_at', { ascending: true });
                 
             if (participantsError) throw participantsError;
             
