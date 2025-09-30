@@ -289,6 +289,18 @@ async function handleApiRequest(req, res, pathname, method) {
             
             if (error) throw error;
             
+            // Get participant counts for all competitions
+            const { data: participantCounts } = await supabase
+                .from('participants')
+                .select('competition_id');
+            
+            const countMap = {};
+            if (participantCounts) {
+                participantCounts.forEach(p => {
+                    countMap[p.competition_id] = (countMap[p.competition_id] || 0) + 1;
+                });
+            }
+            
             // Transform data to match frontend expectations
             const transformed = competitions.map(comp => {
                 // Convert prize_breakdown array to prize_structure object
@@ -314,7 +326,7 @@ async function handleApiRequest(req, res, pathname, method) {
                     prize_structure: prizeStructure,
                     created_at: comp.created_at,
                     updated_at: comp.updated_at,
-                    participant_count: comp.participant_count || 0
+                    participant_count: countMap[comp.id] || 0
                 };
             });
             
@@ -897,12 +909,11 @@ async function handleApiRequest(req, res, pathname, method) {
             res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
             const now = new Date().toISOString();
             
-            // Get current active competition
+            // Get current active competition BY STATUS (not dates)
             const { data: currentComp } = await supabase
                 .from('competitions')
                 .select(`*, prize_breakdown(*)`)
-                .lte('start_date', now)
-                .gte('end_date', now)
+                .eq('status', 'active')
                 .limit(1)
                 .maybeSingle();
             
