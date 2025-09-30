@@ -47,7 +47,39 @@ A modern, interactive website for SpyFly, a fictional bot that scrapes alpha cal
 └── .github/workflows/ # GitHub Actions for staging deployment
 ```
 
-## Recent Changes (Sept 29, 2025)
+## Recent Changes (Sept 30, 2025)
+### Critical Bug Fixes - Post Security Audit Regressions
+- ✅ **Fixed API Data Mapping Issues**:
+  - Resolved competition data loading failure - table was empty despite database having data
+  - Added data transformation layer in server.js to map database columns to frontend expectations
+  - Database: `competition_type` → Frontend: `type`
+  - Database: `total_prize_pool` → Frontend: `prize_pool`
+  - Database: `prize_breakdown` (table) → Frontend: `prize_structure` (JSON object)
+  - Fixed GET /api/competitions, POST /api/competitions, and PUT /api/competitions/:id endpoints
+
+- ✅ **Restored Automatic Prize Allocation**:
+  - Added automatic prize calculator with 3 preset distributions:
+    - Top 3: 50%, 30%, 20% split
+    - Top 5: 40%, 25%, 20%, 10%, 5% split
+    - Top 10: Top-heavy distribution (35%, 20%, 15%, 10%, 8%, 5%, 3%, 2%, 1%, 1%)
+  - Calculator validates prize pool amount before generating structure
+  - Manual JSON editing still available for custom distributions
+
+- ✅ **Fixed Statistics Tab UI Integration**:
+  - Fixed $NaN display issue by adding parseFloat() for prize pool calculations
+  - Fixed "undefined" competition type by adding fallback to 'unknown'
+  - Fixed winners count by using correct database column `payment_status` instead of `status`
+  - Added proper error handling and fallback values (0) for all statistics
+  - Fixed unique users calculation using wallet address deduplication
+  - Added credentials to winners API call for authentication
+
+- ✅ **Fixed Authentication Redirect Loop**:
+  - Changed redirects to absolute paths (e.g., '/admin.html' instead of 'admin.html')
+  - Used window.location.replace() to prevent back button issues
+  - Wrapped checkAuth() in DOMContentLoaded event to ensure cookie is processed before auth check
+  - Fixed cookie timing issue that caused infinite redirects between login and admin pages
+
+## Previous Updates (Sept 29, 2025)
 ### Complete Competition Lifecycle Management - 5-Tab Modal System
 - ✅ **Competition Detail Modal - 5 Comprehensive Tabs**:
   1. **Overview Tab** (Default):
