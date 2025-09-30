@@ -706,6 +706,7 @@ async function handleApiRequest(req, res, pathname, method) {
 
         // Get leaderboard stats and data
         if (pathname === '/api/leaderboard' && method === 'GET') {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
             const { data: leaderboardData } = await supabase
                 .from('leaderboard_data')
                 .select('*')
@@ -893,6 +894,7 @@ async function handleApiRequest(req, res, pathname, method) {
 
         // Get current prize data (for frontend)
         if (pathname === '/api/prizes' && method === 'GET') {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
             const now = new Date().toISOString();
             
             // Get current active competition
