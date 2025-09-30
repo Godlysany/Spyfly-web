@@ -76,15 +76,27 @@ const server = http.createServer(async (req, res) => {
 
 // Authentication helper functions
 async function verifyAdminToken(req) {
-    // Extract token from HttpOnly cookie
-    const cookies = req.headers.cookie || '';
-    const tokenMatch = cookies.match(/admin_token=([^;]+)/);
+    let token = null;
     
-    if (!tokenMatch) {
+    // First check Authorization header (for Railway/localStorage compatibility)
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+    }
+    
+    // Fallback to HttpOnly cookie
+    if (!token) {
+        const cookies = req.headers.cookie || '';
+        const tokenMatch = cookies.match(/admin_token=([^;]+)/);
+        if (tokenMatch) {
+            token = tokenMatch[1];
+        }
+    }
+    
+    if (!token) {
         return null;
     }
     
-    const token = tokenMatch[1];
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         const { data: admin, error } = await supabase
