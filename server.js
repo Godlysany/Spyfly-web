@@ -263,12 +263,42 @@ async function handleApiRequest(req, res, pathname, method) {
         if (pathname === '/api/competitions' && method === 'GET') {
             const { data: competitions, error } = await supabase
                 .from('competitions')
-                .select(`*, prize_breakdown(*)`)
+                .select(`*, prize_breakdown(place, prize_amount)`)
                 .order('start_date', { ascending: false });
             
             if (error) throw error;
+            
+            // Transform data to match frontend expectations
+            const transformed = competitions.map(comp => {
+                // Convert prize_breakdown array to prize_structure object
+                const prizeStructure = {};
+                if (comp.prize_breakdown && comp.prize_breakdown.length > 0) {
+                    comp.prize_breakdown.forEach(pb => {
+                        prizeStructure[pb.place] = pb.prize_amount;
+                    });
+                }
+                
+                return {
+                    id: comp.id,
+                    title: comp.title,
+                    description: comp.description,
+                    type: comp.competition_type,
+                    period: comp.period,
+                    start_date: comp.start_date,
+                    end_date: comp.end_date,
+                    prize_pool: comp.total_prize_pool,
+                    entry_requirements: comp.entry_requirements,
+                    rules: comp.rules,
+                    status: comp.status,
+                    prize_structure: prizeStructure,
+                    created_at: comp.created_at,
+                    updated_at: comp.updated_at,
+                    participant_count: comp.participant_count || 0
+                };
+            });
+            
             res.writeHead(200);
-            res.end(JSON.stringify(competitions));
+            res.end(JSON.stringify(transformed));
             return;
         }
 
@@ -282,32 +312,47 @@ async function handleApiRequest(req, res, pathname, method) {
             }
             
             const body = await getRequestBody(req);
-            const comp = JSON.parse(body);
+            const frontendData = JSON.parse(body);
             
-            // Extract prize breakdown if provided
-            const prizeBreakdown = comp.prize_breakdown;
-            delete comp.prize_breakdown; // Remove from competition object
+            // Transform frontend data to database format
+            const dbComp = {
+                id: frontendData.id,
+                title: frontendData.title,
+                description: frontendData.description,
+                competition_type: frontendData.type,
+                period: frontendData.period,
+                start_date: frontendData.start_date,
+                end_date: frontendData.end_date,
+                total_prize_pool: frontendData.prize_pool,
+                entry_requirements: frontendData.entry_requirements,
+                rules: frontendData.rules,
+                status: frontendData.status || 'draft'
+            };
             
             const { data, error } = await supabase
                 .from('competitions')
-                .insert([comp])
+                .insert([dbComp])
                 .select();
             
             if (error) throw error;
             
-            // Add prize breakdown if provided
-            if (prizeBreakdown && prizeBreakdown.length > 0) {
-                const breakdownInserts = prizeBreakdown.map(breakdown => ({
+            // Add prize breakdown from prize_structure object
+            const prizeStructure = frontendData.prize_structure;
+            if (prizeStructure && typeof prizeStructure === 'object') {
+                const breakdownInserts = Object.entries(prizeStructure).map(([place, amount]) => ({
                     competition_id: data[0].id,
-                    ...breakdown
+                    place: parseInt(place),
+                    prize_amount: parseFloat(amount)
                 }));
                 
-                const { error: breakdownError } = await supabase
-                    .from('prize_breakdown')
-                    .insert(breakdownInserts);
-                    
-                if (breakdownError) {
-                    console.error('Prize breakdown insert error:', breakdownError);
+                if (breakdownInserts.length > 0) {
+                    const { error: breakdownError } = await supabase
+                        .from('prize_breakdown')
+                        .insert(breakdownInserts);
+                        
+                    if (breakdownError) {
+                        console.error('Prize breakdown insert error:', breakdownError);
+                    }
                 }
             }
             
@@ -812,14 +857,26 @@ async function handleApiRequest(req, res, pathname, method) {
             
             const competitionId = pathname.split('/')[3];
             const body = await getRequestBody(req);
-            const updateData = JSON.parse(body);
+            const frontendData = JSON.parse(body);
             
-            // Update timestamp
-            updateData.updated_at = new Date().toISOString();
+            // Transform frontend data to database format
+            const dbUpdate = {
+                title: frontendData.title,
+                description: frontendData.description,
+                competition_type: frontendData.type,
+                period: frontendData.period,
+                start_date: frontendData.start_date,
+                end_date: frontendData.end_date,
+                total_prize_pool: frontendData.prize_pool,
+                entry_requirements: frontendData.entry_requirements,
+                rules: frontendData.rules,
+                status: frontendData.status,
+                updated_at: new Date().toISOString()
+            };
             
             const { data, error } = await supabase
                 .from('competitions')
-                .update(updateData)
+                .update(dbUpdate)
                 .eq('id', competitionId)
                 .select();
                 
@@ -829,6 +886,28 @@ async function handleApiRequest(req, res, pathname, method) {
                 res.writeHead(404);
                 res.end(JSON.stringify({ error: 'Competition not found' }));
                 return;
+            }
+            
+            // Update prize breakdown if provided
+            if (frontendData.prize_structure && typeof frontendData.prize_structure === 'object') {
+                // Delete existing prize breakdown
+                await supabase
+                    .from('prize_breakdown')
+                    .delete()
+                    .eq('competition_id', competitionId);
+                
+                // Insert new prize breakdown
+                const breakdownInserts = Object.entries(frontendData.prize_structure).map(([place, amount]) => ({
+                    competition_id: competitionId,
+                    place: parseInt(place),
+                    prize_amount: parseFloat(amount)
+                }));
+                
+                if (breakdownInserts.length > 0) {
+                    await supabase
+                        .from('prize_breakdown')
+                        .insert(breakdownInserts);
+                }
             }
             
             res.writeHead(200);
