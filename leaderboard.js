@@ -2157,9 +2157,36 @@ function getPlaceEmoji(place) {
 }
 
 function initLeaderboardInteractivity() {
-    const periodButtons = document.querySelectorAll('.period-btn');
+    const periodSelector = document.querySelector('.period-selector');
     const metricSelect = document.getElementById('metric-select');
     const leaderboardData = document.getElementById('leaderboard-data');
+    let activeCompetitionData = null;
+
+    // Load active competition and inject tab
+    async function loadActiveCompetitionTab() {
+        try {
+            const response = await fetch('/api/competitions');
+            const competitions = await response.json();
+            
+            const activeComp = competitions.find(comp => comp.status === 'active');
+            
+            if (activeComp) {
+                activeCompetitionData = activeComp;
+                
+                const activeBtn = document.createElement('button');
+                activeBtn.className = 'period-btn active';
+                activeBtn.dataset.period = 'active';
+                activeBtn.textContent = activeComp.period || activeComp.title;
+                
+                periodSelector.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+                periodSelector.insertBefore(activeBtn, periodSelector.firstChild);
+                
+                console.log('✅ Active competition tab added:', activeComp.period || activeComp.title);
+            }
+        } catch (error) {
+            console.error('❌ Error loading active competition:', error);
+        }
+    }
 
     // Load real leaderboard stats
     async function loadLeaderboardStats() {
@@ -2190,7 +2217,11 @@ function initLeaderboardInteractivity() {
         }
     }
     
-    // Load stats on init
+    // Load active competition tab and stats on init
+    loadActiveCompetitionTab().then(() => {
+        setupEventListeners();
+        updateLeaderboard();
+    });
     loadLeaderboardStats();
 
     // Sample data structure for different periods and metrics
@@ -2266,28 +2297,33 @@ function initLeaderboardInteractivity() {
         }
     };
 
-    let currentPeriod = 'weekly';
+    let currentPeriod = 'active';
     let currentMetric = 'pnl';
 
-    // Period button event listeners
-    periodButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Remove active class from all buttons
-            periodButtons.forEach(btn => btn.classList.remove('active'));
-            // Add active class to clicked button
-            this.classList.add('active');
-            
-            currentPeriod = this.dataset.period;
-            updateLeaderboard();
+    // Setup event listeners (called after dynamic tab injection)
+    function setupEventListeners() {
+        const periodButtons = document.querySelectorAll('.period-btn');
+        
+        // Period button event listeners
+        periodButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                periodButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                currentPeriod = this.dataset.period;
+                updateLeaderboard();
+            });
         });
-    });
 
-    // Metric selector event listener
-    if (metricSelect) {
-        metricSelect.addEventListener('change', function() {
-            currentMetric = this.value;
-            updateLeaderboard();
-        });
+        // Metric selector event listener
+        if (metricSelect) {
+            metricSelect.addEventListener('change', function() {
+                currentMetric = this.value;
+                updateLeaderboard();
+            });
+        }
     }
 
     // The sophisticated view function is now defined globally
@@ -2297,77 +2333,102 @@ function initLeaderboardInteractivity() {
     async function updateLeaderboard() {
         if (!leaderboardData) return;
         
-        try {
-            // Fetch real competition data from API
-            const response = await fetch('/api/prizes');
-            const prizeData = await response.json();
-            
-            // Get current active competition participants
-            const currentComp = prizeData.current && prizeData.current.length > 0 ? prizeData.current[0] : null;
-            
-            if (!currentComp || !currentComp.participants || currentComp.participants.length === 0) {
-                // Show graceful empty state
+        if (currentPeriod === 'active') {
+            try {
+                const response = await fetch('/api/prizes');
+                const prizeData = await response.json();
+                const currentComp = prizeData.current && prizeData.current.length > 0 ? prizeData.current[0] : null;
+                
+                if (!currentComp || !currentComp.participants || currentComp.participants.length === 0) {
+                    leaderboardData.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 60px 20px; color: #666;">
+                                <div style="font-size: 48px; margin-bottom: 20px;">📊</div>
+                                <div style="font-size: 18px; margin-bottom: 10px; color: #2DD47F;">No Active Competition</div>
+                                <div style="font-size: 14px;">Join the next championship to see live rankings here!</div>
+                                <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary" style="margin-top: 20px; display: inline-block;">🚀 Join Bot</a>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                const sortedParticipants = [...currentComp.participants].sort((a, b) => (b.score || 0) - (a.score || 0));
+                leaderboardData.innerHTML = '';
+                
+                sortedParticipants.forEach((participant, index) => {
+                    const row = document.createElement('tr');
+                    const rankClass = index < 3 ? `rank-${index + 1}` : '';
+                    row.className = rankClass;
+                    
+                    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+                    const medalSpan = medal ? `<span class="rank-medal">${medal}</span> ` : '';
+                    
+                    let scoreDisplay = '+$' + (participant.score || 0).toLocaleString();
+                    if (currentComp.competition_type === 'Volume') {
+                        scoreDisplay = '$' + ((participant.score || 0) / 1000).toFixed(1) + 'K';
+                    } else if (currentComp.competition_type === 'Win Rate') {
+                        scoreDisplay = ((participant.score || 0) * 100).toFixed(1) + '%';
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${medalSpan}${index + 1}</td>
+                        <td class="trader-cell">
+                            <div class="trader-info">
+                                <span class="username">@${participant.username || 'Anonymous'}</span>
+                            </div>
+                        </td>
+                        <td class="pnl positive">${scoreDisplay}</td>
+                        <td class="volume">-</td>
+                        <td class="winrate">-</td>
+                        <td>-</td>
+                        <td class="best-trade">-</td>
+                    `;
+                    
+                    leaderboardData.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
                 leaderboardData.innerHTML = `
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 60px 20px; color: #666;">
-                            <div style="font-size: 48px; margin-bottom: 20px;">📊</div>
-                            <div style="font-size: 18px; margin-bottom: 10px; color: #2DD47F;">No Active Competition</div>
-                            <div style="font-size: 14px;">Join the next championship to see live rankings here!</div>
-                            <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary" style="margin-top: 20px; display: inline-block;">🚀 Join Bot</a>
+                        <td colspan="7" style="text-align: center; padding: 40px 20px; color: #ff6b6b;">
+                            <div style="font-size: 36px; margin-bottom: 15px;">⚠️</div>
+                            <div>Failed to load leaderboard data. Please try again later.</div>
                         </td>
                     </tr>
                 `;
-                return;
             }
+        } else {
+            const data = leaderboardSampleData[currentPeriod][currentMetric];
+            if (!data) return;
             
-            // Sort participants by score (descending)
-            const sortedParticipants = [...currentComp.participants].sort((a, b) => (b.score || 0) - (a.score || 0));
-            
-            // Clear and populate table
             leaderboardData.innerHTML = '';
-            
-            sortedParticipants.forEach((participant, index) => {
+            data.forEach(entry => {
                 const row = document.createElement('tr');
-                const rankClass = index < 3 ? `rank-${index + 1}` : '';
+                const rankClass = entry.rank <= 3 ? `rank-${entry.rank}` : '';
                 row.className = rankClass;
                 
-                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+                const medal = entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : '';
                 const medalSpan = medal ? `<span class="rank-medal">${medal}</span> ` : '';
-                
-                // Format score based on competition type
-                let scoreDisplay = '+$' + (participant.score || 0).toLocaleString();
-                if (currentComp.competition_type === 'Volume') {
-                    scoreDisplay = '$' + ((participant.score || 0) / 1000).toFixed(1) + 'K';
-                } else if (currentComp.competition_type === 'Win Rate') {
-                    scoreDisplay = ((participant.score || 0) * 100).toFixed(1) + '%';
-                }
+                const badgeHtml = entry.badge ? `<span class="badge ${entry.badge}">${entry.badge.toUpperCase()}</span>` : '';
                 
                 row.innerHTML = `
-                    <td>${medalSpan}${index + 1}</td>
+                    <td>${medalSpan}${entry.rank}</td>
                     <td class="trader-cell">
                         <div class="trader-info">
-                            <span class="username">@${participant.username || 'Anonymous'}</span>
+                            <span class="username">${entry.username}</span>
+                            ${badgeHtml}
                         </div>
                     </td>
-                    <td class="pnl positive">${scoreDisplay}</td>
-                    <td class="volume">-</td>
-                    <td class="winrate">-</td>
-                    <td>-</td>
-                    <td class="best-trade">-</td>
+                    <td class="pnl positive">${entry.pnl}</td>
+                    <td class="volume">${entry.volume}</td>
+                    <td class="winrate">${entry.winrate}</td>
+                    <td>${entry.trades}</td>
+                    <td class="best-trade">${entry.bestTrade}</td>
                 `;
                 
                 leaderboardData.appendChild(row);
             });
-        } catch (error) {
-            console.error('Error loading leaderboard:', error);
-            leaderboardData.innerHTML = `
-                <tr>
-                    <td colspan="7" style="text-align: center; padding: 40px 20px; color: #ff6b6b;">
-                        <div style="font-size: 36px; margin-bottom: 15px;">⚠️</div>
-                        <div>Failed to load leaderboard data. Please try again later.</div>
-                    </td>
-                </tr>
-            `;
         }
     }
 

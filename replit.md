@@ -4,11 +4,26 @@
 SpyFly is a full-stack web application for a fictional bot that scrapes alpha calls from Solana meme caller groups. The website provides a modern, interactive experience with a sleek dark theme, animated elements, a sophisticated leaderboard system, and a production-ready prize management CMS. Its core purpose is to showcase competition data, manage prizes, and display historical performance, targeting the Solana meme coin trading community.
 
 ### Recent Changes
+**September 30, 2025 - Dynamic Leaderboard Tab + Critical Fixes**
+- **Dynamic Active Competition Tab**: Implemented intelligent tab injection system
+  - Automatically detects active competitions via `/api/competitions`
+  - Dynamically creates and injects tab with competition period/title as first tab
+  - Makes active competition tab primary/selected by default
+  - Users see their real-time ranking within the active competition immediately
+  - Gracefully handles absence of active competition (shows sample data)
+  - Other tabs (Weekly, Monthly, All Time) display sample/historical data
+- **Critical Admin Fix**: Resolved duplicate `const now` declaration in admin.html (line 769)
+  - Admin authentication now works correctly without syntax errors
+  - Successfully logs in with admin/admin123 credentials
+- **Prize Breakdown Layout**: Enhanced CSS for consistent appearance across STATUS 1 & 2
+  - Added flexbox layout with proper spacing and min-height
+  - Fixed layout issues between active and completed competition views
+
 **September 30, 2025 - Test Data Population Session**
 - **Test Data Populated**: Database now has comprehensive test data for all views
-  - 1 active competition (October P&L Championship) with 44 participants
-  - 2 completed competitions (September Volume + August Win Rate) with 11 total winners
-  - $36,400 total prize money distributed across all competitions
+  - 1 active competition (October P&L Championship) with 8 participants
+  - 2 completed competitions (September Volume + August Win Rate) with 9 total winners
+  - $33,000 total prize pool across all competitions
 - **Data Management Tools**: Created `populate-test-data.js` script and `flush-test-data.sql` for easy test data management
 - **Cache Control**: Added `Cache-Control: no-cache` headers to `/api/prizes` and `/api/leaderboard` endpoints
 - **Documentation**: Created `TEST_DATA_SUMMARY.md` with complete test data inventory and flush instructions
