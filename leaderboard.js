@@ -942,7 +942,7 @@ function renderSophisticatedStatus1(data, prizeHub) {
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-icon">🏆</div>
-                            <div class="kpi-value">${stats.total_competitions || historyData.length || 3}</div>
+                            <div class="kpi-value">${historyData.length || 0}</div>
                             <div class="kpi-label">Championships Finished</div>
                         </div>
                         <div class="kpi-card highlight">
@@ -1226,7 +1226,7 @@ function renderSophisticatedStatus2(data, prizeHub) {
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-icon">🏆</div>
-                            <div class="kpi-value">${stats.total_competitions || historyData.length || 3}</div>
+                            <div class="kpi-value">${historyData.length || 0}</div>
                             <div class="kpi-label">Championships Finished</div>
                         </div>
                         <div class="kpi-card highlight">
@@ -1368,7 +1368,7 @@ function renderSophisticatedStatus3(data, prizeHub) {
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-icon">🏆</div>
-                            <div class="kpi-value">${stats.total_competitions || historyData.length || 3}</div>
+                            <div class="kpi-value">${historyData.length || 0}</div>
                             <div class="kpi-label">Championships Finished</div>
                         </div>
                         <div class="kpi-card highlight">
@@ -2303,14 +2303,40 @@ function initLeaderboardInteractivity() {
     // The sophisticated view function is now defined globally
 
 
-    // Function to update leaderboard table
-    function updateLeaderboard() {
-        const data = leaderboardSampleData[currentPeriod][currentMetric];
+    // Function to update leaderboard table with real data from API
+    async function updateLeaderboard() {
+        if (!leaderboardData) return;
         
-        if (leaderboardData && data) {
+        try {
+            // Fetch real competition data from API
+            const response = await fetch('/api/prizes');
+            const prizeData = await response.json();
+            
+            // Get current active competition participants
+            const currentComp = prizeData.current && prizeData.current.length > 0 ? prizeData.current[0] : null;
+            
+            if (!currentComp || !currentComp.participants || currentComp.participants.length === 0) {
+                // Show graceful empty state
+                leaderboardData.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 60px 20px; color: #666;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">📊</div>
+                            <div style="font-size: 18px; margin-bottom: 10px; color: #2DD47F;">No Active Competition</div>
+                            <div style="font-size: 14px;">Join the next championship to see live rankings here!</div>
+                            <a href="https://t.me/spyflyappbot" target="_blank" class="btn btn-primary" style="margin-top: 20px; display: inline-block;">🚀 Join Bot</a>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Sort participants by score (descending)
+            const sortedParticipants = [...currentComp.participants].sort((a, b) => (b.score || 0) - (a.score || 0));
+            
+            // Clear and populate table
             leaderboardData.innerHTML = '';
             
-            data.forEach((trader, index) => {
+            sortedParticipants.forEach((participant, index) => {
                 const row = document.createElement('tr');
                 const rankClass = index < 3 ? `rank-${index + 1}` : '';
                 row.className = rankClass;
@@ -2318,28 +2344,40 @@ function initLeaderboardInteractivity() {
                 const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
                 const medalSpan = medal ? `<span class="rank-medal">${medal}</span> ` : '';
                 
-                const badgeHtml = trader.badge ? `<span class="badge ${trader.badge}">${trader.badge === 'premium' ? 'GENESIS' : 'VIP'}</span>` : '';
-                
-                const winrateClass = parseFloat(trader.winrate) >= 90 ? 'excellent' : 
-                                   parseFloat(trader.winrate) >= 80 ? 'good' : 'average';
+                // Format score based on competition type
+                let scoreDisplay = '+$' + (participant.score || 0).toLocaleString();
+                if (currentComp.competition_type === 'Volume') {
+                    scoreDisplay = '$' + ((participant.score || 0) / 1000).toFixed(1) + 'K';
+                } else if (currentComp.competition_type === 'Win Rate') {
+                    scoreDisplay = ((participant.score || 0) * 100).toFixed(1) + '%';
+                }
                 
                 row.innerHTML = `
-                    <td>${medalSpan}${trader.rank}</td>
+                    <td>${medalSpan}${index + 1}</td>
                     <td class="trader-cell">
                         <div class="trader-info">
-                            <span class="username">${trader.username}</span>
-                            ${badgeHtml}
+                            <span class="username">@${participant.username || 'Anonymous'}</span>
                         </div>
                     </td>
-                    <td class="pnl positive">${trader.pnl}</td>
-                    <td class="volume">${trader.volume}</td>
-                    <td class="winrate ${winrateClass}">${trader.winrate}</td>
-                    <td>${trader.trades}</td>
-                    <td class="best-trade">${trader.bestTrade}</td>
+                    <td class="pnl positive">${scoreDisplay}</td>
+                    <td class="volume">-</td>
+                    <td class="winrate">-</td>
+                    <td>-</td>
+                    <td class="best-trade">-</td>
                 `;
                 
                 leaderboardData.appendChild(row);
             });
+        } catch (error) {
+            console.error('Error loading leaderboard:', error);
+            leaderboardData.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px 20px; color: #ff6b6b;">
+                        <div style="font-size: 36px; margin-bottom: 15px;">⚠️</div>
+                        <div>Failed to load leaderboard data. Please try again later.</div>
+                    </td>
+                </tr>
+            `;
         }
     }
 

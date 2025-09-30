@@ -793,6 +793,15 @@ async function handleApiRequest(req, res, pathname, method) {
                 .gte('end_date', now)
                 .limit(1)
                 .maybeSingle();
+            
+            // Fetch participants for current competition if it exists
+            if (currentComp) {
+                const { data: currentParticipants } = await supabase
+                    .from('participants')
+                    .select('*')
+                    .eq('competition_id', currentComp.id);
+                currentComp.participants = currentParticipants || [];
+            }
 
             // Get upcoming competitions (multiple to show variety)
             const { data: upcomingComps } = await supabase
