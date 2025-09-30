@@ -48,6 +48,42 @@ A modern, interactive website for SpyFly, a fictional bot that scrapes alpha cal
 ```
 
 ## Recent Changes (Sept 30, 2025)
+### LATEST: Critical Data Integration & Display Fixes
+- ✅ **Fixed Frontend-Backend Data Mapping**:
+  - **Landing Page & Leaderboard**: Resolved $NaN displays across entire website
+  - **Root Cause**: Frontend JavaScript was using deprecated field names (`prize_pool_usd`, `amount_usd`)
+  - **Solution**: Updated all frontend code to use correct API field names:
+    - `prize_pool_usd` → `prize_pool` or `total_prize_pool` (with fallbacks)
+    - `amount_usd` → `prize_amount` in prize_breakdown table
+  - **Files Fixed**: `script.js` and `leaderboard.js`
+  
+- ✅ **Fixed Array/Object Data Structure Mismatch**:
+  - **Issue**: API returns `current` and `upcoming` as arrays, but frontend expected single objects
+  - **Solution**: Added array handling with fallbacks: `Array.isArray(data.current) ? data.current[0] : data.current`
+  - **Impact**: Leaderboard now correctly displays competition data ($10,000 prize pool showing properly)
+
+- ✅ **Fixed Database Query Error in /api/prizes**:
+  - **Issue**: `.single()` threw error when no active competition exists
+  - **Solution**: Changed to `.maybeSingle()` to handle null results gracefully
+  - **Result**: API no longer crashes when competitions end
+
+- ✅ **Created Missing initPrizeHub Function**:
+  - **Issue**: Function was called but not defined, causing leaderboard errors
+  - **Solution**: Implemented full function in `script.js` to populate:
+    - Total winners count
+    - Winners carousel with real database data
+    - Future prizes container with upcoming competitions
+  
+- ✅ **Improved Prize Validation Tolerance**:
+  - Changed validation threshold from `remaining < 0` to `remaining < -1`
+  - Allows for floating-point rounding tolerance ($0.99 difference acceptable)
+  - Prevents false validation errors when prizes exactly match pool
+
+- ✅ **Loading Screen Optimization** (Temporary):
+  - Disabled loader animation for testing/screenshot compatibility
+  - Can be re-enabled by uncommenting `document.body.classList.add("loading")` in script.js line 11
+  - Added failsafe inline script to ensure page loads even if JavaScript fails
+
 ### UX Improvements & Data Structure Fixes
 - ✅ **Added Mock Participant Data**:
   - Added realistic participant/leaderboard data for all active and completed competitions

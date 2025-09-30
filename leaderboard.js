@@ -2393,22 +2393,25 @@ function updateCurrentPrizeSection(data) {
     
     if (!section || !data.current) return;
     
-    const current = data.current;
+    // Handle array from API (current is returned as an array)
+    const current = Array.isArray(data.current) ? data.current[0] : data.current;
+    if (!current) return;
     
     title.textContent = current.title;
+    const prizeAmount = current.prize_pool || current.total_prize_pool || 0;
     pool.textContent = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-    }).format(current.prize_pool_usd);
+    }).format(prizeAmount);
     
     // Generate breakdown
     if (current.prize_breakdown && current.prize_breakdown.length > 0) {
         breakdown.innerHTML = current.prize_breakdown.map(item => `
             <div class="breakdown-item">
                 <div class="breakdown-place">${item.place}${getPlaceSuffix(item.place)}</div>
-                <div class="breakdown-amount">$${item.amount_usd.toLocaleString()}</div>
+                <div class="breakdown-amount">$${(item.prize_amount || item.amount_usd || 0).toLocaleString()}</div>
             </div>
         `).join('');
     } else {
@@ -2416,15 +2419,15 @@ function updateCurrentPrizeSection(data) {
         breakdown.innerHTML = `
             <div class="breakdown-item">
                 <div class="breakdown-place">1st</div>
-                <div class="breakdown-amount">$${Math.floor(current.prize_pool_usd * 0.5).toLocaleString()}</div>
+                <div class="breakdown-amount">$${Math.floor(prizeAmount * 0.5).toLocaleString()}</div>
             </div>
             <div class="breakdown-item">
                 <div class="breakdown-place">2nd</div>
-                <div class="breakdown-amount">$${Math.floor(current.prize_pool_usd * 0.3).toLocaleString()}</div>
+                <div class="breakdown-amount">$${Math.floor(prizeAmount * 0.3).toLocaleString()}</div>
             </div>
             <div class="breakdown-item">
                 <div class="breakdown-place">3rd</div>
-                <div class="breakdown-amount">$${Math.floor(current.prize_pool_usd * 0.2).toLocaleString()}</div>
+                <div class="breakdown-amount">$${Math.floor(prizeAmount * 0.2).toLocaleString()}</div>
             </div>
         `;
     }
@@ -2442,11 +2445,14 @@ function updateFuturePrizesSection(data) {
     
     if (!section || !data.upcoming) return;
     
-    const upcoming = data.upcoming;
+    // Handle array from API (upcoming is returned as an array)
+    const upcoming = Array.isArray(data.upcoming) ? data.upcoming[0] : data.upcoming;
+    if (!upcoming) return;
+    const upcomingAmount = upcoming.prize_pool || upcoming.total_prize_pool || 0;
     container.innerHTML = `
         <div class="future-prize-card">
             <h4>${upcoming.title}</h4>
-            <div class="future-pool">$${upcoming.prize_pool_usd.toLocaleString()} Prize Pool</div>
+            <div class="future-pool">$${upcomingAmount.toLocaleString()} Prize Pool</div>
             <div class="future-start">Starts ${new Date(upcoming.start_date).toLocaleDateString()}</div>
             <a href="${upcoming.cta_link}" class="btn btn-secondary">${upcoming.cta_text}</a>
         </div>

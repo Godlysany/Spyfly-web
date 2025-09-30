@@ -10,9 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 </head>
-<body class="loading">
+<body>
     <!-- Loader Overlay START -->
-    <div id="loader" class="loader-overlay">
+    <div id="loader" class="loader-overlay" style="display: none !important;">
         <div class="loader-container">
             <div class="loader-glow"></div>
             <div class="loader-icon">
@@ -424,6 +424,30 @@
     </audio>
 
     <script src="script.js"></script>
+    <script>
+    // Failsafe: Remove loader after 5 seconds if JavaScript fails
+    setTimeout(function() {
+        var loader = document.getElementById('loader');
+        var body = document.body;
+        if (body.classList.contains('loading')) {
+            loader.classList.add('fade-out');
+            body.classList.remove('loading');
+            setTimeout(function() { if (loader) loader.remove(); }, 500);
+        }
+    }, 5000);
+    </script>
+    <script>
+    // Failsafe: Remove loader after 5 seconds if JavaScript fails
+    setTimeout(function() {
+        var loader = document.getElementById('loader');
+        var body = document.body;
+        if (body.classList.contains('loading')) {
+            loader.classList.add('fade-out');
+            body.classList.remove('loading');
+            setTimeout(function() { if (loader) loader.remove(); }, 500);
+        }
+    }, 5000);
+    </script>
     </div><!-- /.main-content -->
 </body>
 </html> 

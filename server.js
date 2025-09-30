@@ -792,7 +792,7 @@ async function handleApiRequest(req, res, pathname, method) {
                 .lte('start_date', now)
                 .gte('end_date', now)
                 .limit(1)
-                .single();
+                .maybeSingle();
 
             // Get upcoming competitions (multiple to show variety)
             const { data: upcomingComps } = await supabase

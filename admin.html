@@ -981,8 +981,8 @@
             progressBar.style.width = `${Math.min(percentage, 100)}%`;
             progressBar.style.background = percentage > 100 ? '#ff6b6b' : 'var(--primary-color)';
 
-            // Show warning if over budget
-            if (remaining < 0) {
+            // Visual warning only if significantly over budget (more than $1 difference due to rounding)
+            if (remaining < -1) {
                 showMessage(`⚠️ Prize allocation exceeds pool by $${Math.abs(remaining).toLocaleString()}`, 'error');
             }
         }

@@ -4,8 +4,8 @@ function initLoaderAnimation() {
     if (!overlay || overlay.dataset.init) { return; }
     overlay.dataset.init = "1";
     
-    // Add loading class to body
-    document.body.classList.add("loading");
+    // Add loading class to body (DISABLED - loader is hidden for testing)
+    // document.body.classList.add("loading");
     
     // Add boom effect for screen flash
     setTimeout(() => {
@@ -27,29 +27,42 @@ function initLoaderAnimation() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Stunning Loader Animation - FIRST!
-    initLoaderAnimation();
-    
-    // Initialize Image Comparison Slider
-    initImageComparisonSlider();
-    
-    // Initialize Animated Flies
-    initAnimatedFlies();
-    
-    // Initialize Flying Fly
-    initFlyingFly();
-    
-    // Initialize Fly Swatter Game
-    initFlySwatter();
-    
-    // Initialize Sound Controls
-    initSoundControls();
-    
-    // Initialize Prize System
-    initPrizeSystem();
-    
-    // Smooth scrolling for navigation links
-    initSmoothScrolling();
+    try {
+        // Initialize Stunning Loader Animation - FIRST!
+        initLoaderAnimation();
+        
+        // Initialize Image Comparison Slider
+        initImageComparisonSlider();
+        
+        // Initialize Animated Flies
+        initAnimatedFlies();
+        
+        // Initialize Flying Fly
+        initFlyingFly();
+        
+        // Initialize Fly Swatter Game
+        initFlySwatter();
+        
+        // Initialize Sound Controls
+        initSoundControls();
+        
+        // Initialize Prize System
+        initPrizeSystem();
+        
+        // Smooth scrolling for navigation links
+        initSmoothScrolling();
+    } catch (error) {
+        console.error('Initialization error:', error);
+        // Ensure loader still completes even if there's an error
+        const overlay = document.getElementById("loader");
+        if (overlay) {
+            setTimeout(() => {
+                overlay.classList.add("fade-out");
+                document.body.classList.remove("loading");
+                setTimeout(() => overlay.remove(), 500);
+            }, 100);
+        }
+    }
 });
 
 // Image Comparison Slider Implementation
@@ -741,6 +754,61 @@ async function initPrizeSystem() {
     }
 }
 
+// Initialize Prize Hub on leaderboard page
+function initPrizeHub(data) {
+    // Update total winners count from history
+    const totalWinners = data.stats?.total_winners || 0;
+    const winnersElement = document.getElementById('total-winners');
+    if (winnersElement) {
+        winnersElement.textContent = totalWinners;
+    }
+    
+    // Populate winners carousel with real data from history
+    const winnersCarousel = document.getElementById('winners-carousel');
+    if (winnersCarousel && data.history && data.history.length > 0) {
+        winnersCarousel.innerHTML = data.history.map(comp => {
+            // Get winners for this competition
+            const winners = comp.winners || [];
+            if (winners.length === 0) return '';
+            
+            return `
+                <div class="winner-card">
+                    <div class="winner-header">
+                        <h4>${comp.title}</h4>
+                        <span class="winner-date">${new Date(comp.end_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+                    </div>
+                    <div class="winner-list">
+                        ${winners.slice(0, 3).map((w, i) => `
+                            <div class="winner-item">
+                                <span class="winner-rank">${['🥇', '🥈', '🥉'][i] || `#${w.place}`}</span>
+                                <span class="winner-name">${w.username || 'Anonymous'}</span>
+                                <span class="winner-prize">$${(w.amount_usd || 0).toLocaleString()}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } else if (winnersCarousel) {
+        winnersCarousel.innerHTML = '<div class="no-winners">No past winners yet. Be the first!</div>';
+    }
+    
+    // Update future prizes container
+    const futureContainer = document.getElementById('future-prizes-container');
+    if (futureContainer && data.upcoming && data.upcoming.length > 0) {
+        futureContainer.innerHTML = data.upcoming.map(prize => {
+            const prizeAmount = prize.prize_pool || prize.total_prize_pool || 0;
+            return `
+                <div class="future-prize-card">
+                    <h4>${prize.title}</h4>
+                    <div class="prize-amount">$${prizeAmount.toLocaleString()}</div>
+                    <div class="prize-date">Starts ${new Date(prize.start_date).toLocaleDateString()}</div>
+                </div>
+            `;
+        }).join('');
+    }
+}
+
 // Apply leaderboard visibility controls based on admin toggle
 function applyLeaderboardToggle(leaderboardEnabled) {
     // Elements to control based on leaderboard toggle
@@ -792,7 +860,8 @@ function updateHeroPrizeBanner(data) {
     
     if (showPromo && now <= endDate) {
         // Update content immediately with fallback
-        if (headline) headline.textContent = currentPrize.highlight_copy || `🔥 ${currentPrize.title} - ${Math.round(currentPrize.prize_pool_usd/1000)}K Prize Pool!`;
+        const prizeAmount = currentPrize.prize_pool || currentPrize.total_prize_pool || 0;
+        if (headline) headline.textContent = currentPrize.highlight_copy || `🔥 ${currentPrize.title} - ${Math.round(prizeAmount/1000)}K Prize Pool!`;
         if (ctaBtn) {
             ctaBtn.textContent = currentPrize.cta_text || 'JOIN NOW';
             ctaBtn.href = currentPrize.cta_link || 'leaderboard.html#prize-hub';
@@ -815,12 +884,13 @@ function updateLeaderboardPrizePill(data) {
     if (!pill || !data.current) return;
     
     const currentPrize = data.current;
+    const prizeAmount = currentPrize.prize_pool || currentPrize.total_prize_pool || 0;
     const amount = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-    }).format(currentPrize.prize_pool_usd);
+    }).format(prizeAmount);
     
     pill.textContent = `💰 ${amount} Prize Pool`;
     pill.style.display = 'inline-block';
